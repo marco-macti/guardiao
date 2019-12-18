@@ -6,7 +6,8 @@ class HomeController extends Controller
 {
 
     public function index(){
-        phpinfo();
+       echo "AQUI";
+       die;
     }
 
     public function importarBCProdutoAux(){
