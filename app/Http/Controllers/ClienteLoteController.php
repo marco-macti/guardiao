@@ -18,7 +18,7 @@ class ClienteLoteController extends Controller
         foreach ($produtos as $index => $produto) {
 
             $produtoBC = DB::select("SELECT
-                                                pc.*,
+                                                bcp.*,
                                                 bcp.nome as base_comparativa_nome,
                                                 bcgtin.gtin as base_comparativa_gtin,
                                                 pcicms.aliquota as base_comparativa_icms_aliquota,
@@ -43,7 +43,7 @@ class ClienteLoteController extends Controller
                 $produtos[$index]->base_comparativa_tributado_4     = empty($produtoBC->tributado_4) ? 'N/A' : $produtoBC->tributado_4;
                 $produtos[$index]->base_comparativa_cnae_clase      = empty($produtoBC->cnae_classe_fk_id) ? 'N/A' : $produtoBC->cnae_classe_fk_id;
                 $produtos[$index]->base_comparativa_cnae            = empty($produtoBC->ncm_fk_id) ? 'N/A' : $produtoBC->ncm_fk_id  ;
-                $produtos[$index]->base_comparativa_icms_aliquota   = (empty($produtoBC->base_comparativa_icms_aliquota) || is_null($produtoBC->base_comparativa_icms_aliquota)) ? 'N/A' : $retBuscaByGTIN->base_comparativa_icms_aliquota;
+                $produtos[$index]->base_comparativa_icms_aliquota   = (empty($produtoBC->base_comparativa_icms_aliquota) || is_null($produtoBC->base_comparativa_icms_aliquota)) ? 'N/A' : $produtoBC->base_comparativa_icms_aliquota;
                 $produtos[$index]->base_comparativa_icms_possui_st  = empty($produtoBC->base_comparativa_icms_possui_st) ? 'N/A' : $produtoBC->base_comparativa_icms_possui_st;
                 $produtos[$index]->base_comparativa_cofins_aliquota = empty($produtoBC->base_comparativa_cofins_aliquota) ? 'N/A' : $produtoBC->base_comparativa_cofins_aliquota;
                 $produtos[$index]->base_comparativa_cofins_cst      = empty($produtoBC->base_comparativa_cofins_cst) ? 'N/A' : $produtoBC->base_comparativa_cofins_cst;
@@ -85,7 +85,7 @@ class ClienteLoteController extends Controller
             }
 
             header('Content-Type: text/csv');
-            header("Content-Disposition: attachment; filename=Relatorio_lote_{$lote_fk_id}.csv");
+            header("Content-Disposition: attachment; filename=Relatorio_lote_{$loteId}.csv");
 
             $fp = fopen('php://output', 'wb');
 

@@ -13,3 +13,5 @@
 
 Route::get('/','HomeController@index');
 Route::get('/relatorio-lote/{lote}','ClienteLoteController@relatorioLote');
+Route::get('/importar-bc-produto-aux','HomeController@importarBCProdutoAux');
+
