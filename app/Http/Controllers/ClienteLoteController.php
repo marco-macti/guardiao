@@ -191,6 +191,8 @@ class ClienteLoteController extends Controller
 
         echo "Quantidade de Itens do Lote : ".count($produtos);
         echo "<br/>";
+        echo "--------------------------------------------------------------------------------------------------------------------";
+        echo "<br/>";
 
         foreach ($produtos as $index => $produto) {
 
@@ -221,6 +223,8 @@ class ClienteLoteController extends Controller
             if(isset($produtoBC[0])){
                 echo "GTIN ".$produto->gtin.' -  encontrado na base comparativa';
                 echo "<br/>";
+                echo "--------------------------------------------------------------------------------------------------------------------";
+                echo "<br/>";
             }else{
 
                 // Se caso o produto não existir na base comparativa , tenta uma consulta no cosmos
@@ -250,8 +254,13 @@ class ClienteLoteController extends Controller
                     if(empty($produtoBCAux)){
                         echo "GTIN ".$produto->gtin.' não encontrado em nenhuma das bases.';
                         echo "<br/>";
+                        echo "--------------------------------------------------------------------------------------------------------------------";
+                        echo "<br/>";
+
                     }else{
                         echo "GTIN ".$produto->gtin.' encontrado na base auxiliar:';
+                        echo "<br/>";
+                        echo "--------------------------------------------------------------------------------------------------------------------";
                         echo "<br/>";
 //                        echo "<pre>";
 //                        print_r($produtoBCAux);
@@ -266,52 +275,56 @@ class ClienteLoteController extends Controller
 
                     if(is_object($object)){
 
-                        echo "GTIN ".$produto->gtin.' encontrado no cosmos.';
-                        echo "<br/>";
+//                        echo "GTIN ".$produto->gtin.' encontrado no cosmos.';
+//                        echo "<br/>";
+//                        echo "--------------------------------------------------------------------------------------------------------------------";
+//                        echo "<br/>";
 //                        echo "<pre>";
 //                        print_r($object);
 //                        echo "<br/>";
-//
-//                        try {
-//
-//                            $gtin  = BCProdutoGtin::where('gtin','=',$produto->gtin)->get();
-//
-//                            if(count($gtin) == 0){
-//
-//                                $newProdutoBC = BCProduto::create([
-//                                    'status'        => '',
-//                                    'nome'          => "$object->description",
-//                                    'descricao'     => "$object->description",
-//                                    'preco_medio'   => "$object->avg_price",
-//                                    'preco_maximo'  => "$object->max_price",
-//                                    'thumbnail'     => "$object->thumbnail",
-//                                    'altura'        => "$object->height",
-//                                    'largura'       => "$object->width",
-//                                    'comprimento'   => "$object->length",
-//                                    'peso_liquido'  => "$object->net_weight",
-//                                    'cest_fk_id'    => isset($object->cest->code) ? $object->cest->code : 1 ,
-//                                    'gpc_fk_id'     => isset($object->gpc->code) ? $object->gpc->code : 1,
-//                                    'ncm_fk_id'     => isset($object->ncm->code) ? $object->ncm->code : 1
-//                                ]);
-//
-//                                $newProdutoBCGtin = BCProdutoGtin::create([
-//                                    'gtin'             => $object->gtin,
-//                                    'bc_produto_fk_id' => $newProdutoBC->id
-//                                ]);
-//                            }
-//
-//                        }catch (\PDOException $e){
-//                            echo $e->getMessage();
-//                            die;
-//                        }
+
+                        try {
+
+                            $gtin  = BCProdutoGtin::where('gtin','=',$produto->gtin)->get();
+
+                            if(count($gtin) == 0){
+
+                                $newProdutoBC = BCProduto::create([
+                                    'status'        => "",
+                                    'nome'          => "$object->description",
+                                    'descricao'     => "$object->description",
+                                    'preco_medio'   => isset($object->avg_price) ? $object->avg_price : 0 ,
+                                    'preco_maximo'  => isset($object->max_price) ? $object->max_price : 0 ,
+                                    'thumbnail'     => "$object->thumbnail",
+                                    'altura'        => isset($object->height) ? $object->height : 0,
+                                    'largura'       => isset($object->width) ? $object->width : 0,
+                                    'comprimento'   => isset($object->length) ? $object->length : 0,
+                                    'peso_liquido'  => isset($object->net_weight) ? $object->net_weight : 0,
+                                    'cest_fk_id'    => isset($object->cest->code) ? $object->cest->code : 1 ,
+                                    'gpc_fk_id'     => isset($object->gpc->code) ? $object->gpc->code : 1,
+                                    'ncm_fk_id'     => isset($object->ncm->code) ? $object->ncm->code : "$produto->ncm"
+                                ]);
+
+                                $newProdutoBCGtin = BCProdutoGtin::create([
+                                    'gtin'             => $object->gtin,
+                                    'bc_produto_fk_id' => $newProdutoBC->id
+                                ]);
+
+                                echo "GTIN ".$produto->gtin." inserido na base com sucesso!";
+                                echo "<br/>";
+                            }
+
+                        }catch (\PDOException $e){
+                            echo $e->getMessage();
+                            die;
+                        }
                     }
                 }
 
                 curl_close($curl);
 
             }
-            echo "--------------------------------------------------------------------------------------------------------------------";
-            echo "<br/>";
+
         }
     }
 }
