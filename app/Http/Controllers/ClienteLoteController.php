@@ -63,7 +63,6 @@ class ClienteLoteController extends Controller
                     var_dump(curl_error($curl));
                 } else {
 
-
                     $object = json_decode($data);
 
                     if(is_object($object)){
@@ -72,9 +71,13 @@ class ClienteLoteController extends Controller
 
                         try {
 
-                            $gtin  = BCProdutoGtin::where('gtin','=',$object->gtin)->get();
+                            $gtin  = BCProdutoGtin::where('gtin','=',$produto->gtin)->get();
 
                             if(count($gtin) == 0){
+
+                                echo "<pre>";
+
+                                dd($object);
 
                                 $newProdutoBC = BCProduto::create([
                                     'status'        => '',
@@ -92,10 +95,15 @@ class ClienteLoteController extends Controller
                                     'ncm_fk_id'     => isset($object->ncm->code) ? $object->ncm->code : 1
                                 ]);
 
+                                print_r($newProdutoBC);
+
                                 $newProdutoBCGtin = BCProdutoGtin::create([
                                     'gtin'             => $object->gtin,
                                     'bc_produto_fk_id' => $newProdutoBC->id
                                 ]);
+
+                                print_r($newProdutoBCGtin);
+                                die;
                                 echo "GTIN ".$produto->gtin.' encontrado no COSMOS e inserido na base de dados.';
                                 echo "<br/>";
                                 echo "Incidências:".count($gtin);
@@ -122,117 +130,6 @@ class ClienteLoteController extends Controller
 
                 curl_close($curl);
 
-                // Se não encontrar o produto na base comparativa , procura na base auxiliar
-
-                //$produtoAux = BCProdutoAux::where('gtin_fk_id','=',$produto->gtin)->first();
-
-                //if(is_object($produtoAux)){
-
-                  //  echo "GTIN ".$produto->gtin.' não foi encontrado na base comparativa , porém encontrado na base auxiliar';
-                  //  echo "<br/>";
-
-                   // print_r($produtoAux);
-
-//                    $newProdutoBC = BCProduto::create([
-//                        'status'        => '',
-//                        'nome'          => '',
-//                        'descricao'     => '',
-//                        'preco_medio'   => 0,
-//                        'preco_maximo'  => 0,
-//                        'thumbnail'     => '',
-//                        'altura'        => 0,
-//                        'largura'       => 0,
-//                        'comprimento'   => 0,
-//                        'peso_liquido'  => 0,
-//                        'cest_fk_id'    => 1,
-//                        'gpc_fk_id'     => 1,
-//                        'ncm_fk_id'     => ''
-//                    ]);
-
-//                    $newProdutoBCGtin = BCProdutoGtin::create([
-//                        '' =>
-//                    ]);
-
-               // }else{
-
-                    // Tenta uma consulta no cosmos
-
-//                    $url = 'https://api.cosmos.bluesoft.com.br/gtins/7891910000197.json';
-//                    $headers = array(
-//                        "Content-Type: application/json",
-//                        "X-Cosmos-Token: SJaFhcrcDrvFrwch5xPQvw"
-//                    );
-//
-//                    $curl = curl_init($url);
-//                    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-//                    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-//                    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-//                    curl_setopt($curl, CURLOPT_FAILONERROR, true);
-//
-//                    $data = curl_exec($curl);
-//                    if ($data === false || $data == NULL) {
-//                        var_dump(curl_error($curl));
-//                    } else {
-//
-//
-//                        $object = json_decode($data);
-//
-//                        if(is_object($object)){
-//
-//                        // Se não encontrar o produto na base comparativa , e nem na base auxiliar,  procura no cosmos
-//
-//                            try {
-//
-//                                $gtin  = BCProdutoGtin::where('gtin','=',$object->gtin)->get();
-//
-//                                if(count($gtin) == 0){
-//
-//                                    $newProdutoBC = BCProduto::create([
-//                                        'status'        => '',
-//                                        'nome'          => "$object->description",
-//                                        'descricao'     => "$object->description",
-//                                        'preco_medio'   => "$object->avg_price",
-//                                        'preco_maximo'  => "$object->max_price",
-//                                        'thumbnail'     => "$object->thumbnail",
-//                                        'altura'        => "$object->height",
-//                                        'largura'       => "$object->width",
-//                                        'comprimento'   => "$object->length",
-//                                        'peso_liquido'  => "$object->net_weight",
-//                                        'cest_fk_id'    => isset($object->cest->code) ? $object->cest->code : 1 ,
-//                                        'gpc_fk_id'     => isset($object->gpc->code) ? $object->gpc->code : 1,
-//                                        'ncm_fk_id'     => isset($object->ncm->code) ? $object->ncm->code : 1
-//                                    ]);
-//
-//                                    $newProdutoBCGtin = BCProdutoGtin::create([
-//                                        'gtin'             => $object->gtin,
-//                                        'bc_produto_fk_id' => $newProdutoBC->id
-//                                    ]);
-//                                    echo "GTIN ".$produto->gtin.' encontrado no COSMOS e inserido na base de dados.';
-//                                    echo "<br/>";
-//                                    echo "Incidências:".count($gtin);
-//                                    echo "<br/>";
-//                                }else{
-//                                    echo "GTIN ".$produto->gtin.' Já cadastrado na base de dados.';
-//                                    echo "<br/>";
-//                                    echo "Incidências:".count($gtin);
-//                                    echo "<br/>";
-//                                }
-//
-//                            }catch (\PDOException $e){
-//                                echo $e->getMessage();
-//                                die;
-//                            }
-//
-//
-//                        }else{
-//                            // Se não encontrar o produto na base comparativa , e nem na base auxiliar,  procura no cosmos
-//                            echo "GTIN ".$produto->gtin.' não foi encontrado em nenhuma das consultas disponíveis.';
-//                            echo "<br/>";
-//                        }
-//                    }
-//
-//                    curl_close($curl);
-
                 }
             }
 //            try{
@@ -253,8 +150,8 @@ class ClienteLoteController extends Controller
 //            }catch (PDOException $e){
 //                echo $e->getMessage();
 //            }
-        }
-die;
+        die;
+
         try{
 
             $data = array('CODIGO_DO_PRODUTO_NO_CLIENTE;NOME_DO_PRODUTO_NO_CLIENTE;NOME_PRODUTO_NA_BASE_COMPARATIVA;GTIN_NO_CLIENTE;GTIN_NA_BASE_COMPARATIVA;NCM_NO_CLIENTE;NCM_NA_BASE_COMPARATIVA;ALIQUOTA_ICMS_NO_CLIENTE;ALIQUOTA_ICMS_NA_BASE_COMPARATIVA;ALIQUOTA_PIS_NO_CLIENTE;ALIQUOTA_PIS_NA_BASE_COMPARATIVA;ALIQUOTA_COFINS_NO_CLIENTE;ALIQUOTA_COFINS_NA_BASE_COMPARATIVA;POSSUI_ST_NO_CLIENTE;POSSUI_ST_NA_BASE_COMPARATIVA;BASE_COMPARATIVA_PIS_CST;BASE_COMPARATIVA_COFINS_CST');
