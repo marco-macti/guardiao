@@ -46,13 +46,15 @@ class ClienteLoteController extends Controller
 
                 // Tenta uma consulta no cosmos
 
-                $url = 'https://api.cosmos.bluesoft.com.br/gtins/7891910000197.json';
+                $url = 'https://api.cosmos.bluesoft.com.br/gtins/'.$produto->gtin.'.json';
+
                 $headers = array(
                     "Content-Type: application/json",
                     "X-Cosmos-Token: SJaFhcrcDrvFrwch5xPQvw"
                 );
 
                 $curl = curl_init($url);
+
                 curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
                 curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -61,14 +63,14 @@ class ClienteLoteController extends Controller
                 $data = curl_exec($curl);
 
                 if ($data === false || $data == NULL) {
-                    var_dump(curl_error($curl));
+
+                    //var_dump(curl_error($curl));
+
                 } else {
 
                     $object = json_decode($data);
 
                     if(is_object($object)){
-
-                        // Se não encontrar o produto na base comparativa , e nem na base auxiliar,  procura no cosmos
 
                         try {
 
@@ -76,7 +78,6 @@ class ClienteLoteController extends Controller
 
                             if(count($gtin) == 0){
 
-                                // Criar
                                 $newProdutoBC = BCProduto::create([
                                     'status'        => '',
                                     'nome'          => "$object->description",
@@ -93,32 +94,16 @@ class ClienteLoteController extends Controller
                                     'ncm_fk_id'     => isset($object->ncm->code) ? $object->ncm->code : 1
                                 ]);
 
-                                print_r($newProdutoBC);
-
                                 $newProdutoBCGtin = BCProdutoGtin::create([
                                     'gtin'             => $object->gtin,
                                     'bc_produto_fk_id' => $newProdutoBC->id
                                 ]);
-
-                                print_r($newProdutoBCGtin);
-                                die;
-                                echo "GTIN ".$produto->gtin.' encontrado no COSMOS e inserido na base de dados.';
-                                echo "<br/>";
-                                echo "Incidências:".count($gtin);
-                                echo "<br/>";
-                            }else{
-                                echo "GTIN ".$produto->gtin.' Já cadastrado na base de dados.';
-                                echo "<br/>";
-                                echo "Incidências:".count($gtin);
-                                echo "<br/>";
                             }
 
                         }catch (\PDOException $e){
                             echo $e->getMessage();
                             die;
                         }
-
-
                     }else{
                         // Se não encontrar o produto na base comparativa , e nem na base auxiliar,  procura no cosmos
                         echo "GTIN ".$produto->gtin.' não foi encontrado em nenhuma das consultas disponíveis.';

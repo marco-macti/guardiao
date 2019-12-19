@@ -8,8 +8,8 @@ $db_user = 'postgres';
 $db_name = 'guardiao_bkp';
 $db_pass = 'Gsv2019!';
 
-//$path = "C:\\wamp64\\www\\br.com.guardiaotributario\\storage\\app\\public\\bc_produto_aux\\tbl_eans_780.json";
-$path = "/home/wwgree/www/orion/greensignal/sistemas/guardiao/public/tbl_eans_780.json";
+$path = "C:\\wamp64\\www\\br.com.guardiaotributario\\storage\\app\\public\\bc_produto_aux\\tbl_eans_780.json";
+//$path = "/home/wwgree/www/orion/greensignal/sistemas/guardiao/public/tbl_eans_780.json";
 
 $dsn = "pgsql:host=$db_host;port=5432;dbname=$db_name;user=$db_user;password=$db_pass";
 
