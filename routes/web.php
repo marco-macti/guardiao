@@ -14,5 +14,6 @@
 Route::get('/','HomeController@index');
 Route::get('/relatorio-lote/{lote}','ClienteLoteController@relatorioLote');
 Route::get('/sincronizar-lote/{lote}','ClienteLoteController@sincronizarLote');
+Route::get('/consulta-cosmos/{gtin}','ClienteLoteController@consultaCosmos');
 Route::get('/importar-bc-produto-aux','HomeController@importarBCProdutoAux');
 
