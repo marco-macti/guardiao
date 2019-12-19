@@ -254,12 +254,51 @@ class ClienteLoteController extends Controller
                                                     <td>Não</td>
                                                 </tr>";
 
-//                        echo "GTIN ".$produto->gtin.' encontrado na base auxiliar:';
-//                        echo "<br/>";
-//                        echo "--------------------------------------------------------------------------------------------------------------------";
-//                        echo "<br/>";
-
                     }else{
+
+                        try {
+
+                            $gtin  = BCProdutoGtin::where('gtin','=',$produto->gtin)->get();
+
+                            if(count($gtin) == 0){
+
+                                $newProdutoBC = BCProduto::create([
+                                    'status'        => "",
+                                    'nome'          => "$produto->seu_nome",
+                                    'descricao'     => "$produto->description",
+                                    'preco_medio'   => 0 ,
+                                    'preco_maximo'  => 0 ,
+                                    'thumbnail'     => "",
+                                    'altura'        => 0,
+                                    'largura'       => 0,
+                                    'comprimento'   => 0,
+                                    'peso_liquido'  => 0,
+                                    'cest_fk_id'    => 1 ,
+                                    'gpc_fk_id'     => 1,
+                                    'ncm_fk_id'     => $produto->ncm
+                                ]);
+
+                                $newProdutoBCGtin = BCProdutoGtin::create([
+                                    'gtin'             => $produto->gtin,
+                                    'bc_produto_fk_id' => $newProdutoBC->id
+                                ]);
+
+                                $ncm = isset($object->ncm->code) ? $object->ncm->code : "$produto->ncm";
+
+                                $produtosNaoEncontrados.= "<tr>
+                                                    <td>{$object->gtin}</td>
+                                                    <td>{$ncm}</td>
+                                                    <td>{$object->description}</td>
+                                                    <td>Base do Cliente</td>
+                                                    <td>Sim</td>
+                                                </tr>";
+
+                            }
+
+                        }catch (\PDOException $e){
+                            echo $e->getMessage();
+                            die;
+                        }
 
                         $produtosNaoEncontrados.= "<tr>
                                                     <td>{$produto->gtin}</td>
@@ -269,10 +308,6 @@ class ClienteLoteController extends Controller
                                                     <td>Não</td>
                                                 </tr>";
 
-//                        echo "GTIN ".$produto->gtin.' não encontrado em nenhuma das bases.';
-//                        echo "<br/>";
-//                        echo "--------------------------------------------------------------------------------------------------------------------";
-//                        echo "<br/>";
                     }
 
                 } else {
