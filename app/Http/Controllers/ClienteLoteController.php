@@ -193,6 +193,8 @@ class ClienteLoteController extends Controller
                                         <th>GTIN</th>
                                         <th>NCM</th>
                                         <th>Nome do Produto</th>
+                                        <th>Origem</th>
+                                        <th>Está cadastrado na base?</th>
                                       </tr>";
 
         foreach ($produtos as $index => $produto) {
@@ -218,103 +220,114 @@ class ClienteLoteController extends Controller
             // Verifica se o produto está na base comparativa
             if(!isset($produtoBC[0])){
 
-                $produtosNaoEncontrados.= "<tr>
-                                    <td>{$produto->gtin}</td>
-                                    <td>{$produto->ncm}</td>
-                                    <td>{$produto->seu_nome}</td>
-                                </tr>";
-
                 // Se caso o produto não existir na base comparativa , tenta uma consulta no cosmos
 
-//                $url = 'https://api.cosmos.bluesoft.com.br/gtins/'.$produto->gtin.'.json';
-//
-//                $headers = array(
-//                    "Content-Type: application/json",
-//                    "X-Cosmos-Token: SJaFhcrcDrvFrwch5xPQvw"
-//                );
-//
-//                $curl = curl_init($url);
-//
-//                curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-//                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-//                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-//                curl_setopt($curl, CURLOPT_FAILONERROR, true);
-//
-//                $data = curl_exec($curl);
+                $url = 'https://api.cosmos.bluesoft.com.br/gtins/'.$produto->gtin.'.json';
 
-//                if ($data === false || $data == NULL) {
-//
-//                    // Na impossibilidade de encontrar o produto no cosmos , ele tenta o ultimo local que é a Base Comparativa Auxiliar.
-//
-//                    $produtoBCAux = BCProdutoAux::where('gtin_fk_id','=',$produto->gtin)->first();
-//
-//                    if(!empty($produtoBCAux)){
-//
+                $headers = array(
+                    "Content-Type: application/json",
+                    "X-Cosmos-Token: SJaFhcrcDrvFrwch5xPQvw"
+                );
+
+                $curl = curl_init($url);
+
+                curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl, CURLOPT_FAILONERROR, true);
+
+                $data = curl_exec($curl);
+
+                if ($data === false || $data == NULL) {
+
+                    // Na impossibilidade de encontrar o produto no cosmos , ele tenta o ultimo local que é a Base Comparativa Auxiliar.
+
+                    $produtoBCAux = BCProdutoAux::where('gtin_fk_id','=',$produto->gtin)->first();
+
+                    if(!empty($produtoBCAux)){
+
+                        $produtosNaoEncontrados.= "<tr>
+                                                    <td>{$produto->gtin}</td>
+                                                    <td>{$produto->ncm}</td>
+                                                    <td>{$produto->seu_nome}</td>
+                                                    <td>Base Auxiliar</td>
+                                                    <td>Não</td>
+                                                </tr>";
+
 //                        echo "GTIN ".$produto->gtin.' encontrado na base auxiliar:';
 //                        echo "<br/>";
 //                        echo "--------------------------------------------------------------------------------------------------------------------";
 //                        echo "<br/>";
-//
-//                    }else{
-//
+
+                    }else{
+
+                        $produtosNaoEncontrados.= "<tr>
+                                                    <td>{$produto->gtin}</td>
+                                                    <td>{$produto->ncm}</td>
+                                                    <td>{$produto->seu_nome}</td>
+                                                    <td>Nenhuma</td>
+                                                    <td>Não</td>
+                                                </tr>";
+
 //                        echo "GTIN ".$produto->gtin.' não encontrado em nenhuma das bases.';
 //                        echo "<br/>";
 //                        echo "--------------------------------------------------------------------------------------------------------------------";
 //                        echo "<br/>";
-//                    }
-//
-//                } else {
-//
-//                    $object = json_decode($data);
-//
-//                    if(is_object($object)){
-//
-//                        try {
-//
-//                            $gtin  = BCProdutoGtin::where('gtin','=',$produto->gtin)->get();
-//
-//                            if(count($gtin) == 0){
-//
-//                                $newProdutoBC = BCProduto::create([
-//                                    'status'        => "",
-//                                    'nome'          => "$object->description",
-//                                    'descricao'     => "$object->description",
-//                                    'preco_medio'   => isset($object->avg_price) ? $object->avg_price : 0 ,
-//                                    'preco_maximo'  => isset($object->max_price) ? $object->max_price : 0 ,
-//                                    'thumbnail'     => "$object->thumbnail",
-//                                    'altura'        => isset($object->height) ? $object->height : 0,
-//                                    'largura'       => isset($object->width) ? $object->width : 0,
-//                                    'comprimento'   => isset($object->length) ? $object->length : 0,
-//                                    'peso_liquido'  => isset($object->net_weight) ? $object->net_weight : 0,
-//                                    'cest_fk_id'    => isset($object->cest->code) ? $object->cest->code : 1 ,
-//                                    'gpc_fk_id'     => isset($object->gpc->code) ? $object->gpc->code : 1,
-//                                    'ncm_fk_id'     => isset($object->ncm->code) ? $object->ncm->code : "$produto->ncm"
-//                                ]);
-//
-//                                $newProdutoBCGtin = BCProdutoGtin::create([
-//                                    'gtin'             => $object->gtin,
-//                                    'bc_produto_fk_id' => $newProdutoBC->id
-//                                ]);
-//
-//                                $ncm = isset($object->ncm->code) ? $object->ncm->code : "$produto->ncm";
-//
-//                                $tableCosmos.= "<tr>
-//                                                    <td>Sim</td>
-//                                                    <td>{$object->gtin}</td>
-//                                                    <td>{$object->description}</td>
-//                                                    <td>{$ncm}</td>
-//                                                </tr>";
-//
-//                            }
-//
-//                        }catch (\PDOException $e){
-//                            echo $e->getMessage();
-//                            die;
-//                        }
-//                    }
-//                }
-//
-//                curl_close($curl);
+                    }
+
+                } else {
+
+                    $object = json_decode($data);
+
+                    if(is_object($object)){
+
+                        try {
+
+                            $gtin  = BCProdutoGtin::where('gtin','=',$produto->gtin)->get();
+
+                            if(count($gtin) == 0){
+
+                                $newProdutoBC = BCProduto::create([
+                                    'status'        => "",
+                                    'nome'          => "$object->description",
+                                    'descricao'     => "$object->description",
+                                    'preco_medio'   => isset($object->avg_price) ? $object->avg_price : 0 ,
+                                    'preco_maximo'  => isset($object->max_price) ? $object->max_price : 0 ,
+                                    'thumbnail'     => "$object->thumbnail",
+                                    'altura'        => isset($object->height) ? $object->height : 0,
+                                    'largura'       => isset($object->width) ? $object->width : 0,
+                                    'comprimento'   => isset($object->length) ? $object->length : 0,
+                                    'peso_liquido'  => isset($object->net_weight) ? $object->net_weight : 0,
+                                    'cest_fk_id'    => isset($object->cest->code) ? $object->cest->code : 1 ,
+                                    'gpc_fk_id'     => isset($object->gpc->code) ? $object->gpc->code : 1,
+                                    'ncm_fk_id'     => isset($object->ncm->code) ? $object->ncm->code : "$produto->ncm"
+                                ]);
+
+                                $newProdutoBCGtin = BCProdutoGtin::create([
+                                    'gtin'             => $object->gtin,
+                                    'bc_produto_fk_id' => $newProdutoBC->id
+                                ]);
+
+                                $ncm = isset($object->ncm->code) ? $object->ncm->code : "$produto->ncm";
+
+                                $produtosNaoEncontrados.= "<tr>
+                                                    <td>{$object->gtin}</td>
+                                                    <td>{$ncm}</td>
+                                                    <td>{$object->description}</td>
+                                                    <td>Cosmos</td>
+                                                    <td>Sim</td>
+                                                </tr>";
+
+                            }
+
+                        }catch (\PDOException $e){
+                            echo $e->getMessage();
+                            die;
+                        }
+                    }
+                }
+
+                curl_close($curl);
 
             }
         }
