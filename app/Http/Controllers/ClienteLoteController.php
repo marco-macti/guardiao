@@ -310,16 +310,7 @@ class ClienteLoteController extends Controller
                         }catch (\PDOException $e){
                             echo $e->getMessage();
                             die;
-                        }
-
-                        $produtosNaoEncontrados.= "<tr>
-                                                    <td>{$produto->gtin}</td>
-                                                    <td>{$produto->ncm}</td>
-                                                    <td>{$produto->seu_nome}</td>
-                                                    <td>Nenhuma</td>
-                                                    <td>Não</td>
-                                                </tr>";
-
+                        }   
                     }
 
                 } else {
