@@ -265,7 +265,7 @@ class ClienteLoteController extends Controller
                                 $newProdutoBC = BCProduto::create([
                                     'status'        => "",
                                     'nome'          => "$produto->seu_nome",
-                                    'descricao'     => "$produto->description",
+                                    'descricao'     => "$produto->seu_nome",
                                     'preco_medio'   => 0 ,
                                     'preco_maximo'  => 0 ,
                                     'thumbnail'     => "",
@@ -283,12 +283,10 @@ class ClienteLoteController extends Controller
                                     'bc_produto_fk_id' => $newProdutoBC->id
                                 ]);
 
-                                $ncm = isset($object->ncm->code) ? $object->ncm->code : "$produto->ncm";
-
                                 $produtosNaoEncontrados.= "<tr>
-                                                    <td>{$object->gtin}</td>
-                                                    <td>{$ncm}</td>
-                                                    <td>{$object->description}</td>
+                                                    <td>{$produto->gtin}</td>
+                                                    <td>{$produto->ncm}</td>
+                                                    <td>{$produto->seu_nome}</td>
                                                     <td>Base do Cliente</td>
                                                     <td>Sim</td>
                                                 </tr>";
