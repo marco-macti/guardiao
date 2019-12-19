@@ -6,6 +6,7 @@ use App\BCProduto;
 use App\BCProdutoAux;
 use App\BCProdutoGtin;
 use App\ClienteLote;
+use App\Ncm;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -262,35 +263,48 @@ class ClienteLoteController extends Controller
 
                             if(count($gtin) == 0){
 
-                                $newProdutoBC = BCProduto::create([
-                                    'status'        => "",
-                                    'nome'          => "$produto->seu_nome",
-                                    'descricao'     => "$produto->seu_nome",
-                                    'preco_medio'   => 0 ,
-                                    'preco_maximo'  => 0 ,
-                                    'thumbnail'     => "",
-                                    'altura'        => 0,
-                                    'largura'       => 0,
-                                    'comprimento'   => 0,
-                                    'peso_liquido'  => 0,
-                                    'cest_fk_id'    => 1 ,
-                                    'gpc_fk_id'     => 1,
-                                    'ncm_fk_id'     => $produto->ncm
-                                ]);
+                                $ncm = Ncm::where('cod_ncm','=',$produto->ncm)->get();
 
-                                $newProdutoBCGtin = BCProdutoGtin::create([
-                                    'gtin'             => $produto->gtin,
-                                    'bc_produto_fk_id' => $newProdutoBC->id
-                                ]);
+                                if(count($ncm) > 0){
+                                    $newProdutoBC = BCProduto::create([
+                                        'status'        => "",
+                                        'nome'          => "$produto->seu_nome",
+                                        'descricao'     => "$produto->seu_nome",
+                                        'preco_medio'   => 0 ,
+                                        'preco_maximo'  => 0 ,
+                                        'thumbnail'     => "",
+                                        'altura'        => 0,
+                                        'largura'       => 0,
+                                        'comprimento'   => 0,
+                                        'peso_liquido'  => 0,
+                                        'cest_fk_id'    => 1 ,
+                                        'gpc_fk_id'     => 1,
+                                        'ncm_fk_id'     => $produto->ncm
+                                    ]);
 
-                                $produtosNaoEncontrados.= "<tr>
+                                    $newProdutoBCGtin = BCProdutoGtin::create([
+                                        'gtin'             => $produto->gtin,
+                                        'bc_produto_fk_id' => $newProdutoBC->id
+                                    ]);
+
+                                    $produtosNaoEncontrados.= "<tr>
                                                     <td>{$produto->gtin}</td>
                                                     <td>{$produto->ncm}</td>
                                                     <td>{$produto->seu_nome}</td>
                                                     <td>Base do Cliente</td>
                                                     <td>Sim</td>
                                                 </tr>";
+                                }else{
 
+                                    $produtosNaoEncontrados.= "<tr>
+                                                    <td>{$produto->gtin}</td>
+                                                    <td>{$produto->ncm}</td>
+                                                    <td>{$produto->seu_nome}</td>
+                                                    <td>Base do Cliente</td>
+                                                    <td>Não</td>
+                                                </tr>";
+
+                                }
                             }
 
                         }catch (\PDOException $e){
