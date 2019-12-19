@@ -59,6 +59,7 @@ class ClienteLoteController extends Controller
                 curl_setopt($curl, CURLOPT_FAILONERROR, true);
 
                 $data = curl_exec($curl);
+
                 if ($data === false || $data == NULL) {
                     var_dump(curl_error($curl));
                 } else {
@@ -75,10 +76,7 @@ class ClienteLoteController extends Controller
 
                             if(count($gtin) == 0){
 
-                                echo "<pre>";
-
-                                dd($object);
-
+                                // Criar
                                 $newProdutoBC = BCProduto::create([
                                     'status'        => '',
                                     'nome'          => "$object->description",
@@ -201,5 +199,8 @@ class ClienteLoteController extends Controller
         }
 
         }
-
+    public function sincronizarLote($loteId){
+        echo $loteId;
+        die;
+    }
 }
