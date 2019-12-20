@@ -258,14 +258,20 @@ class ClienteLoteController extends Controller
                     }else{
 
                         try {
+                            if(count($produto->ncm) < 8){
+                                $ncmProduto = '0'.$produto->ncm;
+                            }else{
+                                $ncmProduto = $produto->ncm;
+                            }
 
-                            $gtin  = BCProdutoGtin::where('gtin','=',$produto->gtin)->get();
+                            $ncm = Ncm::where('cod_ncm','=',$ncmProduto)->get();
 
-                            if(count($gtin) == 0){
+                            if(count($ncm) > 0){
 
-                                $ncm = Ncm::where('cod_ncm','=',$produto->ncm)->get();
+                                $gtin  = BCProdutoGtin::where('gtin','=',$produto->gtin)->get();
 
-                                if(count($ncm) > 0){
+                                if(count($gtin) == 0){
+
                                     $newProdutoBC = BCProduto::create([
                                         'status'        => "",
                                         'nome'          => "$produto->seu_nome",
@@ -279,7 +285,7 @@ class ClienteLoteController extends Controller
                                         'peso_liquido'  => 0,
                                         'cest_fk_id'    => 1 ,
                                         'gpc_fk_id'     => 1,
-                                        'ncm_fk_id'     => $produto->ncm
+                                        'ncm_fk_id'     => $ncmProduto
                                     ]);
 
                                     $newProdutoBCGtin = BCProdutoGtin::create([
@@ -288,29 +294,38 @@ class ClienteLoteController extends Controller
                                     ]);
 
                                     $produtosNaoEncontrados.= "<tr>
-                                                    <td>{$produto->gtin}</td>
-                                                    <td>{$produto->ncm}</td>
-                                                    <td>{$produto->seu_nome}</td>
-                                                    <td>Base do Cliente</td>
-                                                    <td>Sim</td>
-                                                </tr>";
+                                                                <td>{$produto->gtin}</td>
+                                                                <td>{$ncmProduto}</td>
+                                                                <td>{$produto->seu_nome}</td>
+                                                                <td>Base do Cliente</td>
+                                                                <td>Sim</td>
+                                                            </tr>";
                                 }else{
 
                                     $produtosNaoEncontrados.= "<tr>
                                                     <td>{$produto->gtin}</td>
-                                                    <td>{$produto->ncm}</td>
+                                                    <td>{$ncmProduto}</td>
                                                     <td>{$produto->seu_nome}</td>
-                                                    <td>Base do Cliente</td>
-                                                    <td>Não</td>
+                                                    <td>Base Comparativa</td>
+                                                    <td>Sim</td>
                                                 </tr>";
 
                                 }
+                            }else{
+                                $produtosNaoEncontrados.= "<tr>
+                                                            <td>{$produto->gtin}</td>
+                                                            <td>{$ncmProduto}</td>
+                                                            <td>{$produto->seu_nome}</td>
+                                                            <td>Base do Cliente</td>
+                                                            <td>Não - NCM Inexistente</td>
+                                                        </tr>";
+
                             }
 
                         }catch (\PDOException $e){
                             echo $e->getMessage();
                             die;
-                        }   
+                        }
                     }
 
                 } else {

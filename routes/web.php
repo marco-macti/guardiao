@@ -11,9 +11,14 @@
 |
 */
 
-Route::get('/','HomeController@index');
-Route::get('/relatorio-lote/{lote}','ClienteLoteController@relatorioLote');
-Route::get('/sincronizar-lote/{lote}','ClienteLoteController@sincronizarLote');
-Route::get('/consulta-cosmos/{gtin}','ClienteLoteController@consultaCosmos');
-Route::get('/importar-bc-produto-aux','HomeController@importarBCProdutoAux');
+Route::get('/'                                     ,'HomeController@index');
+Route::get('/relatorio-lote/{lote}'                ,'ClienteLoteController@relatorioLote');
+Route::get('/sincronizar-lote/{lote}'              ,'ClienteLoteController@sincronizarLote');
+Route::get('/consulta-cosmos/{gtin}'               ,'ClienteLoteController@consultaCosmos');
+Route::get('/importar-bc-produto-aux'              ,'HomeController@importarBCProdutoAux');
+
+// Rotas Padronizadas com o sistema
+
+Route::get('/basecomparativa/produto/find/{produto}' ,'BCProdutoController@find');
+Route::get('/basecomparativa/produto/update/{produto}' ,'BCProdutoController@update');
 
