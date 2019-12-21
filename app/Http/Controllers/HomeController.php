@@ -6,8 +6,10 @@ class HomeController extends Controller
 {
 
     public function index(){
-       echo "AQUI";
-       die;
+        return response()->json([
+            'APP_NAME' => 'Guardiao Tributário',
+            'API_V'    => '0.0.1'
+        ]);
     }
 
     public function importarBCProdutoAux(){
