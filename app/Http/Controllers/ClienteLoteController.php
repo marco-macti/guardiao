@@ -258,7 +258,7 @@ class ClienteLoteController extends Controller
                     }else{
 
                         try {
-                            if(count($produto->ncm) < 8){
+                            if(strlen($produto->ncm) < 8){
                                 $ncmProduto = '0'.$produto->ncm;
                             }else{
                                 $ncmProduto = $produto->ncm;
