@@ -39,101 +39,26 @@ class ClienteLoteController extends Controller
                                                LEFT JOIN bc_perfilcontabil_pis pcpis ON pcpis.bc_perfil_contabil_fk_id = pc.id
                                             WHERE bcgtin.gtin = '{$produto->gtin}' AND pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id} ");
 
-            // Verifica se o produto está na base comparativa
-            if(isset($produtoBC[0])){
-                echo "GTIN ".$produto->gtin.' -  encontrado na base comparativa';
-                echo "<br/>";
-            }else{
 
-                // Tenta uma consulta no cosmos
+            try {
 
-                $url = 'https://api.cosmos.bluesoft.com.br/gtins/'.$produto->gtin.'.json';
+                $produtos[$index]->base_comparativa_nome = empty($produtoBC->base_comparativa_nome) ? 'N/A' : $produtoBC->base_comparativa_nome;
+                $produtos[$index]->base_comparativa_gtin = empty($produtoBC->base_comparativa_gtin) ? 'N/A' : $produtoBC->base_comparativa_gtin;
+                $produtos[$index]->base_comparativa_ncm = empty($produtoBC->ncm_fk_id) ? 'N/A' : $produtoBC->ncm_fk_id;
+                $produtos[$index]->base_comparativa_tributado_4 = empty($produtoBC->tributado_4) ? 'N/A' : $produtoBC->tributado_4;
+                $produtos[$index]->base_comparativa_cnae_clase = empty($produtoBC->cnae_classe_fk_id) ? 'N/A' : $produtoBC->cnae_classe_fk_id;
+                $produtos[$index]->base_comparativa_cnae = empty($produtoBC->ncm_fk_id) ? 'N/A' : $produtoBC->ncm_fk_id;
+                $produtos[$index]->base_comparativa_icms_aliquota = (empty($produtoBC->base_comparativa_icms_aliquota) || is_null($produtoBC->base_comparativa_icms_aliquota)) ? 'N/A' : $produtoBC->base_comparativa_icms_aliquota;
+                $produtos[$index]->base_comparativa_icms_possui_st = empty($produtoBC->base_comparativa_icms_possui_st) ? 'N/A' : $produtoBC->base_comparativa_icms_possui_st;
+                $produtos[$index]->base_comparativa_cofins_aliquota = empty($produtoBC->base_comparativa_cofins_aliquota) ? 'N/A' : $produtoBC->base_comparativa_cofins_aliquota;
+                $produtos[$index]->base_comparativa_cofins_cst = empty($produtoBC->base_comparativa_cofins_cst) ? 'N/A' : $produtoBC->base_comparativa_cofins_cst;
+                $produtos[$index]->base_comparativa_pis_aliquota = empty($produtoBC->base_comparativa_pis_aliquota) ? 'N/A' : $produtoBC->base_comparativa_pis_aliquota;
+                $produtos[$index]->base_comparativa_pis_cst = empty($produtoBC->base_comparativa_pis_cst) ? 'N/A' : $produtoBC->base_comparativa_pis_cst;
 
-                $headers = array(
-                    "Content-Type: application/json",
-                    "X-Cosmos-Token: SJaFhcrcDrvFrwch5xPQvw"
-                );
-
-                $curl = curl_init($url);
-
-                curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($curl, CURLOPT_FAILONERROR, true);
-
-                $data = curl_exec($curl);
-
-                if ($data === false || $data == NULL) {
-
-                    //var_dump(curl_error($curl));
-
-                } else {
-
-                    $object = json_decode($data);
-
-                    if(is_object($object)){
-
-                        try {
-
-                            $gtin  = BCProdutoGtin::where('gtin','=',$produto->gtin)->get();
-
-                            if(count($gtin) == 0){
-
-                                $newProdutoBC = BCProduto::create([
-                                    'status'        => '',
-                                    'nome'          => "$object->description",
-                                    'descricao'     => "$object->description",
-                                    'preco_medio'   => "$object->avg_price",
-                                    'preco_maximo'  => "$object->max_price",
-                                    'thumbnail'     => "$object->thumbnail",
-                                    'altura'        => "$object->height",
-                                    'largura'       => "$object->width",
-                                    'comprimento'   => "$object->length",
-                                    'peso_liquido'  => "$object->net_weight",
-                                    'cest_fk_id'    => isset($object->cest->code) ? $object->cest->code : 1 ,
-                                    'gpc_fk_id'     => isset($object->gpc->code) ? $object->gpc->code : 1,
-                                    'ncm_fk_id'     => isset($object->ncm->code) ? $object->ncm->code : 1
-                                ]);
-
-                                $newProdutoBCGtin = BCProdutoGtin::create([
-                                    'gtin'             => $object->gtin,
-                                    'bc_produto_fk_id' => $newProdutoBC->id
-                                ]);
-                            }
-
-                        }catch (\PDOException $e){
-                            echo $e->getMessage();
-                            die;
-                        }
-                    }else{
-                        // Se não encontrar o produto na base comparativa , e nem na base auxiliar,  procura no cosmos
-                        echo "GTIN ".$produto->gtin.' não foi encontrado em nenhuma das consultas disponíveis.';
-                        echo "<br/>";
-                    }
-                }
-
-                curl_close($curl);
-
-                }
+            } catch (PDOException $e) {
+                echo $e->getMessage();
             }
-//            try{
-//
-//                $produtos[$index]->base_comparativa_nome            = empty($produtoBC->base_comparativa_nome) ? 'N/A' : $produtoBC->base_comparativa_nome ;
-//                $produtos[$index]->base_comparativa_gtin            = empty($produtoBC->base_comparativa_gtin) ? 'N/A' : $produtoBC->base_comparativa_gtin;
-//                $produtos[$index]->base_comparativa_ncm             = empty($produtoBC->ncm_fk_id) ? 'N/A' : $produtoBC->ncm_fk_id;
-//                $produtos[$index]->base_comparativa_tributado_4     = empty($produtoBC->tributado_4) ? 'N/A' : $produtoBC->tributado_4;
-//                $produtos[$index]->base_comparativa_cnae_clase      = empty($produtoBC->cnae_classe_fk_id) ? 'N/A' : $produtoBC->cnae_classe_fk_id;
-//                $produtos[$index]->base_comparativa_cnae            = empty($produtoBC->ncm_fk_id) ? 'N/A' : $produtoBC->ncm_fk_id  ;
-//                $produtos[$index]->base_comparativa_icms_aliquota   = (empty($produtoBC->base_comparativa_icms_aliquota) || is_null($produtoBC->base_comparativa_icms_aliquota)) ? 'N/A' : $produtoBC->base_comparativa_icms_aliquota;
-//                $produtos[$index]->base_comparativa_icms_possui_st  = empty($produtoBC->base_comparativa_icms_possui_st) ? 'N/A' : $produtoBC->base_comparativa_icms_possui_st;
-//                $produtos[$index]->base_comparativa_cofins_aliquota = empty($produtoBC->base_comparativa_cofins_aliquota) ? 'N/A' : $produtoBC->base_comparativa_cofins_aliquota;
-//                $produtos[$index]->base_comparativa_cofins_cst      = empty($produtoBC->base_comparativa_cofins_cst) ? 'N/A' : $produtoBC->base_comparativa_cofins_cst;
-//                $produtos[$index]->base_comparativa_pis_aliquota    = empty($produtoBC->base_comparativa_pis_aliquota) ? 'N/A' : $produtoBC->base_comparativa_pis_aliquota;
-//                $produtos[$index]->base_comparativa_pis_cst         = empty($produtoBC->base_comparativa_pis_cst) ? 'N/A' : $produtoBC->base_comparativa_pis_cst;
-//
-//            }catch (PDOException $e){
-//                echo $e->getMessage();
-//            }
+        }
 
         try{
 
@@ -185,6 +110,9 @@ class ClienteLoteController extends Controller
 
         }
     public function sincronizarLote($loteId){
+
+        echo "Aguarde... Sincronizando";
+        echo "<br/>";
 
         $lote     = ClienteLote::find($loteId);
         $produtos = $lote->produtos;
@@ -239,9 +167,9 @@ class ClienteLoteController extends Controller
 
                 $data = curl_exec($curl);
 
-                if ($data === false || $data == NULL) {
+                // Na impossibilidade de encontrar o produto no cosmos , ele tenta o ultimo local que é a Base Comparativa Auxiliar.
 
-                    // Na impossibilidade de encontrar o produto no cosmos , ele tenta o ultimo local que é a Base Comparativa Auxiliar.
+                if ($data === false || $data == NULL) {
 
                     $produtoBCAux = BCProdutoAux::where('gtin_fk_id','=',$produto->gtin)->first();
 
@@ -254,7 +182,6 @@ class ClienteLoteController extends Controller
                                                     <td>Base Auxiliar</td>
                                                     <td>Não</td>
                                                 </tr>";
-
                     }else{
 
                         try {
@@ -336,43 +263,128 @@ class ClienteLoteController extends Controller
 
                         try {
 
-                            $gtin  = BCProdutoGtin::where('gtin','=',$produto->gtin)->get();
+                            if(isset($object->ncm->code)) {
 
-                            if(count($gtin) == 0){
+                                $ncm = Ncm::where('cod_ncm', '=', $object->ncm->code)->get();
 
-                                $newProdutoBC = BCProduto::create([
-                                    'status'        => "",
-                                    'nome'          => "$object->description",
-                                    'descricao'     => "$object->description",
-                                    'preco_medio'   => isset($object->avg_price) ? $object->avg_price : 0 ,
-                                    'preco_maximo'  => isset($object->max_price) ? $object->max_price : 0 ,
-                                    'thumbnail'     => "$object->thumbnail",
-                                    'altura'        => isset($object->height) ? $object->height : 0,
-                                    'largura'       => isset($object->width) ? $object->width : 0,
-                                    'comprimento'   => isset($object->length) ? $object->length : 0,
-                                    'peso_liquido'  => isset($object->net_weight) ? $object->net_weight : 0,
-                                    'cest_fk_id'    => isset($object->cest->code) ? $object->cest->code : 1 ,
-                                    'gpc_fk_id'     => isset($object->gpc->code) ? $object->gpc->code : 1,
-                                    'ncm_fk_id'     => isset($object->ncm->code) ? $object->ncm->code : "$produto->ncm"
-                                ]);
+                                if (count($ncm) > 0) {
 
-                                $newProdutoBCGtin = BCProdutoGtin::create([
-                                    'gtin'             => $object->gtin,
-                                    'bc_produto_fk_id' => $newProdutoBC->id
-                                ]);
+                                    $ncmProduto = $object->ncm->code;
 
-                                $ncm = isset($object->ncm->code) ? $object->ncm->code : "$produto->ncm";
+                                    $gtin = BCProdutoGtin::where('gtin', '=', $produto->gtin)->get();
 
-                                $produtosNaoEncontrados.= "<tr>
+                                    if (count($gtin) == 0) {
+
+                                        $newProdutoBC = BCProduto::create([
+                                            'status' => "",
+                                            'nome' => "$object->description",
+                                            'descricao' => "$object->description",
+                                            'preco_medio' => isset($object->avg_price) ? $object->avg_price : 0,
+                                            'preco_maximo' => isset($object->max_price) ? $object->max_price : 0,
+                                            'thumbnail' => "$object->thumbnail",
+                                            'altura' => isset($object->height) ? $object->height : 0,
+                                            'largura' => isset($object->width) ? $object->width : 0,
+                                            'comprimento' => isset($object->length) ? $object->length : 0,
+                                            'peso_liquido' => isset($object->net_weight) ? $object->net_weight : 0,
+                                            'cest_fk_id' => isset($object->cest->code) ? $object->cest->code : 1,
+                                            'gpc_fk_id' => isset($object->gpc->code) ? $object->gpc->code : 1,
+                                            'ncm_fk_id' => $object->ncm->code
+                                        ]);
+
+                                        $newProdutoBCGtin = BCProdutoGtin::create([
+                                            'gtin' => $object->gtin,
+                                            'bc_produto_fk_id' => $newProdutoBC->id
+                                        ]);
+
+                                        $ncm = isset($object->ncm->code) ? $object->ncm->code : "$produto->ncm";
+
+                                        $produtosNaoEncontrados .= "<tr>
                                                     <td>{$object->gtin}</td>
-                                                    <td>{$ncm}</td>
+                                                    <td>{$ncmProduto}</td>
+                                                    <td>{$object->description}</td>
+                                                    <td>Cosmos</td>
+                                                    <td>Sim</td>
+                                                </tr>";
+                                    }
+                                } else {
+                                    $produtosNaoEncontrados .= "<tr>
+                                                            <td>{$produto->gtin}</td>
+                                                            <td>{$object->ncm->code}</td>
+                                                            <td>{$produto->seu_nome}</td>
+                                                            <td>Base do Cliente</td>
+                                                            <td>Não - NCM Inexistente</td>
+                                                        </tr>";
+                                }
+                            }else{
+
+                                if(strlen($produto->ncm) < 8){
+                                    $ncmProduto = '0'.$produto->ncm;
+                                }else{
+                                    $ncmProduto = $produto->ncm;
+                                }
+
+                                $ncm   = Ncm::where('cod_ncm','=',$ncmProduto)->get();
+
+                                if(count($ncm) > 0){
+
+                                    $gtin  = BCProdutoGtin::where('gtin','=',$produto->gtin)->get();
+
+                                    if(count($gtin) == 0){
+
+                                        $newProdutoBC = BCProduto::create([
+                                            'status'        => "",
+                                            'nome'          => "$object->description",
+                                            'descricao'     => "$object->description",
+                                            'preco_medio'   => isset($object->avg_price) ? $object->avg_price : 0 ,
+                                            'preco_maximo'  => isset($object->max_price) ? $object->max_price : 0 ,
+                                            'thumbnail'     => "$object->thumbnail",
+                                            'altura'        => isset($object->height) ? $object->height : 0,
+                                            'largura'       => isset($object->width) ? $object->width : 0,
+                                            'comprimento'   => isset($object->length) ? $object->length : 0,
+                                            'peso_liquido'  => isset($object->net_weight) ? $object->net_weight : 0,
+                                            'cest_fk_id'    => isset($object->cest->code) ? $object->cest->code : 1 ,
+                                            'gpc_fk_id'     => isset($object->gpc->code) ? $object->gpc->code : 1,
+                                            'ncm_fk_id'     => isset($object->ncm->code) ? $object->ncm->code : $ncmProduto
+                                        ]);
+
+                                        $newProdutoBCGtin = BCProdutoGtin::create([
+                                            'gtin'             => $object->gtin,
+                                            'bc_produto_fk_id' => $newProdutoBC->id
+                                        ]);
+
+                                        $ncm = isset($object->ncm->code) ? $object->ncm->code : "$produto->ncm";
+
+                                        $produtosNaoEncontrados.= "<tr>
+                                                    <td>{$object->gtin}</td>
+                                                    <td>{$ncmProduto}</td>
                                                     <td>{$object->description}</td>
                                                     <td>Cosmos</td>
                                                     <td>Sim</td>
                                                 </tr>";
 
-                            }
+                                    }else{
 
+                                        $produtosNaoEncontrados.= "<tr>
+                                                    <td>{$produto->gtin}</td>
+                                                    <td>{$ncmProduto}</td>
+                                                    <td>{$produto->seu_nome}</td>
+                                                    <td>Base Comparativa</td>
+                                                    <td>Sim</td>
+                                                </tr>";
+
+                                    }
+
+                                }else{
+
+                                    $produtosNaoEncontrados.= "<tr>
+                                                            <td>{$produto->gtin}</td>
+                                                            <td>{$ncmProduto}</td>
+                                                            <td>{$produto->seu_nome}</td>
+                                                            <td>Base do Cliente</td>
+                                                            <td>Não - NCM Inexistente</td>
+                                                        </tr>";
+                                }
+                            }
                         }catch (\PDOException $e){
                             echo $e->getMessage();
                             die;
@@ -390,7 +402,6 @@ class ClienteLoteController extends Controller
         echo $produtosNaoEncontrados;
         die;
     }
-
 
     public function consultaCosmos($gtin){
 
