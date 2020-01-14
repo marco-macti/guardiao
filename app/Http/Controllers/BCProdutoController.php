@@ -32,26 +32,37 @@ class BCProdutoController extends Controller
 
     public function update(Request $request){
 
-       $ncmProduto = BCProdutoNcm::where('bc_produto_fk_id',$request->get('ncm'))->get();
+       $ncm        = str_replace(".", "",$request->get('ncm')); 
+       $ncmProduto = BCProdutoNcm::where('bc_produto_fk_id',$request->get('bc_produto_fk_id'))->get();
 
        if(empty($ncmProduto)){
-
+         
             $ncm = BCProdutoNcm::create([
-                'inicio'           => '2020-01-01',
-                'fim'              => '2020-01-01',
-                'ncm_fk_id'        => $request->get('ncm'),
+                'inicio'           => '2020-12-12',
+                'fim'              => '2020-12-12',
+                'ncm_fk_id'        => $ncm,
                 'bc_produto_fk_id' => $request->get('bc_produto_fk_id')
             ]);
 
        }else{
 
-           $produto = BCProduto::find($request->get('bc_produto_fk_id'))->update([
-               'nome' => $request->get('nome')
-           ]);
+          try{
 
-           $ncm = BCProdutoNcm::where('bc_produto_fk_id',$request->get('bc_produto_fk_id'))->update([
-               'ncm_fk_id' => $request->get('ncm')
-           ]);
+             $produto = BCProduto::find($request->get('bc_produto_fk_id'));
+
+             $produto->nome      = $request->get('nome');
+             $produto->ncm_fk_id = $ncm;
+             $produto->save(); 
+
+             $ncm = BCProdutoNcm::where('bc_produto_fk_id',$request->get('bc_produto_fk_id'))->update([
+                 'ncm_fk_id' => $ncm
+             ]); 
+           }catch(\Exception $e){
+              echo $e->getMessage();
+              die;
+           }
+
+           
        }
 
         return response()->json(['success' => true]);
