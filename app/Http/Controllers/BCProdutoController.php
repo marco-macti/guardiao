@@ -55,6 +55,7 @@ class BCProdutoController extends Controller
              $produto->save();
 
              $ncm = BCProdutoNcm::where('bc_produto_fk_id',$request->get('bc_produto_fk_id'))->updateOrCreate([
+                 'inicio'    => date('Y-m-d'),
                  'ncm_fk_id' => $ncm
              ]);
 
