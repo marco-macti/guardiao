@@ -20,5 +20,6 @@ Route::get('/importar-bc-produto-aux'              ,'HomeController@importarBCPr
 // Rotas Padronizadas com o sistema
 
 Route::get('/basecomparativa/produto/find/{produto}' ,'BCProdutoController@find');
-Route::get('/basecomparativa/produto/update/'         ,'BCProdutoController@update');
+Route::get('/basecomparativa/produto/update/'        ,'BCProdutoController@update');
 
+Route::get('/basecomparativa/produto/toJson','BCProdutoController@toJson');

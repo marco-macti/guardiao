@@ -57,4 +57,20 @@ class BCProdutoController extends Controller
         return response()->json(['success' => true]);
 
     }
+
+    public function toJson(){
+
+        $result = DB::select("SELECT
+                                        bcp.id,
+                                        bcp.nome,
+                                        bcpgtin.gtin,
+                                        bcpncm.ncm_fk_id
+                                    FROM bc_produto bcp
+                                       INNER JOIN bc_produto_gtin bcpgtin ON bcpgtin.bc_produto_fk_id = bcp.id
+                                       LEFT JOIN bc_produto_ncm bcpncm ON bcpncm.bc_produto_fk_id = bcp.id
+                                    OFFSET 0 LIMIT 10000");
+
+        dd($result);
+
+    }
 }
