@@ -37,23 +37,23 @@ class ClienteLoteController extends Controller
                                                LEFT JOIN bc_perfil_contabil_icms pcicms ON pcicms.bc_perfil_contabil_fk_id = pc.id
                                                LEFT JOIN bc_perfilcontabil_cofins pccofins ON pccofins.bc_perfil_contabil_fk_id = pc.id
                                                LEFT JOIN bc_perfilcontabil_pis pcpis ON pcpis.bc_perfil_contabil_fk_id = pc.id
-                                            WHERE bcgtin.gtin = '{$produto->gtin}' AND pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id} ");
+                                            WHERE bcgtin.gtin = '{$produto->gtin}' AND pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id} 1 OFFSET 1 LIMIT 1");
 
 
             try {
 
-                $produtos[$index]->base_comparativa_nome = empty($produtoBC->base_comparativa_nome) ? 'N/A' : $produtoBC->base_comparativa_nome;
-                $produtos[$index]->base_comparativa_gtin = empty($produtoBC->base_comparativa_gtin) ? 'N/A' : $produtoBC->base_comparativa_gtin;
-                $produtos[$index]->base_comparativa_ncm = empty($produtoBC->ncm_fk_id) ? 'N/A' : $produtoBC->ncm_fk_id;
-                $produtos[$index]->base_comparativa_tributado_4 = empty($produtoBC->tributado_4) ? 'N/A' : $produtoBC->tributado_4;
-                $produtos[$index]->base_comparativa_cnae_clase = empty($produtoBC->cnae_classe_fk_id) ? 'N/A' : $produtoBC->cnae_classe_fk_id;
-                $produtos[$index]->base_comparativa_cnae = empty($produtoBC->ncm_fk_id) ? 'N/A' : $produtoBC->ncm_fk_id;
-                $produtos[$index]->base_comparativa_icms_aliquota = (empty($produtoBC->base_comparativa_icms_aliquota) || is_null($produtoBC->base_comparativa_icms_aliquota)) ? 'N/A' : $produtoBC->base_comparativa_icms_aliquota;
-                $produtos[$index]->base_comparativa_icms_possui_st = empty($produtoBC->base_comparativa_icms_possui_st) ? 'N/A' : $produtoBC->base_comparativa_icms_possui_st;
-                $produtos[$index]->base_comparativa_cofins_aliquota = empty($produtoBC->base_comparativa_cofins_aliquota) ? 'N/A' : $produtoBC->base_comparativa_cofins_aliquota;
-                $produtos[$index]->base_comparativa_cofins_cst = empty($produtoBC->base_comparativa_cofins_cst) ? 'N/A' : $produtoBC->base_comparativa_cofins_cst;
-                $produtos[$index]->base_comparativa_pis_aliquota = empty($produtoBC->base_comparativa_pis_aliquota) ? 'N/A' : $produtoBC->base_comparativa_pis_aliquota;
-                $produtos[$index]->base_comparativa_pis_cst = empty($produtoBC->base_comparativa_pis_cst) ? 'N/A' : $produtoBC->base_comparativa_pis_cst;
+                $produtos[$index]->base_comparativa_nome = empty($produtoBC[0]->base_comparativa_nome) ? 'N/A' : $produtoBC[0]->base_comparativa_nome;
+                $produtos[$index]->base_comparativa_gtin = empty($produtoBC[0]->base_comparativa_gtin) ? 'N/A' : $produtoBC[0]->base_comparativa_gtin;
+                $produtos[$index]->base_comparativa_ncm = empty($produtoBC[0]->ncm_fk_id) ? 'N/A' : $produtoBC[0]->ncm_fk_id;
+                $produtos[$index]->base_comparativa_tributado_4 = empty($produtoBC[0]->tributado_4) ? 'N/A' : $produtoBC[0]->tributado_4;
+                $produtos[$index]->base_comparativa_cnae_clase = empty($produtoBC[0]->cnae_classe_fk_id) ? 'N/A' : $produtoBC[0]->cnae_classe_fk_id;
+                $produtos[$index]->base_comparativa_cnae = empty($produtoBC[0]->ncm_fk_id) ? 'N/A' : $produtoBC[0]->ncm_fk_id;
+                $produtos[$index]->base_comparativa_icms_aliquota = (empty($produtoBC[0]->base_comparativa_icms_aliquota) || is_null($produtoBC[0]->base_comparativa_icms_aliquota)) ? 'N/A' : $produtoBC[0]->base_comparativa_icms_aliquota;
+                $produtos[$index]->base_comparativa_icms_possui_st = empty($produtoBC[0]->base_comparativa_icms_possui_st) ? 'N/A' : $produtoBC[0]->base_comparativa_icms_possui_st;
+                $produtos[$index]->base_comparativa_cofins_aliquota = empty($produtoBC[0]->base_comparativa_cofins_aliquota) ? 'N/A' : $produtoBC[0]->base_comparativa_cofins_aliquota;
+                $produtos[$index]->base_comparativa_cofins_cst = empty($produtoBC[0]->base_comparativa_cofins_cst) ? 'N/A' : $produtoBC[0]->base_comparativa_cofins_cst;
+                $produtos[$index]->base_comparativa_pis_aliquota = empty($produtoBC[0]->base_comparativa_pis_aliquota) ? 'N/A' : $produtoBC[0]->base_comparativa_pis_aliquota;
+                $produtos[$index]->base_comparativa_pis_cst = empty($produtoBC[0]->base_comparativa_pis_cst) ? 'N/A' : $produtoBC[0]->base_comparativa_pis_cst;
 
             } catch (PDOException $e) {
                 echo $e->getMessage();
