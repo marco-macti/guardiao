@@ -32,11 +32,11 @@ class BCProdutoController extends Controller
 
     public function update(Request $request){
 
-       $ncm        = str_replace(".", "",$request->get('ncm')); 
+       $ncm        = str_replace(".", "",$request->get('ncm'));
        $ncmProduto = BCProdutoNcm::where('bc_produto_fk_id',$request->get('bc_produto_fk_id'))->get();
 
        if(empty($ncmProduto)){
-         
+
             $ncm = BCProdutoNcm::create([
                 'inicio'           => '2020-12-12',
                 'fim'              => '2020-12-12',
@@ -52,17 +52,18 @@ class BCProdutoController extends Controller
 
              $produto->nome      = $request->get('nome');
              $produto->ncm_fk_id = $ncm;
-             $produto->save(); 
+             $produto->save();
 
-             $ncm = BCProdutoNcm::where('bc_produto_fk_id',$request->get('bc_produto_fk_id'))->update([
+             $ncm = BCProdutoNcm::where('bc_produto_fk_id',$request->get('bc_produto_fk_id'))->updateOrCreate([
                  'ncm_fk_id' => $ncm
-             ]); 
+             ]);
+
            }catch(\Exception $e){
               echo $e->getMessage();
               die;
            }
 
-           
+
        }
 
         return response()->json(['success' => true]);
