@@ -37,7 +37,7 @@ class ClienteLoteController extends Controller
                                                LEFT JOIN bc_perfil_contabil_icms pcicms ON pcicms.bc_perfil_contabil_fk_id = pc.id
                                                LEFT JOIN bc_perfilcontabil_cofins pccofins ON pccofins.bc_perfil_contabil_fk_id = pc.id
                                                LEFT JOIN bc_perfilcontabil_pis pcpis ON pcpis.bc_perfil_contabil_fk_id = pc.id
-                                            WHERE bcgtin.gtin = '{$produto->gtin}' AND pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id} 1 OFFSET 1 LIMIT 1");
+                                            WHERE bcgtin.gtin = '{$produto->gtin}' AND pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id} OFFSET 1 LIMIT 1");
 
 
             try {
