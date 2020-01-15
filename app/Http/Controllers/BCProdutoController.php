@@ -18,6 +18,13 @@ class BCProdutoController extends Controller
             $result = DB::select("SELECT
                                             bcp.id,
                                             bcp.nome,
+                                            bcp.descricao,
+                                            bcp.preco_medio,
+                                            bcp.preco_maximo,
+                                            bcp.altura,
+                                            bcp.largura,
+                                            bcp.comprimento,
+                                            bcp.peso_liquido,
                                             bcpgtin.gtin,
                                             bcpncm.ncm_fk_id
                                         FROM bc_produto bcp
