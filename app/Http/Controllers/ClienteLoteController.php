@@ -51,11 +51,39 @@ class ClienteLoteController extends Controller
                                         pcpis.aliquota IS NOT NULL");
 
             if(count($produtoBC) > 0){
+
+                // Verificação se o NCM da Base Comparativa é igual ao produto do lote
+
                 if($produto->ncm != $produtoBC[0]->ncm_fk_id){
                     $produtos[$index]->ncm_correto = 'N';
                 }else{
                     $produtos[$index]->ncm_correto = 'S';
                 }
+
+                // Verificação se aliquota de ICMS da Base Comparativa é igual ao produto do lote
+
+                if($produto->aliquota_icm != $produtoBC[0]->base_comparativa_icms_aliquota){
+                    $produtos[$index]->icms_correto = 'N';
+                }else{
+                    $produtos[$index]->icms_correto = 'S';
+                }
+
+                // Verificação se aliquota de PIS da Base Comparativa é igual ao produto do lote
+
+                if($produto->aliquota_pis != $produtoBC[0]->base_comparativa_pis_aliquota){
+                    $produtos[$index]->pis_correto = 'N';
+                }else{
+                    $produtos[$index]->pis_correto = 'S';
+                }
+
+                // Verificação se aliquota de COFINS da Base Comparativa é igual ao produto do lote
+
+                if($produto->aliquota_cofins != $produtoBC[0]->base_comparativa_cofins_aliquota){
+                    $produtos[$index]->cofins_correto = 'N';
+                }else{
+                    $produtos[$index]->cofins_correto = 'S';
+                }
+
 
             }else{
                 $produtos[$index]->ncm_correto = 'N/A';
@@ -99,7 +127,7 @@ class ClienteLoteController extends Controller
 
         try{
 
-            $data = array('CODIGO_DO_PRODUTO_NO_CLIENTE;NOME_DO_PRODUTO_NO_CLIENTE;NOME_PRODUTO_NA_BASE_COMPARATIVA;GTIN_NO_CLIENTE;GTIN_NA_BASE_COMPARATIVA;NCM_NO_CLIENTE;NCM_NA_BASE_COMPARATIVA;ALIQUOTA_ICMS_NO_CLIENTE;ALIQUOTA_ICMS_NA_BASE_COMPARATIVA;ALIQUOTA_PIS_NO_CLIENTE;ALIQUOTA_PIS_NA_BASE_COMPARATIVA;ALIQUOTA_COFINS_NO_CLIENTE;ALIQUOTA_COFINS_NA_BASE_COMPARATIVA;POSSUI_ST_NO_CLIENTE;POSSUI_ST_NA_BASE_COMPARATIVA;BASE_COMPARATIVA_PIS_CST;BASE_COMPARATIVA_COFINS_CST;ICMS_BASE_LEGAL;COFINS_BASE_LEGAL;PIS_BASE_LEGAL;NCM_CORRETO;');
+            $data = array('CODIGO_DO_PRODUTO_NO_CLIENTE;NOME_DO_PRODUTO_NO_CLIENTE;NOME_PRODUTO_NA_BASE_COMPARATIVA;GTIN_NO_CLIENTE;GTIN_NA_BASE_COMPARATIVA;NCM_NO_CLIENTE;NCM_NA_BASE_COMPARATIVA;ALIQUOTA_ICMS_NO_CLIENTE;ALIQUOTA_ICMS_NA_BASE_COMPARATIVA;ALIQUOTA_PIS_NO_CLIENTE;ALIQUOTA_PIS_NA_BASE_COMPARATIVA;ALIQUOTA_COFINS_NO_CLIENTE;ALIQUOTA_COFINS_NA_BASE_COMPARATIVA;POSSUI_ST_NO_CLIENTE;POSSUI_ST_NA_BASE_COMPARATIVA;BASE_COMPARATIVA_PIS_CST;BASE_COMPARATIVA_COFINS_CST;ICMS_BASE_LEGAL;COFINS_BASE_LEGAL;PIS_BASE_LEGAL;NCM_CORRETO;ICMS_CORRETO;PIS_CORRETO;COFINS_CORRETO;');
 
             foreach ($produtos as $index => $itemLote) {
 
@@ -125,12 +153,15 @@ class ClienteLoteController extends Controller
                         $itemLote->base_comparativa_icms_base_legal;
                         $itemLote->base_comparativa_cofins_base_legal;
                         $itemLote->base_comparativa_pis_base_legal;
-                        $itemLote->ncm_correto";
+                        $itemLote->ncm_correto;
+                        $itemLote->icms_correto;
+                        $itemLote->pis_correto;
+                        $itemLote->cofins_correto";
 
                 array_push($data,$strItem);
             }
 
-            
+
             header('Content-Type: text/csv');
             header("Content-Disposition: attachment; filename=Relatorio_lote_{$loteId}.csv");
 
