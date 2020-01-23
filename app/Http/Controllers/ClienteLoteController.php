@@ -22,38 +22,62 @@ class ClienteLoteController extends Controller
         foreach ($produtos as $index => $produto) {
 
             $produtoBC = DB::select("SELECT
-                                                bcp.*,
-                                                bcp.nome as base_comparativa_nome,
-                                                bcgtin.gtin as base_comparativa_gtin,
-                                                pcicms.aliquota as base_comparativa_icms_aliquota,
-                                                pcicms.possui_st as base_comparativa_icms_possui_st,
-                                                pccofins.aliquota as base_comparativa_cofins_aliquota,
-                                                pccofins.cst as base_comparativa_cofins_cst,
-                                                pcpis.aliquota as base_comparativa_pis_aliquota,
-                                                pcpis.cst as base_comparativa_pis_cst
-                                            FROM bc_produto_gtin AS bcgtin
-                                               INNER JOIN bc_produto AS bcp ON bcp.id = bcgtin.bc_produto_fk_id
-                                               LEFT JOIN bc_perfil_contabil pc ON pc.ncm_fk_id = bcp.ncm_fk_id
-                                               LEFT JOIN bc_perfil_contabil_icms pcicms ON pcicms.bc_perfil_contabil_fk_id = pc.id
-                                               LEFT JOIN bc_perfilcontabil_cofins pccofins ON pccofins.bc_perfil_contabil_fk_id = pc.id
-                                               LEFT JOIN bc_perfilcontabil_pis pcpis ON pcpis.bc_perfil_contabil_fk_id = pc.id
-                                            WHERE bcgtin.gtin = '{$produto->gtin}' AND pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id} ");
+                                            bcp.*,
+                                            bcp.nome as base_comparativa_nome,
+                                            bcgtin.gtin as base_comparativa_gtin,
+                                            pcicms.aliquota as base_comparativa_icms_aliquota,
+                                            pcicms.possui_st as base_comparativa_icms_possui_st,
+                                            pcicms.base_legal as base_comparativa_icms_base_legal,
+                                            pccofins.aliquota as base_comparativa_cofins_aliquota,
+                                            pccofins.cst as base_comparativa_cofins_cst,
+                                            pccofins.base_legal as base_comparativa_cofins_base_legal,
+                                            pcpis.aliquota as base_comparativa_pis_aliquota,
+                                            pcpis.cst as base_comparativa_pis_cst,
+                                            pcpis.base_legal as base_comparativa_pis_base_legal
+                                        FROM bc_produto_gtin AS bcgtin
+                                            INNER JOIN bc_produto AS bcp ON bcp.id = bcgtin.bc_produto_fk_id
+                                            LEFT JOIN bc_perfil_contabil pc ON pc.ncm_fk_id = bcp.ncm_fk_id
+                                            LEFT JOIN bc_perfil_contabil_icms pcicms ON pcicms.bc_perfil_contabil_fk_id = pc.id
+                                            LEFT JOIN bc_perfilcontabil_cofins pccofins ON pccofins.bc_perfil_contabil_fk_id = pc.id
+                                            LEFT JOIN bc_perfilcontabil_pis pcpis ON pcpis.bc_perfil_contabil_fk_id = pc.id
+                                        WHERE 
+                                        bcgtin.gtin = '{$produto->gtin}' AND 
+                                        pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id} AND 
+                                        pcicms.aliquota IS NOT NULL AND 
+                                        pccofins.aliquota IS NOT NULL AND 
+                                        pcpis.aliquota IS NOT NULL");
 
 
             try {
 
                 $produtos[$index]->base_comparativa_nome = empty($produtoBC[0]->base_comparativa_nome) ? 'N/A' : $produtoBC[0]->base_comparativa_nome;
+
                 $produtos[$index]->base_comparativa_gtin = empty($produtoBC[0]->base_comparativa_gtin) ? 'N/A' : $produtoBC[0]->base_comparativa_gtin;
+
                 $produtos[$index]->base_comparativa_ncm = empty($produtoBC[0]->ncm_fk_id) ? 'N/A' : $produtoBC[0]->ncm_fk_id;
+
                 $produtos[$index]->base_comparativa_tributado_4 = empty($produtoBC[0]->tributado_4) ? 'N/A' : $produtoBC[0]->tributado_4;
+
                 $produtos[$index]->base_comparativa_cnae_clase = empty($produtoBC[0]->cnae_classe_fk_id) ? 'N/A' : $produtoBC[0]->cnae_classe_fk_id;
+
                 $produtos[$index]->base_comparativa_cnae = empty($produtoBC[0]->ncm_fk_id) ? 'N/A' : $produtoBC[0]->ncm_fk_id;
+
                 $produtos[$index]->base_comparativa_icms_aliquota = (empty($produtoBC[0]->base_comparativa_icms_aliquota) || is_null($produtoBC[0]->base_comparativa_icms_aliquota)) ? 'N/A' : $produtoBC[0]->base_comparativa_icms_aliquota;
+
+                $produtos[$index]->base_comparativa_icms_base_legal = (empty($produtoBC[0]->base_comparativa_icms_base_legal) || is_null($produtoBC[0]->base_comparativa_icms_base_legal)) ? 'N/A' : $produtoBC[0]->base_comparativa_icms_base_legal;
+
                 $produtos[$index]->base_comparativa_icms_possui_st = empty($produtoBC[0]->base_comparativa_icms_possui_st) ? 'N/A' : $produtoBC[0]->base_comparativa_icms_possui_st;
+
                 $produtos[$index]->base_comparativa_cofins_aliquota = empty($produtoBC[0]->base_comparativa_cofins_aliquota) ? 'N/A' : $produtoBC[0]->base_comparativa_cofins_aliquota;
+
                 $produtos[$index]->base_comparativa_cofins_cst = empty($produtoBC[0]->base_comparativa_cofins_cst) ? 'N/A' : $produtoBC[0]->base_comparativa_cofins_cst;
+
+                $produtos[$index]->base_comparativa_cofins_base_legal = empty($produtoBC[0]->base_comparativa_cofins_base_legal) ? 'N/A' : $produtoBC[0]->base_comparativa_cofins_base_legal;
+
                 $produtos[$index]->base_comparativa_pis_aliquota = empty($produtoBC[0]->base_comparativa_pis_aliquota) ? 'N/A' : $produtoBC[0]->base_comparativa_pis_aliquota;
                 $produtos[$index]->base_comparativa_pis_cst = empty($produtoBC[0]->base_comparativa_pis_cst) ? 'N/A' : $produtoBC[0]->base_comparativa_pis_cst;
+
+                $produtos[$index]->base_comparativa_pis_base_legal = empty($produtoBC[0]->base_comparativa_pis_base_legalt) ? 'N/A' : $produtoBC[0]->base_comparativa_base_legal;
 
             } catch (PDOException $e) {
                 echo $e->getMessage();
@@ -62,7 +86,7 @@ class ClienteLoteController extends Controller
 
         try{
 
-            $data = array('CODIGO_DO_PRODUTO_NO_CLIENTE;NOME_DO_PRODUTO_NO_CLIENTE;NOME_PRODUTO_NA_BASE_COMPARATIVA;GTIN_NO_CLIENTE;GTIN_NA_BASE_COMPARATIVA;NCM_NO_CLIENTE;NCM_NA_BASE_COMPARATIVA;ALIQUOTA_ICMS_NO_CLIENTE;ALIQUOTA_ICMS_NA_BASE_COMPARATIVA;ALIQUOTA_PIS_NO_CLIENTE;ALIQUOTA_PIS_NA_BASE_COMPARATIVA;ALIQUOTA_COFINS_NO_CLIENTE;ALIQUOTA_COFINS_NA_BASE_COMPARATIVA;POSSUI_ST_NO_CLIENTE;POSSUI_ST_NA_BASE_COMPARATIVA;BASE_COMPARATIVA_PIS_CST;BASE_COMPARATIVA_COFINS_CST');
+            $data = array('CODIGO_DO_PRODUTO_NO_CLIENTE;NOME_DO_PRODUTO_NO_CLIENTE;NOME_PRODUTO_NA_BASE_COMPARATIVA;GTIN_NO_CLIENTE;GTIN_NA_BASE_COMPARATIVA;NCM_NO_CLIENTE;NCM_NA_BASE_COMPARATIVA;ALIQUOTA_ICMS_NO_CLIENTE;ALIQUOTA_ICMS_NA_BASE_COMPARATIVA;ALIQUOTA_PIS_NO_CLIENTE;ALIQUOTA_PIS_NA_BASE_COMPARATIVA;ALIQUOTA_COFINS_NO_CLIENTE;ALIQUOTA_COFINS_NA_BASE_COMPARATIVA;POSSUI_ST_NO_CLIENTE;POSSUI_ST_NA_BASE_COMPARATIVA;BASE_COMPARATIVA_PIS_CST;BASE_COMPARATIVA_COFINS_CST;ICMS_BASE_LEGAL;COFINS_BASE_LEGAL;PIS_BASE_LEGAL');
 
             foreach ($produtos as $index => $itemLote) {
 
@@ -84,7 +108,10 @@ class ClienteLoteController extends Controller
                         $itemLote->possui_st;
                         $itemLote->base_comparativa_icms_possui_st;
                         $itemLote->base_comparativa_pis_cst;
-                        $itemLote->base_comparativa_cofins_cst";
+                        $itemLote->base_comparativa_cofins_cst;
+                        $itemLote->base_comparativa_icms_base_legal;
+                        $itemLote->base_comparativa_cofins_base_legal;
+                        $itemLote->base_comparativa_pis_base_legal";
 
                 array_push($data,$strItem);
             }
