@@ -84,9 +84,11 @@ class ClienteLoteController extends Controller
                     $produtos[$index]->cofins_correto = 'S';
                 }
 
-
             }else{
-                $produtos[$index]->ncm_correto = 'N/A';
+                $produtos[$index]->ncm_correto    = 'N/A';
+                $produtos[$index]->icms_correto   = 'N/A';
+                $produtos[$index]->pis_correto    = 'N/A';
+                $produtos[$index]->cofins_correto = 'N/A';
             }
 
             try {
