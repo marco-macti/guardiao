@@ -19,6 +19,9 @@ class ClienteLoteController extends Controller
         $lote     = ClienteLote::find($loteId);
         $produtos = $lote->produtos;
 
+        $corretos = array();
+        $incorretos = array();
+
         foreach ($produtos as $index => $produto) {
 
             $produtoBC = DB::select("SELECT
@@ -40,13 +43,20 @@ class ClienteLoteController extends Controller
                                             LEFT JOIN bc_perfil_contabil_icms pcicms ON pcicms.bc_perfil_contabil_fk_id = pc.id
                                             LEFT JOIN bc_perfilcontabil_cofins pccofins ON pccofins.bc_perfil_contabil_fk_id = pc.id
                                             LEFT JOIN bc_perfilcontabil_pis pcpis ON pcpis.bc_perfil_contabil_fk_id = pc.id
-                                        WHERE 
-                                        bcgtin.gtin = '{$produto->gtin}' AND 
-                                        pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id} AND 
-                                        pcicms.aliquota IS NOT NULL AND 
-                                        pccofins.aliquota IS NOT NULL AND 
+                                        WHERE
+                                        bcgtin.gtin = '{$produto->gtin}' AND
+                                        pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id} AND
+                                        pcicms.aliquota IS NOT NULL AND
+                                        pccofins.aliquota IS NOT NULL AND
                                         pcpis.aliquota IS NOT NULL");
 
+            if(count($produtoBC) > 0){
+                if($produto->ncm != $produtoBC[0]->ncm_fk_id){
+                    array_push($incorretos,$produto);
+                }else{
+                    array_push($corretos,$produto);
+                }
+            }
 
             try {
 
@@ -83,6 +93,8 @@ class ClienteLoteController extends Controller
                 echo $e->getMessage();
             }
         }
+
+        dd($incorretos);
 
         try{
 
