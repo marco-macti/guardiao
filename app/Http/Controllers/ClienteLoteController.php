@@ -27,7 +27,7 @@ class ClienteLoteController extends Controller
                                             bcgtin.gtin as base_comparativa_gtin,
                                             pcicms.aliquota as base_comparativa_icms_aliquota,
                                             pcicms.possui_st as base_comparativa_icms_possui_st,
-                                            pcicms.base_legal as base_comparativa_icms_base_legal,
+                                            pcicms.base_legal_st as base_comparativa_icms_base_legal,
                                             pccofins.aliquota as base_comparativa_cofins_aliquota,
                                             pccofins.cst as base_comparativa_cofins_cst,
                                             pccofins.base_legal as base_comparativa_cofins_base_legal,
