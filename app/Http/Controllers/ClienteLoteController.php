@@ -103,7 +103,7 @@ class ClienteLoteController extends Controller
 
                 $produtos[$index]->base_comparativa_cnae = empty($produtoBC[0]->ncm_fk_id) ? 'N/A' : $produtoBC[0]->ncm_fk_id;
 
-                $produtos[$index]->base_comparativa_icms_aliquota = (empty($produtoBC[0]->base_comparativa_icms_aliquota) || is_null($produtoBC[0]->base_comparativa_icms_aliquota)) ? 'N/A' : $produtoBC[0]->base_comparativa_icms_aliquota;
+                $produtos[$index]->base_comparativa_icms_aliquota =  $produtoBC[0]->base_comparativa_icms_aliquota;
 
                 $produtos[$index]->base_comparativa_icms_base_legal = (empty($produtoBC[0]->base_comparativa_icms_base_legal) || is_null($produtoBC[0]->base_comparativa_icms_base_legal)) ? 'N/A' : $produtoBC[0]->base_comparativa_icms_base_legal;
 
