@@ -335,19 +335,19 @@ class ClienteLoteController extends Controller
                                     if (count($gtin) == 0) {
 
                                         $newProdutoBC = BCProduto::create([
-                                            'status' => "",
-                                            'nome' => "$object->description",
-                                            'descricao' => "$object->description",
-                                            'preco_medio' => isset($object->avg_price) ? $object->avg_price : 0,
+                                            'status'       => "",
+                                            'nome'         => "$object->description",
+                                            'descricao'    => "$object->description",
+                                            'preco_medio'  => isset($object->avg_price) ? $object->avg_price : 0,
                                             'preco_maximo' => isset($object->max_price) ? $object->max_price : 0,
-                                            'thumbnail' => "$object->thumbnail",
-                                            'altura' => isset($object->height) ? $object->height : 0,
-                                            'largura' => isset($object->width) ? $object->width : 0,
-                                            'comprimento' => isset($object->length) ? $object->length : 0,
+                                            'thumbnail'    => "$object->thumbnail",
+                                            'altura'       => isset($object->height) ? $object->height : 0,
+                                            'largura'      => isset($object->width) ? $object->width : 0,
+                                            'comprimento'  => isset($object->length) ? $object->length : 0,
                                             'peso_liquido' => isset($object->net_weight) ? $object->net_weight : 0,
-                                            'cest_fk_id' => isset($object->cest->code) ? $object->cest->code : 1,
-                                            'gpc_fk_id' => isset($object->gpc->code) ? $object->gpc->code : 1,
-                                            'ncm_fk_id' => $object->ncm->code
+                                            'cest_fk_id'   => 1,//isset($object->cest->code) ? $object->cest->code : 1,
+                                            'gpc_fk_id'    => 1, //isset($object->gpc->code) ? $object->gpc->code : 1,
+                                            'ncm_fk_id'    => $object->ncm->code
                                         ]);
 
                                         $newProdutoBCGtin = BCProdutoGtin::create([
@@ -401,8 +401,8 @@ class ClienteLoteController extends Controller
                                             'largura'       => isset($object->width) ? $object->width : 0,
                                             'comprimento'   => isset($object->length) ? $object->length : 0,
                                             'peso_liquido'  => isset($object->net_weight) ? $object->net_weight : 0,
-                                            'cest_fk_id'    => isset($object->cest->code) ? $object->cest->code : 1 ,
-                                            'gpc_fk_id'     => isset($object->gpc->code) ? $object->gpc->code : 1,
+                                            'cest_fk_id'    => 1, //isset($object->cest->code) ? $object->cest->code : 1 ,
+                                            'gpc_fk_id'     => 1, //isset($object->gpc->code) ? $object->gpc->code : 1,
                                             'ncm_fk_id'     => isset($object->ncm->code) ? $object->ncm->code : $ncmProduto
                                         ]);
 
