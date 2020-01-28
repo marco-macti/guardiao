@@ -6,9 +6,11 @@ use App\BCProduto;
 use App\BCProdutoAux;
 use App\BCProdutoGtin;
 use App\ClienteLote;
+use App\LoteProduto;
 use App\Ncm;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
 
 class ClienteLoteController extends Controller
 {
@@ -461,7 +463,133 @@ class ClienteLoteController extends Controller
         echo $produtosNaoEncontrados;
         die;
     }
+    public function monitoramentoLote(Request $request){
 
+        // Recupera o numero do lote
+        $loteId    = Input::get('loteId');
+        // Obtém o objeto do lote
+        $lote      = ClienteLote::find($loteId);
+
+        // Quantidade de itens contidos dentro do lote
+        $qtdItensLote = count($lote->produtos);
+
+        $file      = $request->file('file');
+        $delimiter = ',';
+        $rows       = 0;
+        $ret = array();
+
+        if (($handle = fopen($file->getPathname(), "r")) !== FALSE) {
+
+            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+
+                $num = count($data);
+                $rows++;
+
+                for ($c=0; $c < $num; $c++) {
+                    $data[$c] = trim($data[$c]);
+                }
+
+                array_push($ret,$data);
+            }
+            fclose($handle);
+
+        }
+
+        $rows--;
+
+        // Verifica se a quantidade de itens dentro do lote é igual a quantidade de itens dentro do arquivo.
+        if($rows < $qtdItensLote){
+           echo json_encode(array(
+               'success' => false,
+               'msg'     => 'Quantidade de itens dentro do arquivo inferior a quantidade de itens dentro do Lote.'
+           ));
+        }elseif($rows > $qtdItensLote){
+            echo json_encode(array(
+                'success' => false,
+                'msg'     => 'Quantidade de itens dentro do arquivo superior a quantidade de itens dentro do Lote.'
+            ));
+        }elseif($rows == 1){
+            echo json_encode(array(
+                'success' => false,
+                'msg'     => 'Não foram encontrados itens dentro do arquivo.'
+            ));
+        }else{
+
+
+//            [
+//                [0] => CODIGO_DO_PRODUTO_NO_CLIENTE
+//                [1] => NOME_DO_PRODUTO_NO_CLIENTE
+//                [2] => NOME_PRODUTO_NA_BASE_COMPARATIVA
+//                [3] => GTIN_NO_CLIENTE
+//                [4] => GTIN_NA_BASE_COMPARATIVA
+//                [5] => NCM_NO_CLIENTE
+//                [6] => NCM_NA_BASE_COMPARATIVA
+//                [7] => ALIQUOTA_ICMS_NO_CLIENTE
+//                [8] => ALIQUOTA_ICMS_NA_BASE_COMPARATIVA
+//                [9] => ALIQUOTA_PIS_NO_CLIENTE
+//                [10] => ALIQUOTA_PIS_NA_BASE_COMPARATIVA
+//                [11] => ALIQUOTA_COFINS_NO_CLIENTE
+//                [12] => ALIQUOTA_COFINS_NA_BASE_COMPARATIVA
+//                [13] => POSSUI_ST_NO_CLIENTE
+//                [14] => POSSUI_ST_NA_BASE_COMPARATIVA
+//                [15] => BASE_COMPARATIVA_PIS_CST
+//                [16] => BASE_COMPARATIVA_COFINS_CST
+//                [17] => ICMS_BASE_LEGAL
+//                [18] => COFINS_BASE_LEGAL
+//                [19] => PIS_BASE_LEGAL
+//                [20] => NCM_CORRETO
+//                [21] => ICMS_CORRETO
+//                [22] => PIS_CORRETO
+//                [23] => COFINS_CORRETO
+//            ]
+
+            /*[
+                'gtin',
+                'seu_codigo',
+                'seu_nome',
+                'ncm',
+                'origem',
+                'tributado_4',
+                'uf_origem_fk',
+                'possui_st',
+                'aliquota_icm',
+                'aliquota_pis',
+                'aliquota_cofins',
+                'bc_perfilcontabil_fk_id',
+                'estab_origem_fk_id',
+                'lote_fk_id',
+                'status_fk_id',
+                'trib_estab_origem_fk_id'
+            ];*/
+
+            // Remove o cabeçalho.
+
+            unset($ret[0]);
+
+            foreach ($ret as $index => $item) {
+
+                LoteProduto::where('gtin',$item[3])->where('lote_fk_id',$loteId)->update([
+                    'seu_nome'        => $item[2],
+                    'gtin'            => (($item[4] != 'N/A') ? $item[4] : $item[3]),
+                    'ncm'             => (($item[6] != 'N/A') ? $item[6] : $item[5]),
+                    'possui_st'       => $item[13],
+                    'aliquota_icm'    => $item[7],
+                    'aliquota_pis'    => $item[9],
+                    'aliquota_cofins' => $item[11],
+                    'status_fk_id'    => 5,
+                ]);
+            }
+
+            $lote->cliente_lote_status_fk_id =  4;
+            $lote->save();
+
+            echo json_encode(array(
+                'success' => true,
+                'msg'     => $qtdItensLote. " itens atualizados com sucesso!"
+            ));
+        }
+
+    }
     public function consultaCosmos($gtin){
 
         $url = 'https://api.cosmos.bluesoft.com.br/gtins/'.$gtin.'.json';

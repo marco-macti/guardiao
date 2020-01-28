@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ClienteLote extends Model
 {
-    protected $table = 'cliente_lote';
+    protected $table    = 'cliente_lote';
+    public $timestamps  = false;
     protected $fillable = ['num_lote_cliente', 'data_lote', 'anotacoes', 'cliente_fk_id', 'cliente_lote_status_fk_id', 'dados'];
 
     public function cliente(){
