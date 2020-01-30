@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Cliente;
+use App\LoteProduto;
+use Illuminate\Support\Facades\DB;
+
 class HomeController extends Controller
 {
 
@@ -29,5 +33,41 @@ class HomeController extends Controller
             echo "File or path not found";
         }
 
+    }
+
+    public function updateProdutosLoteCliente(){
+
+        $cliente = Cliente::find(6);
+
+        $produtos =  DB::select("SELECT
+                                            cl.id as NUMERO_DO_LOTE,
+                                            cl.cliente_lote_status_fk_id as STATUS_DO_LOTE,
+                                            lp.bc_perfilcontabil_fk_id as LOTE_PRODUTO_PERFIL_CONTABIL_ID,
+                                            lp.id as LOTE_PRODUTO_ID,
+                                            lp.gtin as LOTE_PRODUTO_GTIN,
+                                            lp.ncm as LOTE_PRODUTO_NCM,
+                                            bcpc.id as BC_PEFIL_CONTABIL_ID,
+                                            bcpc.ncm_fk_id AS BC_PERFIL_CONTABIL_NCM
+                                            FROM
+                                            public.cliente_lote cl
+                                                INNER JOIN lote_produto lp ON lp.lote_fk_id = cl.id
+                                                INNER JOIN bc_perfil_contabil bcpc ON bcpc.ncm_fk_id = lp.ncm
+                                            WHERE cl.cliente_fk_id = $cliente->id
+                                              AND cl.cliente_lote_status_fk_id = 4
+                                              AND lp.status_fk_id = 5
+                                              AND bcpc.trib_estab_destino_fk_id = 5
+                                              AND bcpc.trib_estab_origem_fk_id = 1");
+
+        foreach ($produtos as $index => $produto) {
+            try {
+                LoteProduto::find($produto->lote_produto_id)->update([
+                    'bc_perfilcontabil_fk_id' => $produto->bc_pefil_contabil_id
+                ]);
+            }catch (\PDOException $e){
+                echo $e->getMessage();
+                die;
+            }
+
+        }
     }
 }

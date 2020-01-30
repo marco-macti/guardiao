@@ -24,3 +24,5 @@ Route::get('/basecomparativa/produto/find/{produto}' ,'BCProdutoController@find'
 Route::get('/basecomparativa/produto/update/'        ,'BCProdutoController@update');
 
 Route::get('/basecomparativa/produto/toJson','BCProdutoController@toJson');
+
+Route::get('/update-produtos-lote-cliente'                                     ,'HomeController@updateProdutosLoteCliente');
