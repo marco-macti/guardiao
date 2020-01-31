@@ -11,18 +11,21 @@
 |
 */
 
-Route::get('/'                                     ,'HomeController@index');
-Route::get('/relatorio-lote/{lote}'                ,'ClienteLoteController@relatorioLote');
-Route::get('/sincronizar-lote/{lote}'              ,'ClienteLoteController@sincronizarLote');
-Route::post('/monitoramento-lote'                  ,'ClienteLoteController@monitoramentoLote');
-Route::get('/consulta-cosmos/{gtin}'               ,'ClienteLoteController@consultaCosmos');
-Route::get('/importar-bc-produto-aux'              ,'HomeController@importarBCProdutoAux');
+Route::get('/'                         ,'HomeController@index');
+Route::get('/relatorio-lote/{lote}'    ,'ClienteLoteController@relatorioLote');
+Route::get('/sincronizar-lote/{lote}'  ,'ClienteLoteController@sincronizarLote');
+Route::post('/monitoramento-lote'      ,'ClienteLoteController@monitoramentoLote');
+Route::get('/consulta-cosmos/{gtin}'   ,'ClienteLoteController@consultaCosmos');
+Route::get('/importar-bc-produto-aux'  ,'HomeController@importarBCProdutoAux');
 
-// Rotas Padronizadas com o sistema
+// Rotas base Comparativa
 
 Route::get('/basecomparativa/produto/find/{produto}' ,'BCProdutoController@find');
 Route::get('/basecomparativa/produto/update/'        ,'BCProdutoController@update');
+Route::get('/basecomparativa/produto/toJson'         ,'BCProdutoController@toJson');
 
-Route::get('/basecomparativa/produto/toJson','BCProdutoController@toJson');
+// Rotas area do cliente
+
+Route::get('/areacliente/meus-produtos/{cliente}', 'AreaClienteController@meusProdutos');
 
 Route::get('/update-produtos-lote-cliente'                                     ,'HomeController@updateProdutosLoteCliente');
