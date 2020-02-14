@@ -8,6 +8,7 @@ use App\BCProdutoGtin;
 use App\ClienteLote;
 use App\LoteProduto;
 use App\Ncm;
+use App\Cliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
