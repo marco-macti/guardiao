@@ -802,7 +802,7 @@ class ClienteLoteController extends Controller
                         $lastInsertId = DB::SELECT ("SELECT lp.id  FROM public.lote_produto lp ORDER BY lp.id DESC OFFSET 0 LIMIT 1");
                         $lastInsertId =  $lastInsertId[0]->id;
                         $lastInsertId++;
-
+                        
                         LoteProduto::create([
                             'id'                       =>  $lastInsertId,
                             'gtin'                      => "$linha[2]",
