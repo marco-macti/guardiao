@@ -740,11 +740,13 @@ class ClienteLoteController extends Controller
                         'Lucro Presumido','lucro presumido','LUCRO PRESUMIDO','lucro Presumido','Lucro presumido'
                     );
 
+                    $nacionalOuImportado = trim($linha[4]);
+
                     if(!in_array(strlen($linha[2]),$tamanhoGtins)){                                                    // Validação para verificar o tamanho dos GTIN's
                         $erros[$index]['GTIN'] = 'O tamanho do GTIN é inválido.';
                     }elseif(!strlen($linha[3]) >= 8){                                                                    // Validação para verificar o tamanho mínimo de 8 dígitos do NCM
                         $erros[$index]['NCM'] = 'O tamanho do NCM é '.strlen($linha[3]).' sendo inválido por não conter no mínimo de 8 dígitos.';
-                    }elseif(!in_array($linha[4],array('Nacional','Importado'))){                                        // Validação para verificar se o produto é Nacional ou Importado
+                    }elseif(!in_array($nacionalOuImportado,array('Nacional','Importado'))){                                        // Validação para verificar se o produto é Nacional ou Importado
                         $erros[$index]['NACIONAL_OU_IMPORTADO'] = 'O Valor informado para o campo não está no padrão .';
                     }elseif(!in_array($linhas[5],array('Sim','Não'))){                                                  // Validação para verificar Tributado 4% ou Possui ST
                         $erros[$index]['TRIBUTADO_4'] = 'O Valor informado para o campo não está no padrão.';
