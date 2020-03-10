@@ -804,7 +804,7 @@ class ClienteLoteController extends Controller
                         $lastInsertId++;
 
                         LoteProduto::create([
-                            'id'                       =>  $lastInsertId[0]->id ++,
+                            'id'                       =>  $lastInsertId,
                             'gtin'                      => "$linha[2]",
                             'seu_codigo'                => "$linha[0]",
                             'seu_nome'                  => '$linha[1]',
