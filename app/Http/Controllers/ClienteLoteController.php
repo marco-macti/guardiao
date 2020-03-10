@@ -795,7 +795,7 @@ class ClienteLoteController extends Controller
                             'estab_origem_fk_id'        => $estabelecimentoDeOrigem,
                             'lote_fk_id'                => $loteId,
                             'status_fk_id'              => 1,
-                            'trib_estab_origem_fk_id'   => $lote->cliente->tributacao_estab_origem_fk_id
+                            'trib_estab_origem_fk_id'   => 1 //@todo: Verificar como buscar esta informação no banco. 
                         ]);
 
                         $qtdItensInseridos++;
