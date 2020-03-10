@@ -741,6 +741,8 @@ class ClienteLoteController extends Controller
                     );
 
                     $nacionalOuImportado = trim($linha[4]);
+                    echo $nacionalOuImportado;
+                    die;
 
                     if(!in_array(strlen($linha[2]),$tamanhoGtins)){                                                    // Validação para verificar o tamanho dos GTIN's
                         $erros[$index]['GTIN'] = 'O tamanho do GTIN é inválido.';
