@@ -28,8 +28,8 @@ class ClienteLoteController extends Controller
         foreach ($produtos as $index => $produto) {
 
             $nomeEx      = explode(" ", $produto->seu_nome);
-            $nomeReplace = $nomeEx[0]."|".$nomeEx[1];   
-            
+            $nomeReplace = $nomeEx[0]."|".$nomeEx[1];
+
             $produtoBC = DB::select("SELECT
                                             bcp.*,
                                             bcp.nome as base_comparativa_nome,
@@ -78,13 +78,13 @@ class ClienteLoteController extends Controller
                 if(is_null($produtoBC[0]->base_comparativa_pis_aliquota)){
                     $produtoBC[0]->base_comparativa_pis_aliquota = 0;
                 }
-                
+
                 if($produto->aliquota_pis != $produtoBC[0]->base_comparativa_pis_aliquota ){
                     $produtos[$index]->pis_correto = 'N';
                 }else{
                     $produtos[$index]->pis_correto = 'S';
                 }
-                
+
 
                 // Verificação se aliquota de COFINS da Base Comparativa é igual ao produto do lote
 
@@ -201,7 +201,7 @@ class ClienteLoteController extends Controller
 
         $lote     = ClienteLote::find($loteId);
         $produtos = $lote->produtos;//->where('gtin','=','7896110007373');
-        
+
         // Fix: Resolve o problema de produtos sem bc_perfil_contaabil_id
 
         $cliente  = Cliente::find($lote->cliente_fk_id);
@@ -251,7 +251,7 @@ class ClienteLoteController extends Controller
         foreach ($produtos as $index => $produto) {
 
             $nomeEx      = explode(" ", $produto->seu_nome);
-            $nomeReplace = $nomeEx[0]."|".$nomeEx[1];   
+            $nomeReplace = $nomeEx[0]."|".$nomeEx[1];
 
             $produtoBC = DB::select("SELECT DISTINCT
                                                 bcp.*,
@@ -270,14 +270,14 @@ class ClienteLoteController extends Controller
                                                LEFT JOIN bc_perfilcontabil_cofins pccofins ON pccofins.bc_perfil_contabil_fk_id = pc.id
                                                LEFT JOIN bc_perfilcontabil_pis pcpis ON pcpis.bc_perfil_contabil_fk_id = pc.id
                                             WHERE (bcp.ncm_fk_id = '{$produto->ncm}' AND bcp.nome SIMILAR TO '%($nomeReplace)%' AND pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id}) LIMIT 1 OFFSET 0");
-                               
+
             // Verifica se o produto está na base comparativa
             if(!isset($produtoBC[0])){
 
                 // Se caso o produto não existir na base comparativa , tenta uma consulta no cosmos
 
                 $url = 'https://api.cosmos.bluesoft.com.br/gtins/'.$produto->gtin.'.json';
-            
+
 
                 $headers = array(
                     "Content-Type: application/json",
@@ -303,7 +303,7 @@ class ClienteLoteController extends Controller
                         }
 
                         $ncm = Ncm::where('cod_ncm','=',$ncmProduto)->get();
-                        
+
                         if(count($ncm) > 0){
 
                             $gtin  = BCProdutoGtin::where('gtin','=',$produto->gtin)->get();
@@ -674,12 +674,139 @@ class ClienteLoteController extends Controller
 
     public function upload(Request $request){
 
+        /*
+         * Lib : https://github.com/shuchkin/simplexlsx
+        */
+
         $loteId = $request->lote_fk_id;
+
         if($loteId){
-            
-            $lote  = ClienteLote::find($loteId);  
-            
-            dd($lote);
-        }   
+
+            $lote  = ClienteLote::find($loteId);
+            $file  = $request->files;
+
+            $xlsx = \SimpleXLSX::parse( $request->id_excel_file->getPathname() );
+
+            $linhas            = $xlsx->rows();
+            $qtdLinhas         = count($linhas);
+            $erros             = array();
+            $qtdItensInseridos = 0;
+
+            foreach ($linhas as $index => $linha) {
+
+                $erros[$index] =  array();
+
+                /*
+                 *
+                 * Gabarito de validações de dados:
+                        EAN/GTIN                             = número válido , maior que 6 dígitos e o último digito é um verificador ou seja, tem que ser válido.
+                        NCM                                  = Deve conter ao menos 8 caracteres.
+                        Tributado 4%                         = Deve ser Sim ou Não.
+                        Origem                               = Deve ser Nacional ou Importado.
+                        Unidade federativa                   = Deve conter um valor válido de UF.
+                        Estabelecimento de Origem            = Precisa estar com todas as primeiras letras das palavras em maiusculo
+                        Tributação do Estabelecimento        = Deve ser Lucro Real ou Lucro Presumido
+                        Seu nome                             = Tudo maiusculo
+
+
+                    Gabarito Estrutural dos dados
+                        0 => 55935 ( CODIGO  CLIENTE )
+                        1 => "A/E DIRETOR LINHA EPS COSTURA" ( NOME DE PRODUTOS )
+                        2 => 7896260000000 ( EAN/GTIN )
+                        3 => 94019010 ( NCM )
+                        4 => "Nacional" (NACIONAL OU IMPORTADO )
+                        5 => "Não" ( Tributado 4%? )
+                        6 => "MG" ( UF Origem )
+                        7 => "Comércio Varejista" ( Estabelecimento Origem )
+                        8 => "Lucro Real" ( Tributação Estabelecimento Origem )
+                        9 => "Não" ( Possuí Alíquota PIS )
+                        10 => 0.018 ( Alíquota ICMS )
+                        11 => 1.65 ( Alíquota PIS )
+                        12 => 0.076 ( Alíquota COFINS )
+                 */
+
+                    $tamanhoGtins = [6,8,12,13,14];
+                    $estadosBrasileiros = array(
+                        'AC', 'AL', 'AP', 'AM',
+                        'BA','CE', 'DF', 'ES',
+                        'GO','MA', 'MT', 'MS',
+                        'MG','PA', 'PB', 'PR',
+                        'PE','PI','RJ', 'RN',
+                        'RS', 'RO', 'RR', 'SC',
+                        'SP','SE', 'TO',
+                    );
+                    $tributacoesDosEstabelecimentos = array(
+                        'Lucro Real'     ,'lucro real'     ,'LUCRO REAL'     ,'lucro Real'     ,'Lucro real',
+                        'Lucro Presumido','lucro presumido','LUCRO PRESUMIDO','lucro Presumido','Lucro presumido'
+                    );
+
+                    if(!in_array(strlen($linhas[2]),$tamanhoGtins)){                                                    // Validação para verificar o tamanho dos GTIN's
+                        $erros[$index]['GTIN'] = 'O tamanho do GTIN é inválido.';
+                    }elseif(strlen($linha[3]) >= 8){                                                                    // Validação para verificar o tamanho mínimo de 8 dígitos do NCM
+                        $erros[$index]['NCM'] = 'O tamanho do NCM é inválido por não conter no mínimo de 8 dígitos.';
+                    }elseif(!in_array($linha[4],array('Nacional','Importado'))){                                        // Validação para verificar se o produto é Nacional ou Importado
+                        $erros[$index]['NACIONAL_OU_IMPORTADO'] = 'O Valor informado para o campo não está no padrão .';
+                    }elseif(!in_array($linhas[5],array('Sim','Não'))){                                                  // Validação para verificar Tributado 4% ou Possui ST
+                        $erros[$index]['TRIBUTADO_4'] = 'O Valor informado para o campo não está no padrão.';
+                    }elseif(!in_array($linhas[6],$estadosBrasileiros)){                                                 // Validação para verificar UF de Origem
+                        $erros[$index]['UF_ORIGEM'] = 'O Valor informado para o campo não está no padrão.';
+                    }elseif(!in_array($linha[7],array('Comércio Varejista'))){                                          // Validação para verificar o Estabelecimento de Origem
+                        $erros[$index]['ESTABELECIMENTO_ORIGEM'] = 'O Valor informado para o campo não está no padrão.';
+                    }elseif(!in_array($linha[8],$tributacoesDosEstabelecimentos)){                                      // Validação para verificar a Tributação do Estabelecimento
+                        $erros[$index]['TRIBUTACAO_ESTABELECIMENTO'] = 'O Valor informado para o campo não está no padrão.';
+                    }elseif(!in_array($linhas[9],array('Sim','Não'))){                          // Validação para verificar se possui aliquota de PIS
+                        $erros[$index]['POSSUI_ALIQUOTA_PIS'] = 'O Valor informado para o campo não está no padrão.';
+                    }elseif(is_null($linha[10])){                                                                       // Validação do valor da alíquota de ICMS
+                        $erros[$index]['ALIQUOTA_ICMS'] = 'O Valor informado para o campo não pode ser vazio.';
+                    }elseif(is_null($linha[11])){                                                                       // Validação do valor da alíquota de PIS
+                        $erros[$index]['ALIQUOTA_PIS'] = 'O Valor informado para o campo não pode ser vazio.';
+                    }elseif(is_null($linha[12])){                                                                       // Validação do valor da alíquota de COFINS
+                        $erros[$index]['ALIQUOTA_CONFINS'] = 'O Valor informado para o campo não pode ser vazio.';
+                    }else{
+
+                        // Criação dos registros de produtos do Lote
+                        switch ($linha[7]){
+                            case 'Comércio Varejista':
+                                $estabelecimentoDeOrigem = 2;
+                                break;
+                            case 'Comércio Atacadista':
+                                $estabelecimentoDeOrigem = 1;
+                                break;
+                            default:
+                                $estabelecimentoDeOrigem = 2;
+                                break;
+                        }
+
+                        LoteProduto::create([
+                            'gtin'                      => $linha[2],
+                            'seu_codigo'                => $linha[0],
+                            'seu_nome'                  => $linha[1],
+                            'ncm'                       => $linha[3],
+                            'origem'                    => $linha[4],
+                            'tributado_4'               => $linha[5],
+                            'uf_origem_fk'              => $linha[6],
+                            'possui_st'                 => $linha[9],
+                            'aliquota_icm'              => $linha[10],
+                            'aliquota_pis'              => $linha[11],
+                            'aliquota_cofins'           => $linha[12],
+                            'bc_perfilcontabil_fk_id'   => null,
+                            'estab_origem_fk_id'        => $estabelecimentoDeOrigem,
+                            'lote_fk_id'                => $loteId,
+                            'status_fk_id'              => 1,
+                            'trib_estab_origem_fk_id'   => $lote->cliente->tributacao_estab_origem_fk_id
+                        ]);
+
+                        $qtdItensInseridos++;
+                    }
+
+
+            }
+
+            echo json_encode([
+                'erros'     => $erros,
+                'inseridos' => $qtdItensInseridos
+            ]);
+
+        }
     }
 }
