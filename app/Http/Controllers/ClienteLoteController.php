@@ -802,7 +802,7 @@ class ClienteLoteController extends Controller
 
             }
 
-            echo json_encode([
+            return response()->json([
                 'erros'     => $erros,
                 'inseridos' => $qtdItensInseridos
             ]);
