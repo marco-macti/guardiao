@@ -802,6 +802,8 @@ class ClienteLoteController extends Controller
 
             }
 
+            dd($erros);
+
             return response()->json([
                 'erros'     => $erros,
                 'inseridos' => $qtdItensInseridos
