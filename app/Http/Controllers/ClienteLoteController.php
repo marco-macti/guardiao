@@ -799,11 +799,15 @@ class ClienteLoteController extends Controller
 //                            'trib_estab_origem_fk_id'   => 1 //@todo: Verificar como buscar esta informação no banco.
 //                        ]);
 
+                        $lastInsertId = LoteProduto::select('id')->orderBy('DESC')->limit('1');
+
+                        dd($lastInsertId->id);
 
                         LoteProduto::create([
+                            'id'                       =>  $lastInsertId->id,
                             'gtin'                      => "$linha[2]",
                             'seu_codigo'                => "$linha[0]",
-                            'seu_nome'                  => "$linha[1]",
+                            'seu_nome'                  => '$linha[1]',
                             'ncm'                       => "$linha[3]",
                             'origem'                    => "$linha[4]",
                             'tributado_4'               => "$linha[5]",
