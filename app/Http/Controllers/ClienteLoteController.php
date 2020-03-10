@@ -812,7 +812,7 @@ class ClienteLoteController extends Controller
                             'aliquota_icm'              => "$linha[10]",
                             'aliquota_pis'              => "$linha[11]",
                             'aliquota_cofins'           => "$linha[12]",
-                            'bc_perfilcontabil_fk_id'   => 'NULL',
+                            'bc_perfilcontabil_fk_id'   => NULL,
                             'estab_origem_fk_id'        => "$estabelecimentoDeOrigem",
                             'lote_fk_id'                => "$loteId",
                             'status_fk_id'              => "1",
