@@ -779,7 +779,8 @@ class ClienteLoteController extends Controller
                                 break;
                         }
 
-                        LoteProduto::create([
+                        echo "<pre>";
+                        print_r([
                             'gtin'                      => $linha[2],
                             'seu_codigo'                => $linha[0],
                             'seu_nome'                  => $linha[1],
@@ -795,8 +796,28 @@ class ClienteLoteController extends Controller
                             'estab_origem_fk_id'        => $estabelecimentoDeOrigem,
                             'lote_fk_id'                => $loteId,
                             'status_fk_id'              => 1,
-                            'trib_estab_origem_fk_id'   => 1 //@todo: Verificar como buscar esta informação no banco. 
+                            'trib_estab_origem_fk_id'   => 1 //@todo: Verificar como buscar esta informação no banco.
                         ]);
+
+
+//                        LoteProduto::create([
+//                            'gtin'                      => $linha[2],
+//                            'seu_codigo'                => $linha[0],
+//                            'seu_nome'                  => $linha[1],
+//                            'ncm'                       => $linha[3],
+//                            'origem'                    => $linha[4],
+//                            'tributado_4'               => $linha[5],
+//                            'uf_origem_fk'              => $linha[6],
+//                            'possui_st'                 => $linha[9],
+//                            'aliquota_icm'              => $linha[10],
+//                            'aliquota_pis'              => $linha[11],
+//                            'aliquota_cofins'           => $linha[12],
+//                            'bc_perfilcontabil_fk_id'   => null,
+//                            'estab_origem_fk_id'        => $estabelecimentoDeOrigem,
+//                            'lote_fk_id'                => $loteId,
+//                            'status_fk_id'              => 1,
+//                            'trib_estab_origem_fk_id'   => 1 //@todo: Verificar como buscar esta informação no banco.
+//                        ]);
 
                         $qtdItensInseridos++;
                     }
