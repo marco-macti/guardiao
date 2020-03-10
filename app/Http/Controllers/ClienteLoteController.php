@@ -749,7 +749,7 @@ class ClienteLoteController extends Controller
                     }elseif(!in_array($linha[4],array('Nacional','Importado'))){                                        // Validação para verificar se o produto é Nacional ou Importado
                         $erros[$index]['NACIONAL_OU_IMPORTADO'] = 'O Valor informado para o campo não está no padrão .';
                     }elseif(!in_array($linha[5],array('Sim','Não'))){                                                  // Validação para verificar Tributado 4% ou Possui ST
-                        $erros[$index]['TRIBUTADO_4'] = 'O Valor informado para o campo não está no padrão.'.;
+                        $erros[$index]['TRIBUTADO_4'] = 'O Valor informado para o campo não está no padrão.';
                     }elseif(!in_array($linha[6],$estadosBrasileiros)){                                                 // Validação para verificar UF de Origem
                         $erros[$index]['UF_ORIGEM'] = 'O Valor informado para o campo não está no padrão.';
                     }elseif(!in_array($linha[7],array('Comércio Varejista'))){                                          // Validação para verificar o Estabelecimento de Origem
