@@ -804,10 +804,10 @@ class ClienteLoteController extends Controller
                         $lastInsertId++;
 
                         LoteProduto::create([
-                            'id'                       =>  $lastInsertId,
+                            'id'                        =>  $lastInsertId,
                             'gtin'                      => "$linha[2]",
                             'seu_codigo'                => "$linha[0]",
-                            'seu_nome'                  => '$linha[1]',
+                            'seu_nome'                  => "$linha[1]",
                             'ncm'                       => "$linha[3]",
                             'origem'                    => "$linha[4]",
                             'tributado_4'               => "$linha[5]",
@@ -819,7 +819,7 @@ class ClienteLoteController extends Controller
                             'bc_perfilcontabil_fk_id'   => NULL,
                             'estab_origem_fk_id'        => "$estabelecimentoDeOrigem",
                             'lote_fk_id'                => "$loteId",
-                            'status_fk_id'              => "1",
+                            'status_fk_id'              => "6",
                             'trib_estab_origem_fk_id'   => "1" //@todo: Verificar como buscar esta informação no banco.
                         ]);
 
