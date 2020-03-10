@@ -27,5 +27,12 @@ Route::get('/basecomparativa/produto/toJson'         ,'BCProdutoController@toJso
 // Rotas area do cliente
 
 Route::get('/areacliente/meus-produtos/{cliente}', 'AreaClienteController@meusProdutos');
-
 Route::get('/update-produtos-lote-cliente'                                     ,'HomeController@updateProdutosLoteCliente');
+
+// Robo
+
+Route::post('/robo/importar-produtos-cosmos' ,'RoboController@importarProdutosCosmos');
+
+// Lote
+
+Route::post('/lote/upload', 'ClienteLoteController@upload');

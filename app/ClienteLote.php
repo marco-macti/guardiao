@@ -18,7 +18,8 @@ class ClienteLote extends Model
 
     public function produtos(){
 
-        return $this->hasMany(LoteProduto::class, 'lote_fk_id','id');
+        return $this->hasMany(LoteProduto::class, 'lote_fk_id','id')->orderBy('seu_nome','ASC');
+
     }
 
 

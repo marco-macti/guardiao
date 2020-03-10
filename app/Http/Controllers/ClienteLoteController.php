@@ -27,6 +27,9 @@ class ClienteLoteController extends Controller
 
         foreach ($produtos as $index => $produto) {
 
+            $nomeEx      = explode(" ", $produto->seu_nome);
+            $nomeReplace = $nomeEx[0]."|".$nomeEx[1];   
+            
             $produtoBC = DB::select("SELECT
                                             bcp.*,
                                             bcp.nome as base_comparativa_nome,
@@ -47,11 +50,7 @@ class ClienteLoteController extends Controller
                                             LEFT JOIN bc_perfilcontabil_cofins pccofins ON pccofins.bc_perfil_contabil_fk_id = pc.id
                                             LEFT JOIN bc_perfilcontabil_pis pcpis ON pcpis.bc_perfil_contabil_fk_id = pc.id
                                         WHERE
-                                        bcgtin.gtin = '{$produto->gtin}' AND
-                                        pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id} AND
-                                        pcicms.aliquota IS NOT NULL AND
-                                        pccofins.aliquota IS NOT NULL AND
-                                        pcpis.aliquota IS NOT NULL");
+                                        (bcp.ncm_fk_id = '{$produto->ncm}' AND bcp.nome SIMILAR TO '%($nomeReplace)%' AND pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id}) LIMIT 1 OFFSET 0");
 
             if(count($produtoBC) > 0){
 
@@ -64,6 +63,9 @@ class ClienteLoteController extends Controller
                 }
 
                 // Verificação se aliquota de ICMS da Base Comparativa é igual ao produto do lote
+                if(is_null($produtoBC[0]->base_comparativa_icms_aliquota)){
+                    $produtoBC[0]->base_comparativa_icms_aliquota = 0;
+                }
 
                 if($produto->aliquota_icm != $produtoBC[0]->base_comparativa_icms_aliquota){
                     $produtos[$index]->icms_correto = 'N';
@@ -73,13 +75,22 @@ class ClienteLoteController extends Controller
 
                 // Verificação se aliquota de PIS da Base Comparativa é igual ao produto do lote
 
-                if($produto->aliquota_pis != $produtoBC[0]->base_comparativa_pis_aliquota){
+                if(is_null($produtoBC[0]->base_comparativa_pis_aliquota)){
+                    $produtoBC[0]->base_comparativa_pis_aliquota = 0;
+                }
+                
+                if($produto->aliquota_pis != $produtoBC[0]->base_comparativa_pis_aliquota ){
                     $produtos[$index]->pis_correto = 'N';
                 }else{
                     $produtos[$index]->pis_correto = 'S';
                 }
+                
 
                 // Verificação se aliquota de COFINS da Base Comparativa é igual ao produto do lote
+
+                if(is_null($produtoBC[0]->base_comparativa_cofins_aliquota)){
+                    $produtoBC[0]->base_comparativa_cofins_aliquota = 0;
+                }
 
                 if($produto->aliquota_cofins != $produtoBC[0]->base_comparativa_cofins_aliquota){
                     $produtos[$index]->cofins_correto = 'N';
@@ -166,7 +177,6 @@ class ClienteLoteController extends Controller
                 array_push($data,$strItem);
             }
 
-
             header('Content-Type: text/csv');
             header("Content-Disposition: attachment; filename=Relatorio_lote_{$loteId}.csv");
 
@@ -190,12 +200,12 @@ class ClienteLoteController extends Controller
     public function sincronizarLote($loteId){
 
         $lote     = ClienteLote::find($loteId);
-        $produtos = $lote->produtos;
-
+        $produtos = $lote->produtos;//->where('gtin','=','7896110007373');
+        
         // Fix: Resolve o problema de produtos sem bc_perfil_contaabil_id
 
         $cliente  = Cliente::find($lote->cliente_fk_id);
-        $produtos =  DB::select("SELECT
+        $produtosAudit =  DB::select("SELECT
                                     cl.id as NUMERO_DO_LOTE,
                                     cl.cliente_lote_status_fk_id as STATUS_DO_LOTE,
                                     lp.bc_perfilcontabil_fk_id as LOTE_PRODUTO_PERFIL_CONTABIL_ID,
@@ -216,11 +226,11 @@ class ClienteLoteController extends Controller
 
         //EndFix
 
-        foreach ($produtos as $index => $produto) {
+        foreach ($produtosAudit as $index => $prodAudit) {
 
             try {
-                LoteProduto::find($produto->lote_produto_id)->update([
-                    'bc_perfilcontabil_fk_id' => $produto->bc_pefil_contabil_id
+                LoteProduto::find($prodAudit->lote_produto_id)->update([
+                    'bc_perfilcontabil_fk_id' => $prodAudit->bc_pefil_contabil_id
                 ]);
             }catch (\PDOException $e){
                 echo $e->getMessage();
@@ -228,13 +238,6 @@ class ClienteLoteController extends Controller
             }
 
         }
-
-
-
-
-
-
-
 
         $produtosNaoEncontrados = "<table style='width:100%'>
                                       <tr>
@@ -247,7 +250,10 @@ class ClienteLoteController extends Controller
 
         foreach ($produtos as $index => $produto) {
 
-            $produtoBC = DB::select("SELECT
+            $nomeEx      = explode(" ", $produto->seu_nome);
+            $nomeReplace = $nomeEx[0]."|".$nomeEx[1];   
+
+            $produtoBC = DB::select("SELECT DISTINCT
                                                 bcp.*,
                                                 bcp.nome as base_comparativa_nome,
                                                 bcgtin.gtin as base_comparativa_gtin,
@@ -263,14 +269,15 @@ class ClienteLoteController extends Controller
                                                LEFT JOIN bc_perfil_contabil_icms pcicms ON pcicms.bc_perfil_contabil_fk_id = pc.id
                                                LEFT JOIN bc_perfilcontabil_cofins pccofins ON pccofins.bc_perfil_contabil_fk_id = pc.id
                                                LEFT JOIN bc_perfilcontabil_pis pcpis ON pcpis.bc_perfil_contabil_fk_id = pc.id
-                                            WHERE bcgtin.gtin = '{$produto->gtin}' AND pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id} ");
-
+                                            WHERE (bcp.ncm_fk_id = '{$produto->ncm}' AND bcp.nome SIMILAR TO '%($nomeReplace)%' AND pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id}) LIMIT 1 OFFSET 0");
+                               
             // Verifica se o produto está na base comparativa
             if(!isset($produtoBC[0])){
 
                 // Se caso o produto não existir na base comparativa , tenta uma consulta no cosmos
 
                 $url = 'https://api.cosmos.bluesoft.com.br/gtins/'.$produto->gtin.'.json';
+            
 
                 $headers = array(
                     "Content-Type: application/json",
@@ -296,7 +303,7 @@ class ClienteLoteController extends Controller
                         }
 
                         $ncm = Ncm::where('cod_ncm','=',$ncmProduto)->get();
-
+                        
                         if(count($ncm) > 0){
 
                             $gtin  = BCProdutoGtin::where('gtin','=',$produto->gtin)->get();
@@ -663,5 +670,16 @@ class ClienteLoteController extends Controller
         }
 
 
+    }
+
+    public function upload(Request $request){
+
+        $loteId = $request->lote_fk_id;
+        if($loteId){
+            
+            $lote  = ClienteLote::find($loteId);  
+            
+            dd($lote);
+        }   
     }
 }

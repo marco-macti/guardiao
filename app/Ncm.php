@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ncm extends Model
 {
-    protected $table = 'ncm';
-    public $timestamps  = false;
-    protected $fillable = ['cod_ncm'];
+    protected $table      = 'ncm';
+    protected $primaryKey = 'cod_ncm';
+    public $timestamps    = false;
+    protected $fillable   = ['cod_ncm','descricao'];
 }
