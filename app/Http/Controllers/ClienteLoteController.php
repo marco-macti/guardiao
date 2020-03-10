@@ -740,7 +740,7 @@ class ClienteLoteController extends Controller
                         'Lucro Presumido','lucro presumido','LUCRO PRESUMIDO','lucro Presumido','Lucro presumido'
                     );
 
-                    if(!in_array(strlen($linhas[2]),$tamanhoGtins)){                                                    // Validação para verificar o tamanho dos GTIN's
+                    if(!in_array(strlen($linha[2]),$tamanhoGtins)){                                                    // Validação para verificar o tamanho dos GTIN's
                         $erros[$index]['GTIN'] = 'O tamanho do GTIN é inválido.';
                     }elseif(strlen($linha[3]) >= 8){                                                                    // Validação para verificar o tamanho mínimo de 8 dígitos do NCM
                         $erros[$index]['NCM'] = 'O tamanho do NCM é inválido por não conter no mínimo de 8 dígitos.';
@@ -748,13 +748,13 @@ class ClienteLoteController extends Controller
                         $erros[$index]['NACIONAL_OU_IMPORTADO'] = 'O Valor informado para o campo não está no padrão .';
                     }elseif(!in_array($linhas[5],array('Sim','Não'))){                                                  // Validação para verificar Tributado 4% ou Possui ST
                         $erros[$index]['TRIBUTADO_4'] = 'O Valor informado para o campo não está no padrão.';
-                    }elseif(!in_array($linhas[6],$estadosBrasileiros)){                                                 // Validação para verificar UF de Origem
+                    }elseif(!in_array($linha[6],$estadosBrasileiros)){                                                 // Validação para verificar UF de Origem
                         $erros[$index]['UF_ORIGEM'] = 'O Valor informado para o campo não está no padrão.';
                     }elseif(!in_array($linha[7],array('Comércio Varejista'))){                                          // Validação para verificar o Estabelecimento de Origem
                         $erros[$index]['ESTABELECIMENTO_ORIGEM'] = 'O Valor informado para o campo não está no padrão.';
                     }elseif(!in_array($linha[8],$tributacoesDosEstabelecimentos)){                                      // Validação para verificar a Tributação do Estabelecimento
                         $erros[$index]['TRIBUTACAO_ESTABELECIMENTO'] = 'O Valor informado para o campo não está no padrão.';
-                    }elseif(!in_array($linhas[9],array('Sim','Não'))){                          // Validação para verificar se possui aliquota de PIS
+                    }elseif(!in_array($linha[9],array('Sim','Não'))){                          // Validação para verificar se possui aliquota de PIS
                         $erros[$index]['POSSUI_ALIQUOTA_PIS'] = 'O Valor informado para o campo não está no padrão.';
                     }elseif(is_null($linha[10])){                                                                       // Validação do valor da alíquota de ICMS
                         $erros[$index]['ALIQUOTA_ICMS'] = 'O Valor informado para o campo não pode ser vazio.';
