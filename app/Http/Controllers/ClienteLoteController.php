@@ -801,7 +801,7 @@ class ClienteLoteController extends Controller
 
                         $lastInsertId = LoteProduto::select('id')->orderBy('DESC')->limit('1');
 
-                        dd($lastInsertId->id);
+                        dd($lastInsertId);
 
                         LoteProduto::create([
                             'id'                       =>  $lastInsertId->id,
