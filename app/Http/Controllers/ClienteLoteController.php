@@ -799,7 +799,7 @@ class ClienteLoteController extends Controller
 //                            'trib_estab_origem_fk_id'   => 1 //@todo: Verificar como buscar esta informação no banco.
 //                        ]);
 
-                        $lastInsertId = DB::SELECT ("SELECT id FROM public.lote_produtoORDER BY id DESC OFFSET 0 LIMIT 1");
+                        $lastInsertId = DB::SELECT ("SELECT lp.id  FROM public.lote_produto lp ORDER BY lp.id DESC OFFSET 0 LIMIT 1");
 
                         dd($lastInsertId);
 
