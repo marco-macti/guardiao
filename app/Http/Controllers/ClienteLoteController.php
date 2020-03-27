@@ -833,7 +833,7 @@ class ClienteLoteController extends Controller
                             'bc_perfilcontabil_fk_id'   => NULL,
                             'estab_origem_fk_id'        => "$estabelecimentoDeOrigem",
                             'lote_fk_id'                => "$loteId",
-                            'status_fk_id'              => "6",
+                            'status_fk_id'              => 4,
                             'trib_estab_origem_fk_id'   => "1" //@todo: Verificar como buscar esta informação no banco.
                         ]);
 
