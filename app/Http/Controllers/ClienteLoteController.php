@@ -25,11 +25,17 @@ class ClienteLoteController extends Controller
         $corretos = array();
         $incorretos = array();
 
+
         foreach ($produtos as $index => $produto) {
 
             $nomeEx      = explode(" ", $produto->seu_nome);
-            $nomeReplace = $nomeEx[0]."|".$nomeEx[1];
-
+            if(count($nomeEx) > 1){
+                $nomeReplace = $nomeEx[0]."|".$nomeEx[1];
+            }
+            else{
+                $nomeReplace = $nomeEx[0];
+            }
+            
             $produtoBC = DB::select("SELECT
                                             bcp.*,
                                             bcp.nome as base_comparativa_nome,
@@ -51,6 +57,7 @@ class ClienteLoteController extends Controller
                                             LEFT JOIN bc_perfilcontabil_pis pcpis ON pcpis.bc_perfil_contabil_fk_id = pc.id
                                         WHERE
                                         (bcp.ncm_fk_id = '{$produto->ncm}' AND bcp.nome SIMILAR TO '%($nomeReplace)%' AND pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id}) LIMIT 1 OFFSET 0");
+
 
             if(count($produtoBC) > 0){
 
@@ -134,7 +141,7 @@ class ClienteLoteController extends Controller
                 $produtos[$index]->base_comparativa_pis_aliquota = empty($produtoBC[0]->base_comparativa_pis_aliquota) ? 'N/A' : $produtoBC[0]->base_comparativa_pis_aliquota;
                 $produtos[$index]->base_comparativa_pis_cst = empty($produtoBC[0]->base_comparativa_pis_cst) ? 'N/A' : $produtoBC[0]->base_comparativa_pis_cst;
 
-                $produtos[$index]->base_comparativa_pis_base_legal = empty($produtoBC[0]->base_comparativa_pis_base_legalt) ? 'N/A' : $produtoBC[0]->base_comparativa_base_legal;
+                $produtos[$index]->base_comparativa_pis_base_legal = empty($produtoBC[0]->base_comparativa_pis_base_legal) ? 'N/A' : $produtoBC[0]->base_comparativa_pis_base_legal;
 
             } catch (PDOException $e) {
                 echo $e->getMessage();
@@ -251,7 +258,14 @@ class ClienteLoteController extends Controller
         foreach ($produtos as $index => $produto) {
 
             $nomeEx      = explode(" ", $produto->seu_nome);
-            $nomeReplace = $nomeEx[0]."|".$nomeEx[1];
+
+            if(count($nomeEx) > 1){
+                $nomeReplace = $nomeEx[0]."|".$nomeEx[1];
+            }
+            else{
+                $nomeReplace = $nomeEx[0];
+            }
+            
 
             $produtoBC = DB::select("SELECT DISTINCT
                                                 bcp.*,

@@ -31,7 +31,9 @@ Route::get('/update-produtos-lote-cliente'                                     ,
 
 // Robo
 
-Route::post('/robo/importar-produtos-cosmos' ,'RoboController@importarProdutosCosmos');
+Route::get('/robo/{pg}/{parametro}/{indice_produtos}'              ,'RoboController@index');
+Route::get('/robo/pagina-interna'                ,'RoboController@paginaInterna');
+Route::post('/robo/importar-produtos-cosmos'     ,'RoboController@importarProdutosCosmos');
 
 // Lote
 
