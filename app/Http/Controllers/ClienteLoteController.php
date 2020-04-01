@@ -17,11 +17,12 @@ class ClienteLoteController extends Controller
 {
     public function relatorioLote($loteId){
 
+
         // Busca pelo Cliente do Lote
 
         $lote     = ClienteLote::find($loteId);
         $produtos = $lote->produtos;
-
+        
         $corretos = array();
         $incorretos = array();
 
@@ -126,22 +127,22 @@ class ClienteLoteController extends Controller
 
                 $produtos[$index]->base_comparativa_cnae = empty($produtoBC[0]->ncm_fk_id) ? 'N/A' : $produtoBC[0]->ncm_fk_id;
 
-                $produtos[$index]->base_comparativa_icms_aliquota = (empty($produtoBC[0]->base_comparativa_icms_aliquota) || is_null($produtoBC[0]->base_comparativa_icms_aliquota)) ? 0 : $produtoBC[0]->base_comparativa_icms_aliquota;
+                $produtos[$index]->base_comparativa_icms_aliquota =  @is_null($produtoBC[0]->base_comparativa_icms_aliquota) ? 'N/A' : $produtoBC[0]->base_comparativa_icms_aliquota;
 
-                $produtos[$index]->base_comparativa_icms_base_legal = (empty($produtoBC[0]->base_comparativa_icms_base_legal) || is_null($produtoBC[0]->base_comparativa_icms_base_legal)) ? 'N/A' : $produtoBC[0]->base_comparativa_icms_base_legal;
+                $produtos[$index]->base_comparativa_icms_base_legal = (@is_null($produtoBC[0]->base_comparativa_icms_base_legal)) ? 'N/A' : $produtoBC[0]->base_comparativa_icms_base_legal;
 
-                $produtos[$index]->base_comparativa_icms_possui_st = empty($produtoBC[0]->base_comparativa_icms_possui_st) ? 'N/A' : $produtoBC[0]->base_comparativa_icms_possui_st;
+                $produtos[$index]->base_comparativa_icms_possui_st = @is_null($produtoBC[0]->base_comparativa_icms_possui_st) ? 'N/A' : $produtoBC[0]->base_comparativa_icms_possui_st;
 
-                $produtos[$index]->base_comparativa_cofins_aliquota = empty($produtoBC[0]->base_comparativa_cofins_aliquota) ? 'N/A' : $produtoBC[0]->base_comparativa_cofins_aliquota;
+                $produtos[$index]->base_comparativa_cofins_aliquota = @is_null($produtoBC[0]->base_comparativa_cofins_aliquota) ? 'N/A' : $produtoBC[0]->base_comparativa_cofins_aliquota;
 
-                $produtos[$index]->base_comparativa_cofins_cst = empty($produtoBC[0]->base_comparativa_cofins_cst) ? 'N/A' : $produtoBC[0]->base_comparativa_cofins_cst;
+                $produtos[$index]->base_comparativa_cofins_cst = @is_null($produtoBC[0]->base_comparativa_cofins_cst) ? 'N/A' : $produtoBC[0]->base_comparativa_cofins_cst;
 
-                $produtos[$index]->base_comparativa_cofins_base_legal = empty($produtoBC[0]->base_comparativa_cofins_base_legal) ? 'N/A' : $produtoBC[0]->base_comparativa_cofins_base_legal;
+                $produtos[$index]->base_comparativa_cofins_base_legal = @is_null($produtoBC[0]->base_comparativa_cofins_base_legal) ? 'N/A' : $produtoBC[0]->base_comparativa_cofins_base_legal;
 
-                $produtos[$index]->base_comparativa_pis_aliquota = empty($produtoBC[0]->base_comparativa_pis_aliquota) ? 'N/A' : $produtoBC[0]->base_comparativa_pis_aliquota;
-                $produtos[$index]->base_comparativa_pis_cst = empty($produtoBC[0]->base_comparativa_pis_cst) ? 'N/A' : $produtoBC[0]->base_comparativa_pis_cst;
+                $produtos[$index]->base_comparativa_pis_aliquota = @is_null($produtoBC[0]->base_comparativa_pis_aliquota) ? 'N/A' : $produtoBC[0]->base_comparativa_pis_aliquota;
+                $produtos[$index]->base_comparativa_pis_cst = @is_null($produtoBC[0]->base_comparativa_pis_cst) ? 'N/A' : $produtoBC[0]->base_comparativa_pis_cst;
 
-                $produtos[$index]->base_comparativa_pis_base_legal = empty($produtoBC[0]->base_comparativa_pis_base_legal) ? 'N/A' : $produtoBC[0]->base_comparativa_pis_base_legal;
+                $produtos[$index]->base_comparativa_pis_base_legal = @is_null($produtoBC[0]->base_comparativa_pis_base_legal) ? 'N/A' : $produtoBC[0]->base_comparativa_pis_base_legal;
 
             } catch (PDOException $e) {
                 echo $e->getMessage();
@@ -851,5 +852,153 @@ class ClienteLoteController extends Controller
             ]);
 
         }
+    }
+
+    public function produtosNcmIncorretos(){
+
+        $produtos = DB::select('SELECT id,nome,ncm_fk_id FROM public.bc_produto
+                                ORDER BY id DESC
+                                OFFSET 0 LIMIT 60000');
+
+        $data     = array('COD_PRODUTO;NOME_PRODUTO;NCM_ATUAL;DESC_CATEGORIA_NCM_ATUAL;DESC_SUB_CATEGORIA_NCM_ATUAL;NCM_CORRETO');
+
+        foreach ($produtos as $key => $produto) {
+
+            $nomeExp = preg_replace("/[^A-Za-z0-9\-]/", ' ', $produto->nome);
+            
+            $gtin = BCProdutoGtin::where('bc_produto_fk_id', $produto->id)->first();
+
+            if(!is_object($gtin)){
+                $sql = "SELECT 
+                        n.cod_ncm,
+                        nsub.cod_subcategoria,  
+                        nsub.descricao AS descricao_subcategoria,
+                        ncat.cod_categoria,
+                        ncat.descricao AS descricao_categoria
+                    FROM public.ncm n
+                    INNER JOIN public.ncm_subcategoria nsub ON nsub.cod_subcategoria = n.ncm_subcategoria_fk_id
+                    INNER JOIN public.ncm_categoria ncat ON ncat.cod_categoria = nsub.ncm_categoria_fk_id
+                    WHERE 
+                        n.cod_ncm = '$produto->ncm_fk_id'
+                    AND 
+                        ncat.descricao NOT SIMILAR TO '%($nomeExp)%'
+                    AND 
+                        nsub.descricao NOT SIMILAR TO '%($nomeExp)%'";
+            
+            $result = DB::select($sql);
+
+            if(count($result) > 0){
+                if(empty($result[0]->descricao_categoria)){
+                    $descricao_categoria = '';
+                }
+                else{
+                    $descricao_categoria = str_replace(";", " ", $result[0]->descricao_categoria);
+                }
+                if(empty($result[0]->descricao_subcategoria)){
+                    $descricao_subcategoria = '';
+                }
+                else{
+                    $descricao_subcategoria = str_replace(";", " ",$result[0]->descricao_subcategoria);
+                }
+                //print_r($result[0]);
+
+
+                $strItem = "{$produto->id};
+                            {$produto->nome};
+                            {$produto->ncm_fk_id};
+                            {$descricao_categoria};
+                            {$descricao_subcategoria};
+                            INSIRA_AQUI";
+
+                array_push($data,$strItem);
+                }
+            }
+           
+        }
+        header('Content-Type: text/csv');
+                header("Content-Disposition: attachment; filename=Relatorio_lote_produtos_ncm_incorreto.csv");
+
+                $fp = fopen('php://output', 'wb');
+
+                foreach ($data as $line ) {
+
+                    $val = explode(";", $line);
+                    fputcsv($fp, $val);
+                }
+
+                fclose($fp);
+
+    }
+
+    public function exportaCsvLinear(ClienteLote $lote){
+
+        if($lote->cliente_lote_status_fk_id == 4)
+        $produto = $lote->produtos;
+
+        $produtos = DB::select('SELECT id,nome,ncm_fk_id FROM public.bc_produto OFFSET 0 LIMIT 10000');
+
+        $data     = array('COD_PRODUTO;NOME_PRODUTO;NCM_ATUAL;DESC_CATEGORIA_NCM_ATUAL;DESC_SUB_CATEGORIA_NCM_ATUAL;NCM_CORRETO');
+
+        foreach ($produtos as $key => $produto) {
+            
+            $nomeExp = preg_match("/^[a-zA-Z\d]+$/", $produto->nome);
+            
+            
+            $sql = "SELECT 
+                        n.cod_ncm,
+                        nsub.cod_subcategoria,  
+                        nsub.descricao AS descricao_subcategoria,
+                        ncat.cod_categoria,
+                        ncat.descricao AS descricao_categoria
+                    FROM public.ncm n
+                    INNER JOIN public.ncm_subcategoria nsub ON nsub.cod_subcategoria = n.ncm_subcategoria_fk_id
+                    INNER JOIN public.ncm_categoria ncat ON ncat.cod_categoria = nsub.ncm_categoria_fk_id
+                    WHERE 
+                        n.cod_ncm = '$produto->ncm_fk_id'
+                    AND 
+                        ncat.descricao NOT SIMILAR TO '%($nomeExp)%'";
+            
+            $result = DB::select($sql);
+
+            if(count($result) > 0){
+                if(empty($result[0]->descricao_categoria)){
+                    $descricao_categoria = '';
+                }
+                else{
+                    $descricao_categoria = str_replace(";", " ", $result[0]->descricao_categoria);
+                }
+                if(empty($result[0]->descricao_subcategoria)){
+                    $descricao_subcategoria = '';
+                }
+                else{
+                    $descricao_subcategoria = str_replace(";", " ",$result[0]->descricao_subcategoria);
+                }
+                //print_r($result[0]);
+
+
+                $strItem = "{$produto->id};
+                            {$produto->nome};
+                            {$produto->ncm_fk_id};
+                            {$descricao_categoria};
+                            {$descricao_subcategoria};
+                            INSIRA_AQUI";
+
+                array_push($data,$strItem);
+            }
+           
+        }
+        header('Content-Type: text/csv');
+                header("Content-Disposition: attachment; filename=Relatorio_lote_produtos_ncm_incorreto.csv");
+
+                $fp = fopen('php://output', 'wb');
+
+                foreach ($data as $line ) {
+
+                    $val = explode(";", $line);
+                    fputcsv($fp, $val);
+                }
+
+                fclose($fp);
+
     }
 }

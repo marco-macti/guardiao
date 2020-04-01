@@ -16,7 +16,9 @@ Route::get('/relatorio-lote/{lote}'    ,'ClienteLoteController@relatorioLote');
 Route::get('/sincronizar-lote/{lote}'  ,'ClienteLoteController@sincronizarLote');
 Route::post('/monitoramento-lote'      ,'ClienteLoteController@monitoramentoLote');
 Route::get('/consulta-cosmos/{gtin}'   ,'ClienteLoteController@consultaCosmos');
-Route::get('/importar-bc-produto-aux'  ,'HomeController@importarBCProdutoAux');
+Route::get('/importar-bc-produto-aux'          ,'HomeController@importarBCProdutoAux');
+Route::get('/relatorio-produtos-ncm-incorretos','ClienteLoteController@produtosNcmIncorretos');
+Route::get('/relatorio-linear/{lote}'          ,'ClienteLoteController@exportaCsvLinear');
 
 // Rotas base Comparativa
 
