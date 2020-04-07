@@ -291,22 +291,30 @@ class ClienteLoteController extends Controller
 
                 // Se caso o produto não existir na base comparativa , tenta uma consulta no cosmos
 
-                $url = 'https://api.cosmos.bluesoft.com.br/gtins/'.$produto->gtin.'.json';
+                try{
+
+                    $url = 'https://api.cosmos.bluesoft.com.br/gtins/'.$produto->gtin.'.json';
 
 
-                $headers = array(
-                    "Content-Type: application/json",
-                    "X-Cosmos-Token: SJaFhcrcDrvFrwch5xPQvw"
-                );
+                    $headers = array(
+                        "Content-Type: application/json",
+                        "X-Cosmos-Token: SJaFhcrcDrvFrwch5xPQvw"
+                    );
 
-                $curl = curl_init($url);
+                    $curl = curl_init($url);
 
-                curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($curl, CURLOPT_FAILONERROR, true);
+                    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+                    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl, CURLOPT_FAILONERROR, true);
 
-                $data = curl_exec($curl);
+                    $data = curl_exec($curl);
+
+                }catch(\Exception $e){
+                    dd($e);        
+                }
+
+                
 
                 if ($data === false || $data == NULL) {
 
