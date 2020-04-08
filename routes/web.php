@@ -11,14 +11,14 @@
 |
 */
 
-Route::get('/'                         ,'HomeController@index');
-Route::get('/relatorio-lote/{lote}'    ,'ClienteLoteController@relatorioLote');
-Route::get('/sincronizar-lote/{lote}'  ,'ClienteLoteController@sincronizarLote');
-Route::post('/monitoramento-lote'      ,'ClienteLoteController@monitoramentoLote');
-Route::get('/consulta-cosmos/{gtin}'   ,'ClienteLoteController@consultaCosmos');
-Route::get('/importar-bc-produto-aux'          ,'HomeController@importarBCProdutoAux');
-Route::get('/relatorio-produtos-ncm-incorretos','ClienteLoteController@produtosNcmIncorretos');
-Route::get('/relatorio-linear/{lote}'          ,'ClienteLoteController@exportaCsvLinear');
+Route::get('/'                                  ,'HomeController@index');
+Route::get('/relatorio-lote/{lote}'             ,'ClienteLoteController@relatorioLote');
+Route::get('/sincronizar-lote/{lote}'           ,'ClienteLoteController@sincronizarLote');
+Route::post('/monitoramento-lote'               ,'ClienteLoteController@monitoramentoLote');
+Route::get('/consulta-cosmos/{gtin}'            ,'ClienteLoteController@consultaCosmos');
+Route::get('/importar-bc-produto-aux'           ,'HomeController@importarBCProdutoAux');
+Route::get('/relatorio-produtos-ncm-incorretos' ,'ClienteLoteController@produtosNcmIncorretos');
+Route::get('/relatorio-linear/{cliente}'        ,'ReportsController@relatorioLinear');
 
 // Rotas base Comparativa
 
@@ -29,13 +29,13 @@ Route::get('/basecomparativa/produto/toJson'         ,'BCProdutoController@toJso
 // Rotas area do cliente
 
 Route::get('/areacliente/meus-produtos/{cliente}', 'AreaClienteController@meusProdutos');
-Route::get('/update-produtos-lote-cliente'                                     ,'HomeController@updateProdutosLoteCliente');
+Route::get('/update-produtos-lote-cliente'       ,'HomeController@updateProdutosLoteCliente');
 
 // Robo
 
-Route::get('/robo/{pg}/{parametro}/{indice_produtos}'              ,'RoboController@index');
-Route::get('/robo/pagina-interna'                ,'RoboController@paginaInterna');
-Route::post('/robo/importar-produtos-cosmos'     ,'RoboController@importarProdutosCosmos');
+Route::get('/robo/{pg}/{parametro}/{indice_produtos}'  ,'RoboController@index');
+Route::get('/robo/pagina-interna'                      ,'RoboController@paginaInterna');
+Route::post('/robo/importar-produtos-cosmos'           ,'RoboController@importarProdutosCosmos');
 
 // Lote
 

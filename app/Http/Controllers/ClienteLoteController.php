@@ -22,7 +22,7 @@ class ClienteLoteController extends Controller
 
         $lote     = ClienteLote::find($loteId);
         $produtos = $lote->produtos;
-        
+
         $corretos = array();
         $incorretos = array();
 
@@ -36,7 +36,7 @@ class ClienteLoteController extends Controller
             else{
                 $nomeReplace = $nomeEx[0];
             }
-            
+
             $produtoBC = DB::select("SELECT
                                             bcp.*,
                                             bcp.nome as base_comparativa_nome,
@@ -266,7 +266,7 @@ class ClienteLoteController extends Controller
             else{
                 $nomeReplace = $nomeEx[0];
             }
-            
+
 
             $produtoBC = DB::select("SELECT DISTINCT
                                                 bcp.*,
@@ -311,10 +311,10 @@ class ClienteLoteController extends Controller
                     $data = curl_exec($curl);
 
                 }catch(\Exception $e){
-                    dd($e);        
+                    dd($e);
                 }
 
-                
+
 
                 if ($data === false || $data == NULL) {
 
@@ -873,26 +873,26 @@ class ClienteLoteController extends Controller
         foreach ($produtos as $key => $produto) {
 
             $nomeExp = preg_replace("/[^A-Za-z0-9\-]/", ' ', $produto->nome);
-            
+
             $gtin = BCProdutoGtin::where('bc_produto_fk_id', $produto->id)->first();
 
             if(!is_object($gtin)){
-                $sql = "SELECT 
+                $sql = "SELECT
                         n.cod_ncm,
-                        nsub.cod_subcategoria,  
+                        nsub.cod_subcategoria,
                         nsub.descricao AS descricao_subcategoria,
                         ncat.cod_categoria,
                         ncat.descricao AS descricao_categoria
                     FROM public.ncm n
                     INNER JOIN public.ncm_subcategoria nsub ON nsub.cod_subcategoria = n.ncm_subcategoria_fk_id
                     INNER JOIN public.ncm_categoria ncat ON ncat.cod_categoria = nsub.ncm_categoria_fk_id
-                    WHERE 
+                    WHERE
                         n.cod_ncm = '$produto->ncm_fk_id'
-                    AND 
+                    AND
                         ncat.descricao NOT SIMILAR TO '%($nomeExp)%'
-                    AND 
+                    AND
                         nsub.descricao NOT SIMILAR TO '%($nomeExp)%'";
-            
+
             $result = DB::select($sql);
 
             if(count($result) > 0){
@@ -921,79 +921,7 @@ class ClienteLoteController extends Controller
                 array_push($data,$strItem);
                 }
             }
-           
-        }
-        header('Content-Type: text/csv');
-                header("Content-Disposition: attachment; filename=Relatorio_lote_produtos_ncm_incorreto.csv");
 
-                $fp = fopen('php://output', 'wb');
-
-                foreach ($data as $line ) {
-
-                    $val = explode(";", $line);
-                    fputcsv($fp, $val);
-                }
-
-                fclose($fp);
-
-    }
-
-    public function exportaCsvLinear(ClienteLote $lote){
-
-        if($lote->cliente_lote_status_fk_id == 4)
-        $produto = $lote->produtos;
-
-        $produtos = DB::select('SELECT id,nome,ncm_fk_id FROM public.bc_produto OFFSET 0 LIMIT 10000');
-
-        $data     = array('COD_PRODUTO;NOME_PRODUTO;NCM_ATUAL;DESC_CATEGORIA_NCM_ATUAL;DESC_SUB_CATEGORIA_NCM_ATUAL;NCM_CORRETO');
-
-        foreach ($produtos as $key => $produto) {
-            
-            $nomeExp = preg_match("/^[a-zA-Z\d]+$/", $produto->nome);
-            
-            
-            $sql = "SELECT 
-                        n.cod_ncm,
-                        nsub.cod_subcategoria,  
-                        nsub.descricao AS descricao_subcategoria,
-                        ncat.cod_categoria,
-                        ncat.descricao AS descricao_categoria
-                    FROM public.ncm n
-                    INNER JOIN public.ncm_subcategoria nsub ON nsub.cod_subcategoria = n.ncm_subcategoria_fk_id
-                    INNER JOIN public.ncm_categoria ncat ON ncat.cod_categoria = nsub.ncm_categoria_fk_id
-                    WHERE 
-                        n.cod_ncm = '$produto->ncm_fk_id'
-                    AND 
-                        ncat.descricao NOT SIMILAR TO '%($nomeExp)%'";
-            
-            $result = DB::select($sql);
-
-            if(count($result) > 0){
-                if(empty($result[0]->descricao_categoria)){
-                    $descricao_categoria = '';
-                }
-                else{
-                    $descricao_categoria = str_replace(";", " ", $result[0]->descricao_categoria);
-                }
-                if(empty($result[0]->descricao_subcategoria)){
-                    $descricao_subcategoria = '';
-                }
-                else{
-                    $descricao_subcategoria = str_replace(";", " ",$result[0]->descricao_subcategoria);
-                }
-                //print_r($result[0]);
-
-
-                $strItem = "{$produto->id};
-                            {$produto->nome};
-                            {$produto->ncm_fk_id};
-                            {$descricao_categoria};
-                            {$descricao_subcategoria};
-                            INSIRA_AQUI";
-
-                array_push($data,$strItem);
-            }
-           
         }
         header('Content-Type: text/csv');
                 header("Content-Disposition: attachment; filename=Relatorio_lote_produtos_ncm_incorreto.csv");
