@@ -40,3 +40,8 @@ Route::post('/robo/importar-produtos-cosmos'           ,'RoboController@importar
 // Lote
 
 Route::post('/lote/upload', 'ClienteLoteController@upload');
+
+// Operações do IOB
+
+Route::get('/iob/','IobController@index');
+Route::post('/iob/import-sheet','IobController@importSheet');
