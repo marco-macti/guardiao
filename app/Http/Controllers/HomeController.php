@@ -74,4 +74,11 @@ class HomeController extends Controller
 
         }
     }
+
+    public function getClientes(){
+
+        $clientes = Cliente::all()->pluck('razao_social','id');
+
+        return response()->json($clientes);
+    }
 }

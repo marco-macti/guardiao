@@ -85,27 +85,27 @@ class ReportsController extends Controller
 
                     if( $produto->possui_st == "Sim" && $bcProduto->cest_fk_id != null ){
 
-                        $ICMS_PDV = $produto->aliquota_icm;
-                        $ICMSENT  = $produto->aliquota_icm;
-                        $CST_ICMS = '060';
+                        $ICMS_PDV = 'SUBSTITUICAO'; //$produto->aliquota_icm;
+                        $ICMSENT  = 'SUBSTITUICAO';//$produto->aliquota_icm;
+                        $CST_ICMS = (string) '060';
 
                     }elseif( $produto->possui_st == "Sim" && $produto->aliquota_icm == null && $bcProduto->cest_fk_id != null ){ // SE o produto contiver substituição Tributária e aliquota  vazia
 
                         $ICMS_PDV = 'NAO TRIBUTADO';
                         $ICMSENT  = 'NAO TRIBUTADO';
-                        $CST_ICMS = '041';            // Não tributada
+                        $CST_ICMS = (string) '041';            // Não tributada
 
                     }elseif(  $produto->possui_st == "Não" && $produto->aliquota_icm == null && $bcProduto->cest_fk_id == null ){ // SE o produto não contiver substituição Tributária e aliquota  vazia
 
                         $ICMS_PDV = 'ISENTO';
                         $ICMSENT  = 'ISENTO';
-                        $CST_ICMS = '040';                 // Isenta
+                        $CST_ICMS = (string) '040';                 // Isenta
 
                     }elseif(  $produto->possui_st == "Não" && $produto->aliquota_icm != null ){ // SE o produto não contiver substituição Tributária e aliquota não vazia
 
                         $ICMS_PDV = 'ISENTO';
                         $ICMSENT  = 'ISENTO';
-                        $CST_ICMS = '030';          // Isenta ou não tributária e com cobrança do ICMS por substituição tributária
+                        $CST_ICMS = (string) '030';          // Isenta ou não tributária e com cobrança do ICMS por substituição tributária
 
                     }
 

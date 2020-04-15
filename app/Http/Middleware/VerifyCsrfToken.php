@@ -21,6 +21,7 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         '/monitoramento-lote',
         '/robo/importar-produtos-cosmos',
-        '/lote/upload'
+        '/lote/upload',
+        '/get-clientes'
     ];
 }
