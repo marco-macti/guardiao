@@ -22,6 +22,7 @@ class VerifyCsrfToken extends Middleware
         '/monitoramento-lote',
         '/robo/importar-produtos-cosmos',
         '/lote/upload',
-        '/get-clientes'
+        '/get-clientes',
+        '/iob/importSheet'
     ];
 }

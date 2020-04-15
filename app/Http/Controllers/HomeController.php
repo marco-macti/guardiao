@@ -81,4 +81,20 @@ class HomeController extends Controller
 
         return response()->json($clientes);
     }
+
+    public function getClienteLotes(Cliente $cliente){
+
+        $lotes  = $cliente->lotes();
+        $result = [];
+
+        foreach ($lotes as $key => $lote) {
+
+            $result[$key]['numero']     = $lote->num_lote_cliente;
+            $result[$key]['observacao'] = $lote->anotacoes;
+
+        }
+
+        return response()->json($result);
+
+    }
 }

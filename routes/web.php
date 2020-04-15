@@ -20,7 +20,8 @@ Route::get('/importar-bc-produto-aux'           ,'HomeController@importarBCProdu
 Route::get('/relatorio-produtos-ncm-incorretos' ,'ClienteLoteController@produtosNcmIncorretos');
 Route::get('/relatorio-linear/{cliente}'        ,'ReportsController@relatorioLinear');
 
-Route::get('/get-clientes','HomeController@getClientes');
+Route::get('/get-clientes'                ,'HomeController@getClientes');
+Route::get('/get-cliente-lotes/{cliente}' ,'HomeController@getClienteLotes');
 
 // Rotas base Comparativa
 
