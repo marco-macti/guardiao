@@ -90,7 +90,7 @@ class HomeController extends Controller
         foreach ($lotes as $key => $lote) {
 
             $result[$key]['numero']     = $lote->num_lote_cliente;
-            $result[$key]['observacao'] = $lote->anotacoes;
+            $result[$key]['observacao'] = strip_tags($lote->anotacoes);
 
         }
 

@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 class IobController extends Controller
 {
     public function index(){
+
         return view('iob.form');
+        
     }
 
     public function importSheet(Request $request){
