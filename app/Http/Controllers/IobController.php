@@ -9,11 +9,18 @@ class IobController extends Controller
     public function index(){
 
         return view('iob.form');
-        
+
     }
 
     public function importSheet(Request $request){
 
+        /*array:3 [▼
+          "cliente" => "8"
+          "lote" => "95"
+          "sheet" => "PLANILHA LAUTON ALIQUOTA TESTE.xlsx"
+        ]*/
+
+        dd($request->all());                                                                                                                                                       
 
         $file = $request->file('sheet');
 
