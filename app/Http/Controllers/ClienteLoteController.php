@@ -648,11 +648,11 @@ class ClienteLoteController extends Controller
                     'aliquota_icm'    => $item[7],
                     'aliquota_pis'    => $item[9],
                     'aliquota_cofins' => $item[11],
-                    'status_fk_id'    => 5,
+                    'status_fk_id'    => 5, // Em monitoramento para o produto
                 ]);
             }
 
-            $lote->cliente_lote_status_fk_id =  4;
+            $lote->cliente_lote_status_fk_id =  4; // Em monitoramento para o lote
             $lote->save();
 
             echo json_encode(array(

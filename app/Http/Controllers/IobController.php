@@ -2,7 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\BCPerfilContabilCofins;
+use App\BCPerfilContabilIcms;
+use App\BCPerfilContabilPis;
+use App\BCProduto;
+use App\ClienteLote;
+use App\LoteProduto;
+use App\Ncm;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use PDOException;
 
 class IobController extends Controller
 {
@@ -14,13 +24,9 @@ class IobController extends Controller
 
     public function importSheet(Request $request){
 
-        /*array:3 [▼
-          "cliente" => "8"
-          "lote" => "95"
-          "sheet" => "PLANILHA LAUTON ALIQUOTA TESTE.xlsx"
-        ]*/
-
-        dd($request->all());                                                                                                                                                       
+        // Dados do request
+        $num_lote_cliente  = $request->get('lote');
+        $cliente_fk_id     = $request->get('cliente');
 
         $file = $request->file('sheet');
 
@@ -39,87 +45,198 @@ class IobController extends Controller
 
         // Remove as celulas inicias de 0 a 7
 
-        for ($i = 0; $i <= 7; $i++){
+        for ($i = 0; $i <= 8; $i++){
             unset($rows[$i]);
         }
 
-        /*$base = array [
-            0 => "SKU"
-            1 => "Descrição-SKU"
-            2 => "EAN/GTIN"
-            3 => "Descrição-EAN"
-            4 => "NCM"
-            5 => "EX"
-            6 => "Origem Produto"
-            7 => "Tributado 4%"
-            8 => "Operação"
-            9 => "UF Origem"
-            10 => "UF Destino"
-            11 => "Estabelecimento Origem"
-            12 => "Tributação Estabelecimento Origem"
-            13 => "Tipo de destinatário"
-            14 => "Tributação destinatário"
-            15 => "Destinação da mercadoria"
-            16 => "ICMS - Operação Interestadual - Alíquota"
-            17 => "ICMS - Operação Interna - Alíquota"
-            18 => "ICMS - Operação Interna - Base Legal"
-            19 => "ICMS - Operação Interna - Início de Vigência"
-            20 => "ICMS - Operação Interna - Fim de Vigência"
-            21 => "ICMS - Alíquota ao Fundo - Alíquota ao Fundo"
-            22 => "ICMS - Alíquota ao Fundo - Base Legal"
-            23 => "ICMS - Alíquota ao Fundo - Início de Vigência"
-            24 => "ICMS - Alíquota ao Fundo - Fim de Vigência"
-            25 => "DIFAL"
-            26 => "Redução de Base de Cálculo - Próprio - % de redução"
-            27 => "Redução de Base de Cálculo - Próprio - % a tributar"
-            28 => "Redução de Base de Cálculo - Próprio - Base Legal"
-            29 => "Redução de Base de Cálculo - Próprio - Descrição"
-            30 => "Redução de Base de Cálculo - Próprio - Descrição Condição"
-            31 => "Redução de Base de Cálculo - Próprio - Informações Complementares"
-            32 => "Redução de Base de Cálculo - Próprio - Início de Vigência"
-            33 => "Redução de Base de Cálculo - Próprio - Fim de Vigência"
-            34 => "Redução de Base de Cálculo - ST - % de redução"
-            35 => "Redução de Base de Cálculo - ST - % a tributar"
-            36 => "Redução de Base de Cálculo - ST - Base Legal"
-            37 => "Redução de Base de Cálculo - ST - Descrição"
-            38 => "Redução de Base de Cálculo - ST - Descrição Condição"
-            39 => "Redução de Base de Cálculo - ST - Informações Complementares"
-            40 => "Redução de Base de Cálculo - ST - Início de Vigência"
-            41 => "Redução de Base de Cálculo - ST - Fim de Vigência"
-            42 => "ICMS - Substituição Tributária - MVA Original"
-            43 => "ICMS - Substituição Tributária - MVA Ajustado"
-            44 => "ICMS - Substituição Tributária - Base Legal"
-            45 => "ICMS - Substituição Tributária - CEST"
-            46 => "ICMS - Substituição Tributária - Descrição Conforme Ato Normativo"
-            47 => "ICMS - Substituição Tributária - Informação complementar"
-            48 => "ICMS - Substituição Tributária - Início de Vigência"
-            49 => "ICMS - Substituição Tributária - Fim de Vigência"
-            50 => "ICMS - Substituição Tributária - Observações"
-            51 => "ICMS – ST - % Carga Tributária Média"
-            52 => "ICMS – ST - % Carga Tributária ao Fundo"
-            53 => "ICMS – ST – Carga Total"
-            54 => "ICMS – ST – Carga – Base Legal"
-            55 => "ICMS – ST – Carga – CEST"
-            56 => "ICMS – ST – Carga – Início de Vigência"
-            57 => "ICMS – ST – Carga – Fim de Vigência"
-            58 => "IPI - Aliquota"
-            59 => "IPI - Informação Complementar"
-            60 => "IPI - Base Legal"
-            61 => "IPI - Início de Vigência"
-            62 => "IPI - Fim deVigência"
-            63 => "Alíquota Pis/Pasep"
-            64 => "CST Pis-Pasep"
-            65 => "Base Legal Pis/Pasep"
-            66 => "Pis-Pasep - Início de Vigência"
-            67 => "Pis-Pasep - Fim de Vigência"
-            68 => "Alíquota Cofins"
-            69 => "CST Cofins"
-            70 => "Base Legal Cofins"
-            71 => "Cofins - Início de Vigência"
-            72 => "Cofins - Fim de Vigência"
-        ];*/
+        $contErros = 0;
 
-        dd($rows);
+        foreach ($rows as $key => $row) {
 
+            $seu_codigo             = $row[0];
+            $ncm                    = $row[4];
+            $produtosNaoEncontrados = [];
+            $ncmNaoLocalizados      = [];
+
+            $nomeEx  = explode(" ", $row[1]);
+
+            if(count($nomeEx) > 1){
+                $nomeReplace = $nomeEx[0]."|".$nomeEx[1];
+            }
+            else{
+                $nomeReplace = $nomeEx[0];
+            }
+
+            $lote = ClienteLote::where('num_lote_cliente',$num_lote_cliente)
+                                ->where('cliente_fk_id',$cliente_fk_id)
+                                ->first();
+
+            // Usando Facade de DB
+            $produto = DB::select("SELECT
+                                    *
+                                    FROM
+                                        public.lote_produto
+                                    WHERE
+                                        seu_codigo = '{$row[0]}'
+                                    AND
+                                        lote_fk_id = {$lote->id} ");
+
+            if(!empty($produto)){
+
+                // Busca pelo NCM informado da planilha, se não encontrar ele cadastra.
+
+                if(!is_object(Ncm::where('cod_ncm',$ncm)->first())){
+
+                    $contErros++;
+
+                    array_push($ncmNaoLocalizados,$ncm);
+
+                }
+            }
+        }
+
+        if($contErros > 0){
+
+            // Havendo mais que um erro , ele já exibe os erros
+
+            dd($ncmNaoLocalizados);
+
+        }else{
+
+            foreach ($rows as $key => $row) {
+
+
+                $lote = ClienteLote::where('num_lote_cliente', $num_lote_cliente)
+                                    ->where('cliente_fk_id'  , $cliente_fk_id)
+                                    ->first();
+
+                $nomeEx  = explode(" ", $row[1]);
+
+                if(count($nomeEx) > 1){
+                    $nomeReplace = $nomeEx[0]."|".$nomeEx[1];
+                }
+                else{
+                    $nomeReplace = $nomeEx[0];
+                }
+
+                try {
+                    $produtoBC = DB::select("SELECT
+                                            bcp.*,
+                                            pc.id AS perfil_contabil_id,
+                                            pcicms.id AS perfil_contabil_icms_id,
+                                            pccofins.id AS perfil_contabil_confins_id,
+                                            pcpis.id AS perfil_contabil_pis_id
+                                        FROM bc_produto_gtin AS bcgtin
+                                            INNER JOIN bc_produto AS bcp ON bcp.id = bcgtin.bc_produto_fk_id
+                                            LEFT JOIN bc_perfil_contabil pc ON pc.ncm_fk_id = bcp.ncm_fk_id
+                                            LEFT JOIN bc_perfil_contabil_icms pcicms ON pcicms.bc_perfil_contabil_fk_id = pc.id
+                                            LEFT JOIN bc_perfilcontabil_cofins pccofins ON pccofins.bc_perfil_contabil_fk_id = pc.id
+                                            LEFT JOIN bc_perfilcontabil_pis pcpis ON pcpis.bc_perfil_contabil_fk_id = pc.id
+                                        WHERE
+                                        (bcp.ncm_fk_id = '{$row[4]}'
+                                        AND bcp.nome SIMILAR TO '%($nomeReplace)%'
+                                        AND pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id})
+                                        LIMIT 1 OFFSET 0");
+
+                } catch (\Throwable $th) {
+                    echo $th->getMessage();
+                    die;
+                }
+
+
+                if(isset($produtoBC[0])){
+
+                    $produtoBC = $produtoBC[0];
+
+                     // Atualiza o NCM com os dados disponíveis
+
+
+                    $ncm = Ncm::where('cod_ncm',$ncm)->first();
+
+                    if(!empty($row[61])){
+                        $ncm->update([
+                            'dt_inicio_vigencia' => Carbon::createFromFormat('d/m/Y',$row[61])->format('Y-m-d')
+                        ]);
+                    }
+
+                    if(!empty($row[62])){
+                        $ncm->update([
+                            'dt_fim_vigencia'    => Carbon::createFromFormat('d/m/Y',$row[62])->format('Y-m-d')
+                        ]);
+                    }
+
+                    // Atualiza o produto na base comparativa com os dados da planilha enviada
+
+                    try{
+
+                        $bcp = BCProduto::find($produtoBC->id)->first();
+                        $bcp->ncm_fk_id = $row[4];
+
+                    }catch(PDOException $e){
+                           echo $e->getMessage();
+                           die;
+                    }
+
+                    // Atualiza as aliqutoas de PIS na base comparativa com os dados da planilha enviada
+
+
+                    $bcPerfilContabilPis = BCPerfilContabilPis::where('bc_perfil_contabil_fk_id',$produtoBC->perfil_contabil_id)->first();
+                    $bcPerfilContabilPis->update([
+                        'aliquota'   => $row[63],
+                        'cst'        => $row[64],
+                        'base_legal' => $row[65]
+                    ]);
+
+                    if(!empty($row[66])){
+                        $bcPerfilContabilPis->inicio = Carbon::createFromFormat('d/m/Y',$row[66])->format('Y-m-d');
+                    }
+
+                    if(!empty($row[67])){
+                        $bcPerfilContabilPis->fim = Carbon::createFromFormat('d/m/Y',$row[67])->format('Y-m-d');
+                    }
+
+                    $bcPerfilContabilPis->save();
+
+                    // Atualiza as aliqutoas de COFINS na base comparativa com os dados da planilha enviada
+
+                    $bcPerfilContabilCofins = BCPerfilContabilCofins::where('bc_perfil_contabil_fk_id',$produtoBC->perfil_contabil_id)->first();
+                    $bcPerfilContabilCofins->update([
+                        'aliquota'   => $row[68],
+                        'cst'        => $row[69],
+                        'base_legal' => $row[70]
+                    ]);
+
+                    if(!empty($row[71])){
+                        $bcPerfilContabilCofins->inicio = Carbon::createFromFormat('d/m/Y',$row[71])->format('Y-m-d');
+                    }
+
+                    if(!empty($row[72])){
+                        $bcPerfilContabilCofins->fim = Carbon::createFromFormat('d/m/Y',$row[72])->format('Y-m-d');
+                    }
+
+                    $bcPerfilContabilCofins->save();
+
+
+                    // Atualiza as aliqutoas de ICMS na base comparativa com os dados da planilha enviada
+
+                    $bcPerfilContabilIcms = BCPerfilContabilIcms::where('bc_perfil_contabil_fk_id',$produtoBC->perfil_contabil_id)->first();
+                    $bcPerfilContabilIcms->update([
+                        'aliquota'   => $row[58],
+                        'cst'        => $row[59],
+                        'base_legal' => $row[60]
+                    ]);
+
+                    if(!empty($row[61])){
+                        $bcPerfilContabilIcms->inicio = Carbon::createFromFormat('d/m/Y',$row[61])->format('Y-m-d');
+                    }
+
+                    if(!empty($row[62])){
+                        $bcPerfilContabilIcms->fim = Carbon::createFromFormat('d/m/Y',$row[62])->format('Y-m-d');
+                    }
+
+                    $bcPerfilContabilIcms->save();
+                }
+            }
+        }
     }
 }
