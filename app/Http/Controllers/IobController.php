@@ -51,11 +51,13 @@ class IobController extends Controller
 
         $contErros = 0;
 
+        $totalProdutos =  count($rows);
+        $totalProdutosAtualizados = 0;
+
         foreach ($rows as $key => $row) {
 
             $seu_codigo             = $row[0];
             $ncm                    = $row[4];
-            $produtosNaoEncontrados = [];
             $ncmNaoLocalizados      = [];
 
             $nomeEx  = explode(" ", $row[1]);
@@ -150,7 +152,6 @@ class IobController extends Controller
 
                      // Atualiza o NCM com os dados disponíveis
 
-
                     $ncm = Ncm::where('cod_ncm',$ncm)->first();
 
                     if(!empty($row[61])){
@@ -178,65 +179,133 @@ class IobController extends Controller
                     }
 
                     // Atualiza as aliqutoas de PIS na base comparativa com os dados da planilha enviada
-
-
                     $bcPerfilContabilPis = BCPerfilContabilPis::where('bc_perfil_contabil_fk_id',$produtoBC->perfil_contabil_id)->first();
-                    $bcPerfilContabilPis->update([
-                        'aliquota'   => $row[63],
-                        'cst'        => $row[64],
-                        'base_legal' => $row[65]
-                    ]);
 
-                    if(!empty($row[66])){
-                        $bcPerfilContabilPis->inicio = Carbon::createFromFormat('d/m/Y',$row[66])->format('Y-m-d');
+                    // Verifica se existe a consulta no banco.
+                    if(is_object($bcPerfilContabilPis)){
+
+                        // Verifica se a aliquota está presente para o PIS
+                        if(!empty($row[63])){
+                            $bcPerfilContabilPis->update([
+                                'aliquota'   => $row[63]
+                            ]);
+                        }
+
+                        // Verifica se o CST está presente para o PIS
+                        $bcPerfilContabilPis->update([
+                            'cst'        => $row[64]
+                        ]);
+
+                        // Verifica se a base legal está presente para o PIS
+                        $bcPerfilContabilPis->update([
+                            'base_legal' => $row[65]
+                        ]);
+
+                        // Verifica se a data inicio está presente para o PIS
+                        if(!empty($row[66])){
+                            $bcPerfilContabilPis->inicio = Carbon::createFromFormat('d/m/Y',$row[66])->format('Y-m-d');
+                        }
+                        // Verifica se a data fim está presente para o PIS
+                        if(!empty($row[67])){
+                            $bcPerfilContabilPis->fim = Carbon::createFromFormat('d/m/Y',$row[67])->format('Y-m-d');
+                        }
+
+                        // Atualiza o objeto de instância com os dados imputados.
+                        $bcPerfilContabilPis->save();
+
                     }
-
-                    if(!empty($row[67])){
-                        $bcPerfilContabilPis->fim = Carbon::createFromFormat('d/m/Y',$row[67])->format('Y-m-d');
-                    }
-
-                    $bcPerfilContabilPis->save();
 
                     // Atualiza as aliqutoas de COFINS na base comparativa com os dados da planilha enviada
 
                     $bcPerfilContabilCofins = BCPerfilContabilCofins::where('bc_perfil_contabil_fk_id',$produtoBC->perfil_contabil_id)->first();
-                    $bcPerfilContabilCofins->update([
-                        'aliquota'   => $row[68],
-                        'cst'        => $row[69],
-                        'base_legal' => $row[70]
-                    ]);
 
-                    if(!empty($row[71])){
-                        $bcPerfilContabilCofins->inicio = Carbon::createFromFormat('d/m/Y',$row[71])->format('Y-m-d');
+                    if(is_object($bcPerfilContabilCofins)){
+
+                        if(!empty($row[68])){
+                            // Verifica se a aliquota está presente para o COFINS
+                            $bcPerfilContabilCofins->update([
+                                'aliquota' => $row[68]
+                            ]);
+                        }
+
+                        // Verifica se o CST está presente para o COFINS
+                        if(!empty($row[69])){
+                            $bcPerfilContabilCofins->update([
+                                'cst'  => $row[69]
+                            ]);
+                        }
+
+                        // Verifica se a Base Legal está presente para o COFINS
+                        if(!empty($row[70])){
+                            $bcPerfilContabilCofins->update([
+                                'base_legal' => $row[70]
+                            ]);
+                        }
+
+                        // Verifica se a data inicio está presente para o COFINS
+                        if(!empty($row[71])){
+                            $bcPerfilContabilCofins->inicio = Carbon::createFromFormat('d/m/Y',$row[71])->format('Y-m-d');
+                        }
+
+                        // Verifica se a data fim está presente para o COFINS
+                        if(!empty($row[72])){
+                            $bcPerfilContabilCofins->fim = Carbon::createFromFormat('d/m/Y',$row[72])->format('Y-m-d');
+                        }
+
+                        // Atualiza o objeto de instância com os dados imputados.
+                        $bcPerfilContabilCofins->save();
+
                     }
-
-                    if(!empty($row[72])){
-                        $bcPerfilContabilCofins->fim = Carbon::createFromFormat('d/m/Y',$row[72])->format('Y-m-d');
-                    }
-
-                    $bcPerfilContabilCofins->save();
-
 
                     // Atualiza as aliqutoas de ICMS na base comparativa com os dados da planilha enviada
 
                     $bcPerfilContabilIcms = BCPerfilContabilIcms::where('bc_perfil_contabil_fk_id',$produtoBC->perfil_contabil_id)->first();
-                    $bcPerfilContabilIcms->update([
-                        'aliquota'   => $row[58],
-                        'cst'        => $row[59],
-                        'base_legal' => $row[60]
-                    ]);
 
-                    if(!empty($row[61])){
-                        $bcPerfilContabilIcms->inicio = Carbon::createFromFormat('d/m/Y',$row[61])->format('Y-m-d');
+                    if(is_object($bcPerfilContabilIcms)){
+
+                        // Verifica se a aliquota está presente para o ICMS
+                        if(!empty($row[58])){
+                            $bcPerfilContabilIcms->update([
+                                'aliquota'   => $row[58]
+                            ]);
+                        }
+
+                        // Verifica se o CST está presente para o ICMS
+                        if(!empty($row[59])){
+
+                            $bcPerfilContabilIcms->update([
+                                'cst'        => $row[59],
+                            ]);
+                        }
+
+                        // Verifica se a base legal está presente para o ICMS
+                        if(!empty($row[60])){
+                            $bcPerfilContabilIcms->update([
+                                'base_legal' => $row[60]
+                            ]);
+                        }
+
+                        // Verifica se a data inicio está presente para o ICMS
+                        if(!empty($row[61])){
+                            $bcPerfilContabilIcms->inicio = Carbon::createFromFormat('d/m/Y',$row[61])->format('Y-m-d');
+                        }
+
+                        // Verifica se a data fim está presente para o ICMS
+                        if(!empty($row[62])){
+                            $bcPerfilContabilIcms->fim = Carbon::createFromFormat('d/m/Y',$row[62])->format('Y-m-d');
+                        }
+
+                        $bcPerfilContabilIcms->save();
                     }
 
-                    if(!empty($row[62])){
-                        $bcPerfilContabilIcms->fim = Carbon::createFromFormat('d/m/Y',$row[62])->format('Y-m-d');
-                    }
-
-                    $bcPerfilContabilIcms->save();
                 }
+
+                $totalProdutosAtualizados++;
             }
         }
+
+        echo "Total de Produtos : {$totalProdutos} <br/>";
+        echo "Total de Produtos atualizados: {$totalProdutosAtualizados} <br/>";
+
     }
 }
