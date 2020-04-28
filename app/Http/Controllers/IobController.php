@@ -8,6 +8,7 @@ use App\BCPerfilContabilPis;
 use App\BCProduto;
 use App\ClienteLote;
 use App\LoteProduto;
+use App\BCProdutoNcm;
 use App\Ncm;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -107,10 +108,9 @@ class IobController extends Controller
 
             foreach ($rows as $key => $row) {
 
-
                 $lote = ClienteLote::where('num_lote_cliente', $num_lote_cliente)
-                                    ->where('cliente_fk_id'  , $cliente_fk_id)
-                                    ->first();
+                                ->where('cliente_fk_id'  , $cliente_fk_id)
+                                ->first();
 
                 $nomeEx  = explode(" ", $row[1]);
 
@@ -122,7 +122,8 @@ class IobController extends Controller
                 }
 
                 try {
-                    $produtoBC = DB::select("SELECT
+
+                      $produtoBC = DB::select("SELECT
                                             bcp.*,
                                             pc.id AS perfil_contabil_id,
                                             pcicms.id AS perfil_contabil_icms_id,
@@ -134,17 +135,14 @@ class IobController extends Controller
                                             LEFT JOIN bc_perfil_contabil_icms pcicms ON pcicms.bc_perfil_contabil_fk_id = pc.id
                                             LEFT JOIN bc_perfilcontabil_cofins pccofins ON pccofins.bc_perfil_contabil_fk_id = pc.id
                                             LEFT JOIN bc_perfilcontabil_pis pcpis ON pcpis.bc_perfil_contabil_fk_id = pc.id
-                                        WHERE
-                                        (bcp.ncm_fk_id = '{$row[4]}'
-                                        AND bcp.nome SIMILAR TO '%($nomeReplace)%'
-                                        AND pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id})
+                                        WHERE bcp.nome = '{$row[1]}'
+                                        AND pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id}
                                         LIMIT 1 OFFSET 0");
-
+                    
                 } catch (\Throwable $th) {
                     echo $th->getMessage();
                     die;
                 }
-
 
                 if(isset($produtoBC[0])){
 
@@ -152,7 +150,7 @@ class IobController extends Controller
 
                      // Atualiza o NCM com os dados disponíveis
 
-                    $ncm = Ncm::where('cod_ncm',$ncm)->first();
+                    $ncm = Ncm::where('cod_ncm',$row[4])->first();
 
                     if(!empty($row[61])){
                         $ncm->update([
@@ -170,8 +168,36 @@ class IobController extends Controller
 
                     try{
 
-                        $bcp = BCProduto::find($produtoBC->id)->first();
-                        $bcp->ncm_fk_id = $row[4];
+                        try{
+
+                         $bcp    = BCProduto::where('id',$produtoBC->id)->first();
+                         $bcp->ncm_fk_id = $row[4];
+                         $bcp->save();
+
+                        $bcpNcm = BCProdutoNcm::where('bc_produto_fk_id',$produtoBC->id)
+                                               ->where('ncm_fk_id'       ,$produtoBC->ncm_fk_id)
+                                               ->first();
+                        if(!is_object($bcpNcm)){
+
+                            BCProdutoNcm::create([
+                                                     'inicio'           => date('Y-m-d'),
+                                                     'ncm_fk_id'        => $row[4],
+                                                     'bc_produto_fk_id' => $produtoBC->id
+                                                 ]);
+
+                        }else{
+                            $bcpNcm->update([
+                                                     'inicio'           => date('Y-m-d'),
+                                                     'ncm_fk_id'        => $row[4],
+                                                     'bc_produto_fk_id' => $produtoBC->id
+                                                 ]);
+                        }                       
+
+                                               
+                       }catch(\Exception $e){
+                          echo $e->getMessage();
+                          die;
+                       }
 
                     }catch(PDOException $e){
                            echo $e->getMessage();
@@ -300,6 +326,20 @@ class IobController extends Controller
 
                 }
 
+
+                // Atualiza o NCM do produto no LOTE
+
+                $produtoLoteX = LoteProduto::where('seu_nome',"{$row[1]}")
+                                           ->where('lote_fk_id',$lote->id)
+                                           ->first();
+
+                if(is_object($produtoLoteX)){
+                    $produtoLoteX->update([
+                        'ncm' =>$row[4]
+                    ]);
+                }
+
+                
                 $totalProdutosAtualizados++;
             }
         }

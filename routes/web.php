@@ -2,6 +2,7 @@
 
 Route::get('/'                                        ,'HomeController@index');
 Route::get('/relatorio-lote/{lote}'                   ,'ClienteLoteController@relatorioLote');
+Route::get('/relatorio-lote-pos-iob/{lote}'           ,'ClienteLoteController@relatorioLotePosIOB');
 Route::get('/sincronizar-lote/{lote}'                 ,'ClienteLoteController@sincronizarLote');
 Route::post('/monitoramento-lote'                     ,'ClienteLoteController@monitoramentoLote');
 Route::get('/consulta-cosmos/{gtin}'                  ,'ClienteLoteController@consultaCosmos');
