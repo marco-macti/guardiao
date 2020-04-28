@@ -38,6 +38,8 @@ class ClienteLoteController extends Controller
                     $nomeReplace = $nomeEx[0];
                 }
 
+
+
                 $produtoBC = DB::select("SELECT
                                                 bcp.*,
                                                 bcp.nome as base_comparativa_nome,
@@ -51,8 +53,8 @@ class ClienteLoteController extends Controller
                                                 pcpis.aliquota as base_comparativa_pis_aliquota,
                                                 pcpis.cst as base_comparativa_pis_cst,
                                                 pcpis.base_legal as base_comparativa_pis_base_legal
-                                            FROM bc_produto_gtin AS bcgtin
-                                                INNER JOIN bc_produto AS bcp ON bcp.id = bcgtin.bc_produto_fk_id
+                                            FROM bc_produto AS bcp
+                                                LEFT JOIN bc_produto_gtin AS bcgtin ON bcp.id = bcgtin.bc_produto_fk_id
                                                 LEFT JOIN bc_perfil_contabil pc ON pc.ncm_fk_id = bcp.ncm_fk_id
                                                 LEFT JOIN bc_perfil_contabil_icms pcicms ON pcicms.bc_perfil_contabil_fk_id = pc.id
                                                 LEFT JOIN bc_perfilcontabil_cofins pccofins ON pccofins.bc_perfil_contabil_fk_id = pc.id
@@ -60,7 +62,7 @@ class ClienteLoteController extends Controller
                                             WHERE
                                             (bcp.ncm_fk_id = '{$produto->ncm}' 
                                             AND bcp.nome SIMILAR TO '%($nomeReplace)%' 
-                                            AND pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id}) 
+                                            /*AND pc.trib_estab_origem_fk_id = {$lote->cliente->enquadramento_tributario_fk_id}*/) 
                                             LIMIT 1 OFFSET 0");
 
 
