@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class Cliente extends Model
 {
+	protected $primarykey = 'id';
     protected $table = 'cliente';
     protected $guarded = [];
 

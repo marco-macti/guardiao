@@ -19,6 +19,7 @@ class BCPerfilContabil extends Model
 		'cnae_classe_fk_id',
 		'dest_mercadoria_fk_id',
 		'estab_origem_fk_id',
+		'estab_dest_fk_id',
 		'ncm_fk_id',
 		'trib_estab_destino_fk_id',
 		'trib_estab_origem_fk_id',
