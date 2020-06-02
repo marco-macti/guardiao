@@ -17,6 +17,7 @@ class ReportsController extends Controller
 {
     public function relatorioLinear(Cliente $cliente){
 
+    
         if(is_object($cliente)){
 
             // Monta o Cabeçalho da exportação
@@ -53,19 +54,22 @@ class ReportsController extends Controller
 
                 if(is_object($bcProdutoGtin)){
 
-                    $bcProduto = BCProduto::where('id',$bcProdutoGtin->bc_produto_fk_id)->first();
+                    $bcProduto = BCProduto::select('bc_produto.*','cest.mva')
+                                            ->leftJoin('cest', 'bc_produto.cest_fk_id', '=', 'cest.id')
+                                            ->where('bc_produto.id',$bcProdutoGtin->bc_produto_fk_id)
+                                            ->first();
 
                     $COD_INTERNO             = $produto->seu_codigo;
-                    $CODBARRA                = $produto->gtin;
+                    $CODBARRA                = "'".$produto->gtin."'";
                     $DESCRICAO               = trim($produto->seu_nome);
-                    $ICMS_PDV                = '';    // Tratado Abaixo
-                    $ICMSENT                 = '';    // Tratado Abaixo
-                    $REDUCAO_BASE_ICMS       = '';    // Coletar retorno do IOB
-                    $CST_ICMS                = '';    // Tratado Abaixo
+                    $ICMS_PDV                = '';    // OK
+                    $ICMSENT                 = '';    // OK
+                    $REDUCAO_BASE_ICMS       = 0;     // Ok
+                    $CST_ICMS                = '';    // OK
                     $NCM                     = $produto->ncm;
-                    $PIS_COFINS              = '';    // Tratado Abaixo
-                    $MVA                     = '';    // Coletar retorno do IOB
-                    $PAUTA                   = '';    // Coletar retorno do IOB
+                    $PIS_COFINS              = '';    // Ok
+                    $MVA                     = $bcProduto->mva;    
+                    $PAUTA                   = '';    // Ok
                     $CST_PIS_ENTRADA         = '';    // OK
                     $CST_PIS_SAIDA           = '';    // OK
                     $CST_COFINS_ENTRADA      = '';    // OK
@@ -76,6 +80,15 @@ class ReportsController extends Controller
                     $TIPOSPED                = '00';  //00 – Mercadoria para revenda
                     $CEST                    = $bcProduto->cest_fk_id;
 
+
+                    if(!empty($bcProduto->mva)){
+                        $MVA   = $bcProduto->mva;
+                        $PAUTA = '';
+                    }else{
+                        $MVA   = '';
+                        $PAUTA = 0;
+                    }                        
+
                     // Se produto possui ST Sim e Possui CEST ( no Guardiao)
                     //    CST_ICMS = 060
                     // Se produto posui ST SIM e Possui CEST ( no Guardiao) e aliquota vazia
@@ -83,23 +96,26 @@ class ReportsController extends Controller
                     // Se produto possui ST não e nao POSSUI CEST ( NO guardiao ) e aliquota vazia
                     //   CST_ICMS = 30 ou 40
 
-                    if( $produto->possui_st == "Sim" && $bcProduto->cest_fk_id != null ){
+                    if( !empty($bcProduto->cest_fk_id) && $bcProduto->cest_fk_id != 1){
 
                         $ICMS_PDV = 'SUBSTITUICAO'; //$produto->aliquota_icm;
-                        $ICMSENT  = 'SUBSTITUICAO';//$produto->aliquota_icm;
+                        $ICMSENT  = 'SUBSTITUICAO'; //$produto->aliquota_icm;
                         $CST_ICMS = (string) '060';
 
-                    }elseif( $produto->possui_st == "Sim" && $produto->aliquota_icm == null && $bcProduto->cest_fk_id != null ){ // SE o produto contiver substituição Tributária e aliquota  vazia
+                    }elseif( !empty($bcProduto->cest_fk_id) && $bcProduto->cest_fk_id != 1 && $produto->aliquota_icm == null ){ 
+                    // SE o produto contiver substituição Tributária e aliquota  vazia
 
                         $ICMS_PDV = 'NAO TRIBUTADO';
                         $ICMSENT  = 'NAO TRIBUTADO';
-                        $CST_ICMS = (string) '041';            // Não tributada
+                        $CST_ICMS = (string) '041';  // Não tributada
 
-                    }elseif(  $produto->possui_st == "Não" && $produto->aliquota_icm == null && $bcProduto->cest_fk_id == null ){ // SE o produto não contiver substituição Tributária e aliquota  vazia
+                    }elseif( (empty($bcProduto->cest_fk_id) || $bcProduto->cest_fk_id == 1) && 
+                        $produto->aliquota_icm == null && $produto->possui_st == "Não"){ 
+                    // SE o produto não contiver substituição Tributária e aliquota  vazia
 
                         $ICMS_PDV = 'ISENTO';
                         $ICMSENT  = 'ISENTO';
-                        $CST_ICMS = (string) '040';                 // Isenta
+                        $CST_ICMS = (string) '040';   // Isenta
 
                     }elseif(  $produto->possui_st == "Não" && $produto->aliquota_icm != null ){ // SE o produto não contiver substituição Tributária e aliquota não vazia
 
@@ -107,6 +123,11 @@ class ReportsController extends Controller
                         $ICMSENT  = 'ISENTO';
                         $CST_ICMS = (string) '030';          // Isenta ou não tributária e com cobrança do ICMS por substituição tributária
 
+                    }else{
+
+                        $ICMS_PDV = 'ISENTO';
+                        $ICMSENT  = 'ISENTO';
+                        $CST_ICMS = (string) '030';          // Isenta ou não tributária e com cobrança do ICMS por substituição tributária 
                     }
 
                     //CST_ENTRADA_PIS_COFINS
@@ -119,38 +140,46 @@ class ReportsController extends Controller
                     // SE o produto poussui_ST e não possui Aliquota = 004
                     // SE o produto poussui_ST e  possui Aliquota = 001
 
-                    if($produto->possui_st == "Sim" && $produto->aliquota_icm == null){
+                    if(!empty($bcProduto->cest_fk_id) && $bcProduto->cest_fk_id != 1 && $produto->aliquota_icm != null){
+
                         $CST_PIS_ENTRADA     = '004';
                         $CST_COFINS_ENTRADA  = '004';
+
                         $CST_PIS_SAIDA       = '070';
                         $CST_COFINS_SAIDA    = '070';
+
                         $PIS_NATRECEITA      = '004';
-                    }elseif($produto->possui_st == "Sim" && $produto->aliquota_icm != null){
+
+                    }else{
+
                         $CST_PIS_ENTRADA    = '001';
                         $CST_COFINS_ENTRADA = '001';
                         $PIS_NATRECEITA     = '001';
+                        $CST_PIS_SAIDA      = '050';
+                        $CST_COFINS_SAIDA   = '050';
+
                     }
 
                     $strItem = "{$COD_INTERNO};
-                            {$CODBARRA};
-                            {$DESCRICAO};
-                            {$ICMS_PDV};
-                            {$ICMSENT};
-                            {$REDUCAO_BASE_ICMS};
-                            {$CST_ICMS};
-                            {$NCM};
-                            {$PIS_COFINS};
-                            {$MVA};
-                            {$PAUTA};
-                            {$CST_PIS_ENTRADA};
-                            {$CST_PIS_SAIDA};
-                            {$CST_COFINS_ENTRADA};
-                            {$CST_COFINS_SAIDA};
-                            {$PIS_NATRECEITA};
-                            {$SIT_ESPECIAL_PIS_COFINS};
-                            {$ALIQUOTA_SIT_ESPECIAL};
-                            {$TIPOSPED};
-                            {$CEST}";
+                                {$CODBARRA};
+                                {$DESCRICAO};
+                                {$ICMS_PDV};
+                                {$ICMSENT};
+                                {$REDUCAO_BASE_ICMS};
+                                {$CST_ICMS};
+                                {$NCM};
+                                {$PIS_COFINS};
+                                {$MVA};
+                                {$PAUTA};
+                                {$CST_PIS_ENTRADA};
+                                {$CST_PIS_SAIDA};
+                                {$CST_COFINS_ENTRADA};
+                                {$CST_COFINS_SAIDA};
+                                {$PIS_NATRECEITA};
+                                {$SIT_ESPECIAL_PIS_COFINS};
+                                {$ALIQUOTA_SIT_ESPECIAL};
+                                {$TIPOSPED};
+                                {$CEST}";
 
                     array_push($data,$strItem);
 
