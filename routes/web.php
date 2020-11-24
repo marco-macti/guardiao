@@ -41,4 +41,14 @@ Route::get('/iob/'                                     ,'IobController@index');
 Route::post('/iob/import-sheet'                        ,'IobController@importSheet');
 Route::post('/cliente/import-sheet-cest'               ,'ClienteLoteController@importSheetCest');
 
+//IA
+Route::get('/ia'                                       ,'IaController@index');
+Route::post('/ia/import-e-auditor'                     ,'IaController@importEAuditor')->name('importEAuditor');
+Route::get('/ia/preditar'                              ,'IaController@preditar');
+Route::get('/ia/trainamento-base'                     ,'IaController@trainamentoBase')->name('trainamentoBase');
+Route::get('/ia/registra-ia'                          ,'IaController@registraIa')->name('registraIa');
+
+
+
+
 
