@@ -15,6 +15,15 @@ use Illuminate\Support\Facades\Input;
 
 class ClienteLoteController extends Controller
 {
+
+    public function exportJsonNcm(){
+        $ncm = DB::select("SELECT n.cod_ncm, n.descricao, bc.nome FROM ncm n INNER JOIN bc_produto bc ON n.cod_ncm = bc.ncm_fk_id LIMIT 100000 OFFSET 500");
+
+
+       //header("Content-type: text/html; charset=UTF-8");
+       echo json_encode($ncm);
+    }
+
     public function relatorioLote($loteId){
 
 
@@ -67,7 +76,7 @@ class ClienteLoteController extends Controller
                                             AND bcp.nome SIMILAR TO '%($nomeReplace)%' AND
                                             pcicms.bc_perfil_contabil_fk_id IS NOT NULL AND
                                             pcpis.bc_perfil_contabil_fk_id IS NOT NULL AND
-                                            pccofins.bc_perfil_contabil_fk_id IS NOT NULL                                            
+                                            pccofins.bc_perfil_contabil_fk_id IS NOT NULL                                           
                                             ORDER BY bcp.nome DESC
                                             LIMIT 1 OFFSET 0");
                 
@@ -246,15 +255,14 @@ class ClienteLoteController extends Controller
 
         // Busca pelo Cliente do Lote
         $lote     = ClienteLote::find($loteId);
-        $produtos = $lote->produtos;
+        $produtos = $lote->produtos;//->where('seu_codigo','3436');
 
         $corretos = array();
         $incorretos = array();
-
+        $usa_cest_mva_lote = false;
+        $icms_st           = false;
 
         foreach ($produtos as $index => $produto) {
-
-
 
             $nomeEx      = explode(" ", $produto->seu_nome);
             if(count($nomeEx) > 1){
@@ -266,9 +274,13 @@ class ClienteLoteController extends Controller
 
             $nomeReplace = trim($nomeReplace);
 
-           
-               
-                $produtoBC = DB::select("SELECT
+                if(!empty($produto->cest) && $produto->cest != 1  && $produto->cest != '1'){
+
+                    $usa_cest_mva_lote = false;
+                    $icms_st           = false;
+                    
+
+                    $produtoBC = DB::select("SELECT
                                             bcp.*,
                                             bcp.nome as base_comparativa_nome,
                                             bcgtin.gtin as base_comparativa_gtin,
@@ -282,8 +294,178 @@ class ClienteLoteController extends Controller
                                             pcpis.cst as base_comparativa_pis_cst,
                                             pcpis.base_legal as base_comparativa_pis_base_legal,
                                             bcp.cest_fk_id as cest,
-                                            c.mva
+                                            c.mva,
+                                            ncmBd.descricao as descricao_ncm
                                         FROM bc_produto AS bcp
+                                            LEFT JOIN ncm AS ncmBd ON ncmBd.cod_ncm = bcp.ncm_fk_id
+                                            LEFT JOIN bc_produto_gtin AS bcgtin ON bcp.id = bcgtin.bc_produto_fk_id
+                                            LEFT JOIN bc_perfil_contabil pc ON pc.ncm_fk_id = bcp.ncm_fk_id
+                                            LEFT JOIN bc_perfil_contabil_icms pcicms ON pcicms.bc_perfil_contabil_fk_id = pc.id
+                                            LEFT JOIN bc_perfilcontabil_cofins pccofins ON pccofins.bc_perfil_contabil_fk_id = pc.id
+                                            LEFT JOIN bc_perfilcontabil_pis pcpis ON pcpis.bc_perfil_contabil_fk_id = pc.id
+                                            LEFT JOIN cest c ON c.id = bcp.cest_fk_id
+                                        WHERE
+                                        bcp.ncm_fk_id = '{$produto->ncm}' 
+                                        AND bcp.nome SIMILAR TO '%($nomeReplace)%' 
+                                        AND pcicms.bc_perfil_contabil_fk_id IS NOT NULL 
+                                        AND pcpis.bc_perfil_contabil_fk_id IS NOT NULL 
+                                        AND bcp.cest_fk_id IS NOT NULL
+                                        AND bcp.cest_fk_id != '' 
+                                        AND bcp.cest_fk_id != '1'
+                                        ORDER BY bcp.nome DESC
+                                        LIMIT 1 OFFSET 0");
+
+                    if(count($produtoBC) < 1){
+
+                        $usa_cest_mva_lote = false;
+                        $icms_st           = false;
+                        //busca na base comparativa usando o ncm e produto com cest
+                        $produtoBC = DB::select("SELECT
+                                            bcp.*,
+                                            bcp.nome as base_comparativa_nome,
+                                            bcgtin.gtin as base_comparativa_gtin,
+                                            pcicms.aliquota as base_comparativa_icms_aliquota,
+                                            pcicms.possui_st as base_comparativa_icms_possui_st,
+                                            pcicms.base_legal_st as base_comparativa_icms_base_legal,
+                                            pccofins.aliquota as base_comparativa_cofins_aliquota,
+                                            pccofins.cst as base_comparativa_cofins_cst,
+                                            pccofins.base_legal as base_comparativa_cofins_base_legal,
+                                            pcpis.aliquota as base_comparativa_pis_aliquota,
+                                            pcpis.cst as base_comparativa_pis_cst,
+                                            pcpis.base_legal as base_comparativa_pis_base_legal,
+                                            bcp.cest_fk_id as cest,
+                                            c.mva,
+                                            ncmBd.descricao as descricao_ncm
+                                        FROM bc_produto AS bcp
+                                            LEFT JOIN ncm AS ncmBd ON ncmBd.cod_ncm = bcp.ncm_fk_id
+                                            LEFT JOIN bc_produto_gtin AS bcgtin ON bcp.id = bcgtin.bc_produto_fk_id
+                                            LEFT JOIN bc_perfil_contabil pc ON pc.ncm_fk_id = bcp.ncm_fk_id
+                                            LEFT JOIN bc_perfil_contabil_icms pcicms ON pcicms.bc_perfil_contabil_fk_id = pc.id
+                                            LEFT JOIN bc_perfilcontabil_cofins pccofins ON pccofins.bc_perfil_contabil_fk_id = pc.id
+                                            LEFT JOIN bc_perfilcontabil_pis pcpis ON pcpis.bc_perfil_contabil_fk_id = pc.id
+                                            LEFT JOIN cest c ON c.id = bcp.cest_fk_id
+                                        WHERE
+                                        bcp.ncm_fk_id = '{$produto->ncm}' 
+                                        AND pcicms.bc_perfil_contabil_fk_id IS NOT NULL 
+                                        AND pcpis.bc_perfil_contabil_fk_id IS NOT NULL 
+                                        AND bcp.cest_fk_id IS NOT NULL
+                                        AND bcp.cest_fk_id != '' 
+                                        AND bcp.cest_fk_id != '1'
+                                        ORDER BY bcp.nome DESC
+                                        LIMIT 1 OFFSET 0");
+
+                        if(count($produtoBC) < 1){
+
+                            //busca na base comparativa qualquer produto que esteja no ncm do lote, como sabemos que ele é ST inserimos no relatório a as aliquotas de 
+                                // icms = 0, pis = base comparativa, cofins =base comparativa
+
+                            $usa_cest_mva_lote = true;
+                            $icms_st           = true;
+
+                            $produtoBC = DB::select("SELECT
+                                            bcp.*,
+                                            bcp.nome as base_comparativa_nome,
+                                            bcgtin.gtin as base_comparativa_gtin,
+                                            pcicms.aliquota as base_comparativa_icms_aliquota,
+                                            pcicms.possui_st as base_comparativa_icms_possui_st,
+                                            pcicms.base_legal_st as base_comparativa_icms_base_legal,
+                                            pccofins.aliquota as base_comparativa_cofins_aliquota,
+                                            pccofins.cst as base_comparativa_cofins_cst,
+                                            pccofins.base_legal as base_comparativa_cofins_base_legal,
+                                            pcpis.aliquota as base_comparativa_pis_aliquota,
+                                            pcpis.cst as base_comparativa_pis_cst,
+                                            pcpis.base_legal as base_comparativa_pis_base_legal,
+                                            bcp.cest_fk_id as cest,
+                                            c.mva,
+                                            ncmBd.descricao as descricao_ncm
+                                        FROM bc_produto AS bcp
+                                            LEFT JOIN ncm AS ncmBd ON ncmBd.cod_ncm = bcp.ncm_fk_id
+                                            LEFT JOIN bc_produto_gtin AS bcgtin ON bcp.id = bcgtin.bc_produto_fk_id
+                                            LEFT JOIN bc_perfil_contabil pc ON pc.ncm_fk_id = bcp.ncm_fk_id
+                                            LEFT JOIN bc_perfil_contabil_icms pcicms ON pcicms.bc_perfil_contabil_fk_id = pc.id
+                                            LEFT JOIN bc_perfilcontabil_cofins pccofins ON pccofins.bc_perfil_contabil_fk_id = pc.id
+                                            LEFT JOIN bc_perfilcontabil_pis pcpis ON pcpis.bc_perfil_contabil_fk_id = pc.id
+                                            LEFT JOIN cest c ON c.id = bcp.cest_fk_id
+                                        WHERE
+                                        bcp.ncm_fk_id = '{$produto->ncm}' 
+                                        AND bcp.nome SIMILAR TO '%($nomeReplace)%' 
+                                        AND pcicms.bc_perfil_contabil_fk_id IS NOT NULL 
+                                        AND pcpis.bc_perfil_contabil_fk_id IS NOT NULL 
+                                        ORDER BY bcp.nome DESC
+                                        LIMIT 1 OFFSET 0");
+
+                            if(count($produtoBC) < 1){
+                                $usa_cest_mva_lote = true;
+                                $icms_st           = true;
+                                //tenta somente com o ncm
+                                $produtoBC = DB::select("SELECT
+                                            bcp.*,
+                                            bcp.nome as base_comparativa_nome,
+                                            bcgtin.gtin as base_comparativa_gtin,
+                                            pcicms.aliquota as base_comparativa_icms_aliquota,
+                                            pcicms.possui_st as base_comparativa_icms_possui_st,
+                                            pcicms.base_legal_st as base_comparativa_icms_base_legal,
+                                            pccofins.aliquota as base_comparativa_cofins_aliquota,
+                                            pccofins.cst as base_comparativa_cofins_cst,
+                                            pccofins.base_legal as base_comparativa_cofins_base_legal,
+                                            pcpis.aliquota as base_comparativa_pis_aliquota,
+                                            pcpis.cst as base_comparativa_pis_cst,
+                                            pcpis.base_legal as base_comparativa_pis_base_legal,
+                                            bcp.cest_fk_id as cest,
+                                            c.mva,
+                                            ncmBd.descricao as descricao_ncm
+                                        FROM bc_produto AS bcp
+                                            LEFT JOIN ncm AS ncmBd ON ncmBd.cod_ncm = bcp.ncm_fk_id
+                                            LEFT JOIN bc_produto_gtin AS bcgtin ON bcp.id = bcgtin.bc_produto_fk_id
+                                            LEFT JOIN bc_perfil_contabil pc ON pc.ncm_fk_id = bcp.ncm_fk_id
+                                            LEFT JOIN bc_perfil_contabil_icms pcicms ON pcicms.bc_perfil_contabil_fk_id = pc.id
+                                            LEFT JOIN bc_perfilcontabil_cofins pccofins ON pccofins.bc_perfil_contabil_fk_id = pc.id
+                                            LEFT JOIN bc_perfilcontabil_pis pcpis ON pcpis.bc_perfil_contabil_fk_id = pc.id
+                                            LEFT JOIN cest c ON c.id = bcp.cest_fk_id
+                                        WHERE
+                                        bcp.ncm_fk_id = '{$produto->ncm}' 
+                                        AND pcicms.bc_perfil_contabil_fk_id IS NOT NULL 
+                                        AND pcpis.bc_perfil_contabil_fk_id IS NOT NULL 
+                                        ORDER BY bcp.nome DESC
+                                        LIMIT 1 OFFSET 0");
+                            }else{
+                                $usa_cest_mva_lote = false;
+                                $icms_st           = false;
+                            }
+                        }else{
+                            $usa_cest_mva_lote = false;
+                            $icms_st           = false;
+                        }
+                    }else{
+                        $usa_cest_mva_lote = false;
+                        $icms_st           = false;
+                    }
+
+                }
+                else{
+                    
+                    $usa_cest_mva_lote = false;
+                    $icms_st           = false;
+
+                   
+                    $produtoBC = DB::select("SELECT
+                                            bcp.*,
+                                            bcp.nome as base_comparativa_nome,
+                                            bcgtin.gtin as base_comparativa_gtin,
+                                            pcicms.aliquota as base_comparativa_icms_aliquota,
+                                            pcicms.possui_st as base_comparativa_icms_possui_st,
+                                            pcicms.base_legal_st as base_comparativa_icms_base_legal,
+                                            pccofins.aliquota as base_comparativa_cofins_aliquota,
+                                            pccofins.cst as base_comparativa_cofins_cst,
+                                            pccofins.base_legal as base_comparativa_cofins_base_legal,
+                                            pcpis.aliquota as base_comparativa_pis_aliquota,
+                                            pcpis.cst as base_comparativa_pis_cst,
+                                            pcpis.base_legal as base_comparativa_pis_base_legal,
+                                            bcp.cest_fk_id as cest,
+                                            c.mva,
+                                            ncmBd.descricao as descricao_ncm
+                                        FROM bc_produto AS bcp
+                                            LEFT JOIN ncm AS ncmBd ON ncmBd.cod_ncm = bcp.ncm_fk_id
                                             LEFT JOIN bc_produto_gtin AS bcgtin ON bcp.id = bcgtin.bc_produto_fk_id
                                             LEFT JOIN bc_perfil_contabil pc ON pc.ncm_fk_id = bcp.ncm_fk_id
                                             LEFT JOIN bc_perfil_contabil_icms pcicms ON pcicms.bc_perfil_contabil_fk_id = pc.id
@@ -294,26 +476,30 @@ class ClienteLoteController extends Controller
                                         bcp.ncm_fk_id = '{$produto->ncm}' 
                                         AND bcp.nome SIMILAR TO '%($nomeReplace)%' AND
                                         pcicms.bc_perfil_contabil_fk_id IS NOT NULL AND
-                                        pcpis.bc_perfil_contabil_fk_id IS NOT NULL AND
-                                        pccofins.bc_perfil_contabil_fk_id IS NOT NULL AND
-                                        bcp.cest_fk_id != '' AND 
-                                        bcp.cest_fk_id != '1'                                       
+                                        pcpis.bc_perfil_contabil_fk_id IS NOT NULL 
                                         ORDER BY bcp.nome DESC
                                         LIMIT 1 OFFSET 0");
-        
+                }
+               
+            // Fix do Trim para remover espaços e lixos que podem vir do banco 
 
+            
 
             if(count($produtoBC) > 0){
 
-
+                //$produtos[$index]->base_comparativa_nome  = trim($produtoBC->nome);
+                
                 $produto->aliquota_icm    = (string) $produto->aliquota_icm    * 100;
                 $produto->aliquota_pis    = (string) $produto->aliquota_pis    * 100;
                 $produto->aliquota_cofins = (string) $produto->aliquota_cofins * 100;
                 //inclui cest
+
                 $produtos[$index]->cest = $produtoBC[0]->cest;
+                $produtos[$index]->ncm_descricao = $produtoBC[0]->descricao_ncm;
 
                 //verifica cest do cliente com a base comparativa
-                if($produtoBC[0]->cest == $produto->cest){
+                $produtos[$index]->cest_cliente = $produto->cest;
+                if($produtoBC[0]->cest == $produto->cest && $produtoBC[0]->cest != 1){
                     $produtos[$index]->cest_cliente = $produto->cest;
                     $produtos[$index]->cest_correto = 'S';
                 }
@@ -322,14 +508,58 @@ class ClienteLoteController extends Controller
                     $produtos[$index]->cest_correto = 'N';
                 }
 
+
                 //verifica cest do cliente com a base comparativa
+                $produtos[$index]->mva_cliente = $produto->mva;
                 if($produtoBC[0]->mva == $produto->mva){
-                    $produtos[$index]->mva_cliente = $produto->mva;
-                    $produtos[$index]->mva_correto = 'S';
+                    if(!empty($produtoBC[0]->cest) && $produtoBC[0]->cest != 1){
+                        $produtos[$index]->mva_cliente = $produto->mva;
+                        $produtos[$index]->mva_correto = 'S';
+                        $produtos[$index]->mva = $produtoBC[0]->mva;
+                    }
+                    else{
+                        $produtos[$index]->mva_cliente = '';
+                        $produtos[$index]->mva_correto = 'N/A';
+                        $produtos[$index]->mva = '';
+                    }
                 }
                 else{
-                    $produtos[$index]->mva_cliente = $produto->mva;
-                    $produtos[$index]->mva_correto = 'N';
+
+                    if(!empty($produtoBC[0]->cest) && $produtoBC[0]->cest != 1){
+                        $produtos[$index]->mva_cliente = $produto->mva;
+                        $produtos[$index]->mva_correto = 'N';
+                        $produtos[$index]->mva = $produtoBC[0]->mva;
+                    }
+                    else{
+                        $produtos[$index]->mva_cliente = '';
+                        $produtos[$index]->mva_correto = 'N/A';
+                        $produtos[$index]->mva = '';
+                    }
+                    
+                }
+
+
+                if($usa_cest_mva_lote == true){
+                    if(!empty($produtoBC[0]->cest) && $produtoBC[0]->cest != '1' && $produtoBC[0]->cest != 1){
+                        $produtos[$index]->cest = $produtoBC[0]->cest;
+
+                        if(!empty($produtoBC[0]->mva)){
+                            $produtos[$index]->mva = $produtoBC[0]->mva;
+                        }
+                        else{
+                            $produtos[$index]->mva = $produto->mva;
+                        }
+                    }
+                    else{
+                        $produtos[$index]->cest = $produto->cest;
+
+                        if(!empty($produtoBC[0]->mva)){
+                            $produtos[$index]->mva = $produtoBC[0]->mva;
+                        }
+                        else{
+                            $produtos[$index]->mva = $produto->mva;
+                        }
+                    }
                 }
 
                 // Verificação se o NCM da Base Comparativa é igual ao produto do lote
@@ -340,14 +570,27 @@ class ClienteLoteController extends Controller
                     $produtos[$index]->ncm_correto = 'S';
                 }
 
+
                 // Verificação se aliquota de ICMS da Base Comparativa é igual ao produto do lote
-                if(is_null($produtoBC[0]->base_comparativa_icms_aliquota)){
+                if(is_null($produtoBC[0]->base_comparativa_icms_aliquota) OR $usa_cest_mva_lote == true){
                     $produtoBC[0]->base_comparativa_icms_aliquota = 0;
+                    $usa_cest_mva_lote = false;
+                }
+                else{
+                    $produtoBC[0]->base_comparativa_icms_aliquota = $produtoBC[0]->base_comparativa_icms_aliquota;
                 }
 
-                if(!empty($produtoBC[0]->cest)){
+
+
+                if((!empty($produtoBC[0]->cest) && $produtoBC[0]->cest != '1' && $produtoBC[0]->cest != 1) OR $usa_cest_mva_lote == true){
                     $produtoBC[0]->base_comparativa_icms_aliquota = 0;
+                    $usa_cest_mva_lote = false;
                 }
+                else{
+                    $produtoBC[0]->base_comparativa_icms_aliquota = $produtoBC[0]->base_comparativa_icms_aliquota;
+                }   
+
+
 
                 //VALIDANDO CST
                 if($produtoBC[0]->base_comparativa_cofins_cst == '01'){
@@ -364,6 +607,7 @@ class ClienteLoteController extends Controller
                 }else{
                     $produtos[$index]->icms_correto = 'N';
                 }
+
 
                 // Verificação se aliquota de PIS da Base Comparativa é igual ao produto do lote
 
@@ -391,11 +635,18 @@ class ClienteLoteController extends Controller
                     $produtos[$index]->cofins_correto = 'N';
                 }
 
+
+
             }else{
                 $produtos[$index]->ncm_correto    = 'N/A';
                 $produtos[$index]->icms_correto   = 'N/A';
                 $produtos[$index]->pis_correto    = 'N/A';
                 $produtos[$index]->cofins_correto = 'N/A';
+                $produtos[$index]->cest_cliente   = 'N/A';
+                $produtos[$index]->cest_correto   = 'N/A';
+                $produtos[$index]->mva_cliente    = 'N/A';
+                $produtos[$index]->mva_correto    = 'N/A';
+                $produtos[$index]->mva     = 'N/A';
             }
 
 
@@ -418,9 +669,16 @@ class ClienteLoteController extends Controller
 
                 $produtos[$index]->base_comparativa_icms_base_legal = (@is_null($produtoBC[0]->base_comparativa_icms_base_legal)) ? '-' : $produtoBC[0]->base_comparativa_icms_base_legal;
 
+
+
                 // ICMS
 
-                $produtos[$index]->base_comparativa_icms_possui_st = @(is_null($produtoBC[0]->base_comparativa_icms_aliquota) || $produtoBC[0]->base_comparativa_icms_aliquota == 0)  ? 'Sim' : 'Nao';
+                $produtos[$index]->base_comparativa_icms_possui_st = @(!empty($produtoBC[0]->cest) && $produtoBC[0]->cest != 1)  ? 'Sim' : 'Nao';
+
+                if(@!empty($produtoBC[0]->cest) && $produtoBC[0]->cest != 1){
+                    $produtos[$index]->base_comparativa_icms_aliquota = $produtoBC[0]->base_comparativa_icms_aliquota;
+                }
+
 
                 $produtos[$index]->base_comparativa_cofins_aliquota = @is_null($produtoBC[0]->base_comparativa_cofins_aliquota) ? 'N/A' : $produtoBC[0]->base_comparativa_cofins_aliquota;
 
@@ -455,7 +713,7 @@ class ClienteLoteController extends Controller
 
             try{
 
-                $data = array('CODIGO_DO_PRODUTO_NO_CLIENTE;NOME_DO_PRODUTO_NO_CLIENTE;NOME_PRODUTO_NA_BASE_COMPARATIVA;GTIN_NO_CLIENTE;GTIN_NA_BASE_COMPARATIVA;NCM_NO_CLIENTE;NCM_NA_BASE_COMPARATIVA;ALIQUOTA_ICMS_NO_CLIENTE;ALIQUOTA_ICMS_NA_BASE_COMPARATIVA;ALIQUOTA_PIS_NO_CLIENTE;ALIQUOTA_PIS_NA_BASE_COMPARATIVA;ALIQUOTA_COFINS_NO_CLIENTE;ALIQUOTA_COFINS_NA_BASE_COMPARATIVA;POSSUI_ST_NO_CLIENTE;POSSUI_ST_NA_BASE_COMPARATIVA;BASE_COMPARATIVA_PIS_CST;BASE_COMPARATIVA_COFINS_CST;ICMS_BASE_LEGAL;COFINS_BASE_LEGAL;PIS_BASE_LEGAL;NCM_CORRETO;ICMS_CORRETO;PIS_CORRETO;COFINS_CORRETO;CEST;MONOFASICO;CST;CEST_CLIENTE;CEST_CORRETO;MVA_CLIENTE;MVA_CORRETO');
+                $data = array('CODIGO_DO_PRODUTO_NO_CLIENTE;NOME_DO_PRODUTO_NO_CLIENTE;NOME_PRODUTO_NA_BASE_COMPARATIVA;GTIN_NO_CLIENTE;GTIN_NA_BASE_COMPARATIVA;NCM_NO_CLIENTE;NCM_NA_BASE_COMPARATIVA;ALIQUOTA_ICMS_NO_CLIENTE;ALIQUOTA_ICMS_NA_BASE_COMPARATIVA;ALIQUOTA_PIS_NO_CLIENTE;ALIQUOTA_PIS_NA_BASE_COMPARATIVA;ALIQUOTA_COFINS_NO_CLIENTE;ALIQUOTA_COFINS_NA_BASE_COMPARATIVA;POSSUI_ST_NO_CLIENTE;POSSUI_ST_NA_BASE_COMPARATIVA;BASE_COMPARATIVA_PIS_CST;BASE_COMPARATIVA_COFINS_CST;ICMS_BASE_LEGAL;COFINS_BASE_LEGAL;PIS_BASE_LEGAL;NCM_CORRETO;ICMS_CORRETO;PIS_CORRETO;COFINS_CORRETO;CEST;MONOFASICO;CST;CEST_CLIENTE;CEST_CORRETO;MVA_CLIENTE;MVA_CORRETO;MVA;DESCRICAO_NCM');
 
                 $arrNcm = array("27101159",
                                 "27101259",
@@ -498,6 +756,7 @@ class ClienteLoteController extends Controller
                     }
 
 
+
                     $strItem = "{$itemLote->seu_codigo};
                             $itemLote->seu_nome;
                             $itemLote->base_comparativa_nome;
@@ -528,7 +787,9 @@ class ClienteLoteController extends Controller
                             $itemLote->cest_cliente;
                             $itemLote->cest_correto;
                             $itemLote->mva_cliente;
-                            $itemLote->mva_correto";
+                            $itemLote->mva_correto;
+                            $itemLote->mva;
+                            $itemLote->ncm_descricao";
 
                     array_push($data,$strItem);
 
@@ -749,9 +1010,6 @@ class ClienteLoteController extends Controller
             }
 
         }
-
-
-
 
     public function sincronizarLote($loteId){
 
@@ -1098,6 +1356,7 @@ class ClienteLoteController extends Controller
         $rows       = 0;
         $ret = array();
 
+
         if (($handle = fopen($file->getPathname(), "r")) !== FALSE) {
 
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
@@ -1187,15 +1446,17 @@ class ClienteLoteController extends Controller
             unset($ret[0]);
 
             foreach ($ret as $index => $item) {
-
-                LoteProduto::where('gtin',$item[3])->where('lote_fk_id',$loteId)->update([
-                    'seu_nome'        => $item[2],
-                    'gtin'            => (($item[4] != 'N/A') ? $item[4] : $item[3]),
+                
+                LoteProduto::where('seu_codigo', $item[0])->where('lote_fk_id',$loteId)->update([
+                    'seu_nome'        => $item[1],
+                    'gtin'            => $item[3],
                     'ncm'             => (($item[6] != 'N/A') ? $item[6] : $item[5]),
                     'possui_st'       => $item[13],
-                    'aliquota_icm'    => floatval($item[7]),
-                    'aliquota_pis'    => floatval($item[9]),
-                    'aliquota_cofins' => floatval($item[11]),
+                    'aliquota_icm'    => floatval($item[8]),
+                    'aliquota_pis'    => floatval($item[10]),
+                    'aliquota_cofins' => floatval($item[12]),
+                    'cest'            => $item[24],
+                    'mva'             => $item[31],
                     'status_fk_id'    => 5, // Em monitoramento para o produto
                 ]);
             }
@@ -1529,6 +1790,7 @@ class ClienteLoteController extends Controller
         $cestPlanOld = '';
         $mvaPlanOld  = '';
         $descPlanOld = '';
+
         foreach ($rows as $key => $row) {
             $cestPlan = $row[1];
             $ncmPlan  = $row[2];
@@ -1567,6 +1829,8 @@ class ClienteLoteController extends Controller
                 
                 //verifica se o cest já existe na base
                 if(count($this->buscaCest($cestPlan)) > 0){
+
+
                     //existe o cest então atualiza mva
 
                     //verifica se o mva não está vazio
@@ -1586,7 +1850,7 @@ class ClienteLoteController extends Controller
 
                         foreach ($produtosBc as $key => $produtoBc) {
 
-                            if($produtoBC->cest_fk_id != $cestPlan){
+                            if($produtoBc->cest_fk_id != $cestPlan){
                                 
                                 //atualiza produto inserindo o cest
                                 $retorno['atualizaProdutosCest'][$contAtualizaProdutosCest] = $this->atualizaProdutosCest($cestPlan, $produtoBc->id_produto);
@@ -1617,9 +1881,9 @@ class ClienteLoteController extends Controller
                 }
                 else{
                     //nao existe o cest
-
+                    
                     //insere o cest e mva na tabela de cest
-                    //$this->insereCestMva($cestPlan, $mvaPlan);
+                    $this->insereCestMva($cestPlan, $mvaPlan);
 
                     //Pega NCM da linha para verificar quais produtos estão vinculados a ele e que são ST
                     $produtosBc = $this->verficaProdutosNcmST($ncmPlan);
@@ -1679,6 +1943,11 @@ class ClienteLoteController extends Controller
         if(!empty($ncm)){
             $ncmDb = DB::select("SELECT * FROM public.ncm WHERE cod_ncm = '".$ncm."'");
 
+            if(count($ncmDb) < 1){
+                //busca pela subcategoria
+                $ncmDb = DB::select("SELECT * FROM public.ncm WHERE ncm_subcategoria_fk_id = '".$ncm."'");                
+            }
+
             return $ncmDb;
         }else{
             return [];
@@ -1696,7 +1965,8 @@ class ClienteLoteController extends Controller
     }
 
     public function atualizaMva($mva, $cest){
-        if(!empty($mva) && !empty($cest) && is_numeric($mva)){
+        if(!empty($mva) && !empty($cest) && is_numeric($mva) && strlen($mva) <= 10){
+
             $atualizaMva = DB::select("UPDATE public.cest SET mva = '".$mva."' WHERE id = '".$cest."'");
 
             return $atualizaMva;
@@ -1707,9 +1977,17 @@ class ClienteLoteController extends Controller
 
     public function atualizaNcm($desc, $ncm){
         if(!empty($desc) && !empty($ncm)){
-            $atualizaNcm = DB::select("UPDATE public.ncm SET descricao = '".$desc."' WHERE id = '".$ncm."'");
 
-            return $atualizaMva;
+            if(strlen($ncm) <= 5){
+                //atualiza pela subcategoria
+                $atualizaNcm = DB::select("UPDATE public.ncm SET descricao = '".$desc."' WHERE ncm_subcategoria_fk_id = '".$ncm."'");
+            }
+            else{
+                $atualizaNcm = DB::select("UPDATE public.ncm SET descricao = '".$desc."' WHERE cod_ncm = '".$ncm."'");
+            }
+            
+
+            return $atualizaNcm;
         }else{
             return [];
         }
@@ -1727,9 +2005,17 @@ class ClienteLoteController extends Controller
 
     public function insereCestMva($cest, $mva){
         if(!empty($cest) && !empty($mva)){
-            $insereCestMva = DB::select("INSERT INTO public.cest (id, mva) VALUES ('".$cest."', '".$mva."')");
 
-            return $insereCestMva;
+            if(strlen($mva) <= 10){
+                $insereCestMva = DB::select("INSERT INTO public.cest (id, mva) VALUES ('".$cest."', '".$mva."')");
+
+                return $insereCestMva;
+            }            
+            else{
+                return [];
+            }
+
+            
         }else{
             return [];
         }
@@ -1739,10 +2025,19 @@ class ClienteLoteController extends Controller
 
         if(!empty($ncm)){
 
-            $produtosBc = DB::select("SELECT DISTINCT bcp.id as id_produto FROM bc_produto AS bcp 
+            $produtosBc = DB::select("SELECT DISTINCT bcp.id as id_produto, bcp.cest_fk_id FROM bc_produto AS bcp 
                                       INNER JOIN bc_perfil_contabil pc ON pc.ncm_fk_id = bcp.ncm_fk_id 
                                       INNER JOIN bc_perfil_contabil_icms pcicms ON pcicms.bc_perfil_contabil_fk_id = pc.id 
-                                      WHERE bcp.ncm_fk_id = '38151210' AND pcicms.possui_st = 'Sim'");
+                                      WHERE bcp.ncm_fk_id = '$ncm' AND pcicms.possui_st = 'Sim'");
+
+            if(count($produtosBc) < 1){
+                //busca ncm pela subcategoria
+                $produtosBc = DB::select("SELECT DISTINCT bcp.id as id_produto, bcp.cest_fk_id FROM bc_produto AS bcp 
+                                          INNER JOIN bc_perfil_contabil pc ON pc.ncm_fk_id = bcp.ncm_fk_id 
+                                          INNER JOIN bc_perfil_contabil_icms pcicms ON pcicms.bc_perfil_contabil_fk_id = pc.id 
+                                          INNER JOIN ncm ON ncm.cod_ncm = bcp.ncm_fk_id
+                                          WHERE ncm.ncm_subcategoria_fk_id = '$ncm' AND pcicms.possui_st = 'Sim'");
+            }
 
             return $produtosBc;
 
@@ -1767,7 +2062,7 @@ class ClienteLoteController extends Controller
 
                     foreach ($produtosBc as $key => $produtoBc) {
 
-                        if($produtoBC->cest_fk_id != $cest){
+                        if($produtoBc->cest_fk_id != $cest){
 
                             //atualiza produto inserindo o cest
                             $this->atualizaProdutosCest($cest, $produtoBc->id_produto);
