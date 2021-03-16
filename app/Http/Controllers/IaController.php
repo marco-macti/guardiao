@@ -112,15 +112,116 @@ class IaController extends Controller
                 
     }
 
+
+    public function treinar(Request $request){
+        $import = new EAuditor();
+        Excel::import($import, request()->file('file'));
+        
+        echo'<html>
+            <body>
+            <table border="1">
+             <tr>
+                <td align="center">Nome produto</td>
+                <td align="center">NCM Cliente</td>
+                <td align="center">NCM Inteligência Artificial</td>
+                <td align="center">Acurácia</td>
+                <td align="center">ACERTOU?</td>
+             </tr>';
+        $contAcertos = 0;
+        $totalItens  = 0;
+        $json = [];
+        $contErros = 0;
+        $linha = 0;
+        foreach ($import->sheetData[0] as $key => $value) {
+            if(!empty($value[0]) && $key > 0 && $key < 7413){
+                $produto = $value[0];
+                $predict = $this->classifier->predict($produto);
+                $probailidade = $this->getProbability($predict['probability']);
+                echo'<tr>
+                        <td align="center">'.$produto.'</td>
+                        <td align="center">'.$value[1].'</td>
+                        <td align="center">'.$predict['label'].'</td>
+            ';
+                if($probailidade > 70 && $probailidade < 90){
+                    echo '<td align="center" style="background-color:yellow">'.$probailidade.'%</td>';
+                }elseif($probailidade > 90){
+                    echo '<td align="center" style="background-color:green">'.$probailidade.'%</td>';
+                }else{
+                    echo '<td align="center" style="background-color:red">'.$probailidade.'%</td>';
+                }
+
+                if($value[1] != $predict['label']){
+                    echo '<td align="center" style="background-color:red">AUDITAR</td>';
+                    $json[$contErros]['cod_ncm']   = $value[1];
+                    $json[$contErros]['descricao'] = $produto;
+                    $json[$contErros]['nome']      = $produto;
+                    $contErros++;
+                }else{
+                    echo '<td align="center" style="background-color:green">NCM CORRETO</td>';
+                    $contAcertos++;
+                }
+
+
+                $linha++;
+            echo'</tr>';
+               /* $json[$totalItens]['cod_ncm']   = $value[2];
+                $json[$totalItens]['descricao'] = $produto;
+                $json[$totalItens]['nome']      = $produto;*/
+                $totalItens++;
+            }
+        }
+        $calcAcuraciaGlobal = $contAcertos / $totalItens * 100;
+
+        if($calcAcuraciaGlobal <= 100){
+            $json  = json_encode($json);
+            $json  = substr($json, 1);
+            $json  = substr($json, 0, -1);
+            $json  = $json.',';
+            $atual = json_encode($this->arrJsonAtual);
+            $novo  = substr_replace($atual, $json, 1, 0);
+            file_put_contents('trainingbkp.json', $novo, JSON_UNESCAPED_UNICODE); 
+        }
+        echo'</table>';
+        //echo json_encode($json);
+        echo'<h1>Acertou '.$contAcertos.' de '.$totalItens.' - média de acurácia '.number_format($calcAcuraciaGlobal,2).'</h1>
+
+        
+        
+        </body></html>';
+
+        //$smsJSON            = file_get_contents('training.json');
+        //$arrJsonAtualNew    = json_decode($smsJSON);
+        /*foreach ($json as $key => $value) {
+            array_unshift($this->arrJsonAtual, $value);    
+        }*/
+        
+        //file_put_contents('training.json', json_encode($this->arrJsonAtual, JSON_UNESCAPED_UNICODE));        
+        
+                
+
+        /*if($calcAcuraciaGlobal < 99){
+            //$this->importEAuditor($request);
+        }else{
+            echo'<h1>Acertou '.$contAcertos.' de '.$totalItens.' - média de acurácia '.number_format($calcAcuraciaGlobal,2).'</h1>';
+        }*/
+
+        
+    }
+
     public function importEAuditor(Request $request){
         $import = new EAuditor();
         Excel::import($import, request()->file('file'));
 
         $convenio_142  = new EAuditor();
         Excel::import($convenio_142, 'storage/icms_convenio_142_2018.xls');
+
         
         $produtos_aliquota_42  = new EAuditor();
         Excel::import($produtos_aliquota_42, 'storage/produtos_com_aliquota_42.xlsx');
+
+        $tipi  = new EAuditor();
+        Excel::import($tipi, 'storage/tipi.xls');
+        
         
         echo'<html>
             <body>
@@ -132,6 +233,8 @@ class IaController extends Controller
                 <td align="center">Acurácia</td>
                 <td align="center">ACERTOU?</td>
                 <td align="center">Treinar</td>
+                <td align="center">Desc. NCM Cliente</td>
+                <td align="center">Desc. NCM IA</td>
                 <td align="center">Item</td>
                 <td align="center">Cest</td>
                 <td align="center">Descrição</td>
@@ -144,7 +247,8 @@ class IaController extends Controller
         $contErros = 0;
         $linha = 0;
         foreach ($import->sheetData[0] as $key => $value) {
-            if(!empty($value[0]) && $key > 1 && $key < 500){
+
+            if(!empty($value[0]) && $key > 0 && $key < 100){
                 $produto = $value[0];
                 $predict = $this->classifier->predict($produto);
                 $probailidade = $this->getProbability($predict['probability']);
@@ -177,6 +281,49 @@ class IaController extends Controller
                         <input type="hidden" id="nome-'.$linha.'" value="'.$produto.'" placeholder="NCM Correto" />
                         <button name="btn" class="btn-salva-ncm" data-id="'.$linha.'">Ok</button>
                       </td>';
+
+
+                //busca desc cliente
+                $desc_ncm_cliente_capitulo = $this->buscaDescNcmClienteCapitulo($tipi, $value[1]);
+                $desc_ncm_cliente_posicao = $this->buscaDescNcmClientePosicao($tipi, $value[1]);
+                $desc_ncm_cliente_subposicao = $this->buscaDescNcmClienteSubPosicao($tipi, $value[1]);
+                $desc_ncm_cliente_subitem = $this->buscaDescNcmClienteSubItem($tipi, $value[1]);
+
+                if(!empty($desc_ncm_cliente_capitulo)){
+                    echo '<td align="center">
+                            <strong>Capítulo:</strong> '.$desc_ncm_cliente_capitulo['ex_capitulo'].'<br />
+                            
+                            <strong>Posição:</strong> '.$desc_ncm_cliente_posicao['ex_posicao'].'<br />
+                           
+                            <strong>Subposição:</strong> '.$desc_ncm_cliente_subposicao['ex_subposicao'].'<br />
+                            
+                            <strong>Subitem:</strong> '.$desc_ncm_cliente_subitem['ex_sub_item'].'<br />
+                            
+                          </td>';
+                }else{
+                    echo '<td> - </td>';
+                }
+
+                //busca desc preditado
+                $desc_ncm_cliente_capitulo = $this->buscaDescNcmClienteCapitulo($tipi, $predict['label']);
+                $desc_ncm_cliente_posicao = $this->buscaDescNcmClientePosicao($tipi, $predict['label']);
+                $desc_ncm_cliente_subposicao = $this->buscaDescNcmClienteSubPosicao($tipi, $predict['label']);
+                $desc_ncm_cliente_subitem = $this->buscaDescNcmClienteSubItem($tipi, $predict['label']);
+
+                if(!empty($desc_ncm_cliente_capitulo)){
+                    echo '<td align="center">
+                            <strong>Capítulo:</strong> '.$desc_ncm_cliente_capitulo['ex_capitulo'].'<br />
+                            
+                            <strong>Posição:</strong> '.$desc_ncm_cliente_posicao['ex_posicao'].'<br />
+                            
+                            <strong>Subposição:</strong> '.$desc_ncm_cliente_subposicao['ex_subposicao'].'<br />
+                           
+                            <strong>Subitem:</strong> '.$desc_ncm_cliente_subitem['ex_sub_item'].'<br />
+                            
+                          </td>';
+                }else{
+                    echo '<td> - </td>';
+                }
 
                 //busca convenio 142
                 $ret_convenio_142 = $this->buscaCovenio142($convenio_142, $predict['label']);
@@ -253,7 +400,7 @@ class IaController extends Controller
 
                 $linha++;
             echo'</tr>';
-                /*$json[$totalItens]['cod_ncm']   = $value[2];
+               /* $json[$totalItens]['cod_ncm']   = $value[2];
                 $json[$totalItens]['descricao'] = $produto;
                 $json[$totalItens]['nome']      = $produto;*/
                 $totalItens++;
@@ -330,6 +477,242 @@ class IaController extends Controller
         }*/
 
         
+    }
+
+    public function buscaDescNcmCliente($tipi, $ncm){
+        $ret = [];
+        $ret['descricao_capitulo']         = '';
+        $ret['ex_capitulo']                = '';
+        $ret['aliquota_capitulo']          = '';
+        $ret['descricao_posicao']          = '';
+        $ret['ex_posicao']                 = '';
+        $ret['aliquota_posicao']           = '';
+        $ret['descricao_subposicao']       = '';
+        $ret['ex_subposicao']              = '';
+        $ret['aliquota_subposicao']        = '';
+        $ret['descricao_sub_item']         = '';
+        $ret['ex_sub_item']                = '';
+        $ret['aliquota_sub_item']          = '';
+        foreach ($tipi->sheetData[0] as $key => $value) {
+            if($key > 0 && !empty($value[0])){
+                $capitulo   = substr($value[0], 0, 2);
+                $posicao    = substr($value[0], 0, 4);
+                $subposicao = substr($value[0], 0, 6);
+                $sub_item   = $value[0];
+                $ncm        = (strlen($ncm) <= 7) ? '0'.$ncm : $ncm;
+
+                if($capitulo == substr($ncm, 0, 2)){
+                    $ret['descricao_capitulo']          = $value[2];
+                    $ret['ex_capitulo']                 = $value[1];
+                    $ret['aliquota_capitulo']           = $value[3];
+                }
+                if($posicao == substr($ncm, 0, 4)){
+                    $ret['descricao_posicao']          = $value[2];
+                    $ret['ex_posicao']                 = $value[1];
+                    $ret['aliquota_posicao']           = $value[3];
+                }
+                if($subposicao == substr($ncm, 0, 6)){
+                    $ret['descricao_subposicao']          = $value[2];
+                    $ret['ex_subposicao']                 = $value[1];
+                    $ret['aliquota_subposicao']           = $value[3];
+                }
+                if($sub_item == $ncm){
+                    $ret['descricao_sub_item']          = $value[2];
+                    $ret['ex_sub_item']                 = $value[1];
+                    $ret['aliquota_sub_item']           = $value[3];
+                }
+            }
+        }
+
+        return $ret;
+    }
+
+    public function buscaDescNcmClienteSubItem($tipi, $ncm){
+        $ret = [];
+        $ret['descricao_capitulo']         = '';
+        $ret['ex_capitulo']                = '';
+        $ret['aliquota_capitulo']          = '';
+        $ret['descricao_posicao']          = '';
+        $ret['ex_posicao']                 = '';
+        $ret['aliquota_posicao']           = '';
+        $ret['descricao_subposicao']       = '';
+        $ret['ex_subposicao']              = '';
+        $ret['aliquota_subposicao']        = '';
+        $ret['descricao_sub_item']         = '';
+        $ret['ex_sub_item']                = '';
+        $ret['aliquota_sub_item']          = '';
+        $rodou = false;
+        foreach ($tipi->sheetData[0] as $key => $value) {
+            if($key > 0 && !empty($value[0])){
+                $capitulo   = substr($value[0], 0, 2);
+                $posicao    = substr($value[0], 0, 4);
+                $subposicao = substr($value[0], 0, 6);
+                $sub_item   = str_replace(".","", $value[0]);
+                $ncm        = (strlen($ncm) <= 7) ? '0'.$ncm : $ncm;
+
+                
+                if($sub_item == $ncm && $rodou == false){
+                    $ret['descricao_sub_item']          = $value[2];
+                    $ret['ex_sub_item']                 = $value[1];
+                    $ret['aliquota_sub_item']           = $value[3];
+                    $rodou = true;
+                }
+            }
+        }
+
+        return $ret;
+    }
+
+    public function buscaDescNcmClienteSubPosicao($tipi, $ncm){
+        $ret = [];
+        $ret['descricao_capitulo']         = '';
+        $ret['ex_capitulo']                = '';
+        $ret['aliquota_capitulo']          = '';
+        $ret['descricao_posicao']          = '';
+        $ret['ex_posicao']                 = '';
+        $ret['aliquota_posicao']           = '';
+        $ret['descricao_subposicao']       = '';
+        $ret['ex_subposicao']              = '';
+        $ret['aliquota_subposicao']        = '';
+        $ret['descricao_sub_item']         = '';
+        $ret['ex_sub_item']                = '';
+        $ret['aliquota_sub_item']          = '';
+        $rodou = false;
+        foreach ($tipi->sheetData[0] as $key => $value) {
+            if($key > 0 && !empty($value[0])){
+                $capitulo   = substr($value[0], 0, 2);
+                $posicao    = substr($value[0], 0, 4);
+                $subposicao = substr(str_replace(".","",$value[0]), 0, 6);
+                $sub_item   = $value[0];
+                $ncm        = (strlen($ncm) <= 7) ? '0'.$ncm : $ncm;
+
+                
+                if($subposicao == substr($ncm, 0, 6) && $rodou == false){
+                    $ret['descricao_subposicao']          = $value[2];
+                    $ret['ex_subposicao']                 = $value[1];
+                    $ret['aliquota_subposicao']           = $value[3];
+                    $rodou = true;
+                }
+            }
+        }
+
+        return $ret;
+    }
+
+    public function buscaDescNcmClientePosicao($tipi, $ncm){
+        $ret = [];
+        $ret['descricao_capitulo']         = '';
+        $ret['ex_capitulo']                = '';
+        $ret['aliquota_capitulo']          = '';
+        $ret['descricao_posicao']          = '';
+        $ret['ex_posicao']                 = '';
+        $ret['aliquota_posicao']           = '';
+        $ret['descricao_subposicao']       = '';
+        $ret['ex_subposicao']              = '';
+        $ret['aliquota_subposicao']        = '';
+        $ret['descricao_sub_item']         = '';
+        $ret['ex_sub_item']                = '';
+        $ret['aliquota_sub_item']          = '';
+        $rodou = false;
+        foreach ($tipi->sheetData[0] as $key => $value) {
+            if($key > 0 && !empty($value[0])){
+                $capitulo   = substr($value[0], 0, 2);
+                $posicao    = substr(str_replace(".","",$value[0]), 0, 4);
+                $subposicao = substr($value[0], 0, 6);
+                $sub_item   = $value[0];
+                $ncm        = (strlen($ncm) <= 7) ? '0'.$ncm : $ncm;
+
+                
+                if($posicao == substr($ncm, 0, 4) && $rodou == false){
+                    $ret['descricao_posicao']          = $value[2];
+                    $ret['ex_posicao']                 = $value[1];
+                    $ret['aliquota_posicao']           = $value[3];
+                    $rodou = true;
+                }
+            }
+        }
+
+        return $ret;
+    }
+
+    public function buscaDescNcmClienteCapitulo($tipi, $ncm){
+        $ret = [];
+        $ret['descricao_capitulo']         = '';
+        $ret['ex_capitulo']                = '';
+        $ret['aliquota_capitulo']          = '';
+        $ret['descricao_posicao']          = '';
+        $ret['ex_posicao']                 = '';
+        $ret['aliquota_posicao']           = '';
+        $ret['descricao_subposicao']       = '';
+        $ret['ex_subposicao']              = '';
+        $ret['aliquota_subposicao']        = '';
+        $ret['descricao_sub_item']         = '';
+        $ret['ex_sub_item']                = '';
+        $ret['aliquota_sub_item']          = '';
+        $rodou = false;
+        foreach ($tipi->sheetData[0] as $key => $value) {
+            if($key > 0 && !empty($value[0])){
+                $capitulo   = substr($value[0], 0, 2);
+                $ncm        = (strlen($ncm) <= 7) ? '0'.$ncm : $ncm;
+
+                if($capitulo == substr($ncm, 0, 2) && $rodou == false){
+                    $ret['descricao_capitulo']          = $value[2];
+                    $ret['ex_capitulo']                 = $value[1];
+                    $ret['aliquota_capitulo']           = $value[3];
+                    $rodou = true;
+                }
+            }
+        }
+
+        return $ret;
+    }
+
+    public function buscaDescNcmPreditado($tipi, $ncm){
+        $ret = [];
+        $ret['descricao_capitulo']         = '';
+        $ret['ex_capitulo']                = '';
+        $ret['aliquota_capitulo']          = '';
+        $ret['descricao_posicao']          = '';
+        $ret['ex_posicao']                 = '';
+        $ret['aliquota_posicao']           = '';
+        $ret['descricao_subposicao']       = '';
+        $ret['ex_subposicao']              = '';
+        $ret['aliquota_subposicao']        = '';
+        $ret['descricao_sub_item']         = '';
+        $ret['ex_sub_item']                = '';
+        $ret['aliquota_sub_item']          = '';
+        foreach ($tipi->sheetData[0] as $key => $value) {
+            if($key > 0 && !empty($value[0])){
+                $capitulo   = substr($value[0], 0, 2);
+                $posicao    = substr($value[0], 0, 4);
+                $subposicao = substr($value[0], 0, 6);
+                $sub_item   = $value[0];
+                $ncm        = (strlen($ncm) <= 7) ? '0'.$ncm : $ncm;
+
+                if($capitulo == substr($ncm, 0, 2)){
+                    $ret['descricao_capitulo'] = $value[2];
+                    $ret['ex_capitulo']                 = $value[1];
+                    $ret['aliquota_capitulo']           = $value[3];
+                }
+                if($posicao == substr($ncm, 0, 4)){
+                    $ret['descricao_posicao']  = $value[2];
+                    $ret['ex_posicao']                 = $value[1];
+                    $ret['aliquota_posicao']           = $value[3];
+                }
+                if($subposicao == substr($ncm, 0, 6)){
+                    $ret['descricao_subposicao']  = $value[2];
+                    $ret['ex_subposicao']                 = $value[1];
+                    $ret['aliquota_subposicao']           = $value[3];
+                }
+                if($sub_item == $ncm){
+                    $ret['descricao_sub_item']           = $value[2];
+                    $ret['ex_sub_item']                 = $value[1];
+                    $ret['aliquota_sub_item']           = $value[3];
+                }
+            }
+        }
+
+        return $ret;
     }
 
     public function buscaCovenio142($convenio_142, $ncm){
