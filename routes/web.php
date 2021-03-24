@@ -48,8 +48,13 @@ Route::post('/cliente/import-sheet-cest'               ,'ClienteLoteController@i
 Route::get('/ia'                                       ,'IaController@index');
 Route::post('/ia/import-e-auditor'                     ,'IaController@importEAuditor')->name('importEAuditor');
 Route::get('/ia/preditar'                              ,'IaController@preditar');
-Route::get('/ia/trainamento-base'                     ,'IaController@trainamentoBase')->name('trainamentoBase');
-Route::get('/ia/registra-ia'                          ,'IaController@registraIa')->name('registraIa');
+Route::get('/ia/trainamento-base'                      ,'IaController@trainamentoBase')->name('trainamentoBase');
+Route::get('/ia/registra-ia'                           ,'IaController@registraIa')->name('registraIa');
+
+// Retorno parao Guardião
+
+Route::any('/ia/retorna-dados'                         ,'IaController@retornaDadosIa');
+Route::any('/ia/retorna-dados-planilha/{ncm}'                ,'IaController@retornaDadosPlanilhaIa');
 
 
 
