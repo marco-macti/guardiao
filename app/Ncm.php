@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ncm extends Model
 {
+    protected $connection= 'old';
     protected $table      = 'ncm';
     protected $primaryKey = 'cod_ncm';
     public $timestamps    = false;

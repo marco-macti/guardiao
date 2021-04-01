@@ -4,7 +4,7 @@ Route::get('/'                                        ,'HomeController@index');
 Route::get('/relatorio-lote/{lote}'                   ,'ClienteLoteController@relatorioLote');
 Route::get('/relatorio-lote-passo-4/{lote}'           ,'ClienteLoteController@relatorioLotePasso4');
 
-Route::get('/export-json'           ,'ClienteLoteController@exportJsonNcm');
+Route::get('/export-json'                             ,'ClienteLoteController@exportJsonNcm');
 
 Route::get('/relatorio-lote-pos-iob/{lote}'           ,'ClienteLoteController@relatorioLotePosIOB');
 Route::get('/sincronizar-lote/{lote}'                 ,'ClienteLoteController@sincronizarLote');

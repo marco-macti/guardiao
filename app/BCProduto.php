@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BCProduto extends Model
 {
+    protected $connection= 'old';
 	protected $primaryKey = 'id';
     protected $table      = 'bc_produto';
     public $timestamps    = false;

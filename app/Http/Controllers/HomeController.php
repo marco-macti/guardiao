@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Cliente;
-use App\LoteProduto;
 use Illuminate\Support\Facades\DB;
+
+use App\Cliente as OldCliente;
+use App\Models\Cliente;
 
 class HomeController extends Controller
 {

@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class BCPerfilContabil extends Model
 {
+	protected $connection= 'old';
     protected $primaryKey = 'id';
     protected $table      = 'bc_perfil_contabil';
     public $timestamps    = false;
+
     protected $fillable   = [
     	'dt_ult_atualizacao',
 		'origem',

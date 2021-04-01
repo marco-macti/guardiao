@@ -57,7 +57,7 @@
           </div><!-- search-box -->
         </div><!-- slim-header-left -->
         <div class="slim-header-right">
-          <div class="dropdown dropdown-a">
+          <div style="display:none" class="dropdown dropdown-a">
             <a href="" class="header-notification" data-toggle="dropdown">
               <i class="icon ion-ios-bolt-outline"></i>
             </a>
@@ -113,7 +113,7 @@
               </div>
             </div><!-- dropdown-menu-right -->
           </div><!-- dropdown -->
-          <div class="dropdown dropdown-b">
+          <div style="display:none" class="dropdown dropdown-b">
             <a href="" class="header-notification" data-toggle="dropdown">
               <i class="icon ion-ios-bell-outline"></i>
               <span class="indicator"></span>

@@ -1,12 +1,11 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class LoteProduto extends Model
 {
-    protected $connection= 'old';
     protected $table       = 'lote_produto';
     protected $primaryKey  = 'id';
     public $timestamps     = false;

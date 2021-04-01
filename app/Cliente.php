@@ -7,9 +7,10 @@ use Illuminate\Support\Facades\DB;
 
 class Cliente extends Model
 {
+    protected $connection = 'old';
 	protected $primarykey = 'id';
-    protected $table = 'cliente';
-    protected $guarded = [];
+    protected $table      = 'cliente';
+    protected $guarded    = [];
 
     public function lotes(){
 
