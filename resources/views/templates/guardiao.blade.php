@@ -53,7 +53,7 @@
             </a>
           </h2>
 
-          <div class="search-box">
+          <div style="display: none" class="search-box">
             <input type="text" class="form-control" placeholder="Search">
             <button class="btn btn-primary"><i class="fa fa-search"></i></button>
           </div><!-- search-box -->
@@ -212,6 +212,7 @@
     <script src="{{ URL('js/ResizeSensor.js') }}"></script>
     <script src="{{ URL('js/slim.js') }}"></script>
     <script src="{{ URL('js/dropzone/dist/dropzone.js') }}"></script>
+    
     @stack('post-scripts')
 
   </body>

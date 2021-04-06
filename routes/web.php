@@ -60,3 +60,10 @@ Route::any('/ia/retorna-dados-planilha/{ncm}'          ,'IaController@retornaDad
 Route::group(['namespace' => 'Frontend'], function(){
     Route::resource('/lotes', 'LotesController');
 });
+
+Route::prefix('admin')->group(function () {
+    Route::group(['namespace' => 'Admin'], function(){
+        Route::resource('/lotes', 'LotesController');
+    });
+});
+
