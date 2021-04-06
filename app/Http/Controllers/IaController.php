@@ -255,8 +255,8 @@ class IaController extends Controller
                 echo'<tr>
                         <td align="center">'.$produto.'</td>
                         <td align="center">'.$value[1].'</td>
-                        <td align="center">'.$predict['label'].'</td>
-            ';
+                        <td align="center">'.$predict['label'].'</td>';
+                        
                 if($probailidade > 70 && $probailidade < 90){
                     echo '<td align="center" style="background-color:yellow">'.$probailidade.'%</td>';
                 }elseif($probailidade > 90){
@@ -799,5 +799,70 @@ class IaController extends Controller
         $novo  = substr_replace($atual, $json, 1, 0);
         file_put_contents('trainingbkp.json', $novo); 
 
+    }
+
+    public function retornaDadosIa(Request $request){
+
+        if(empty($request->produto) && empty($request->ncm)) return response()->json(['success' => false,'msg' => 'Necessário enviar produto e NCM']);
+
+        $ret = ['success' => true];
+
+        $predict = $this->classifier->predict($request->produto);
+
+        $probailidade = $this->getProbability($predict['probability']);
+        
+        $ret['ncm_ia']           = $predict['label'];
+        $ret['probabilidade_ia'] = $probailidade;
+
+        $convenio_142  = new EAuditor();
+        Excel::import($convenio_142, 'storage/icms_convenio_142_2018.xls');
+
+        $produtos_aliquota_42  = new EAuditor();
+        Excel::import($produtos_aliquota_42, 'storage/produtos_com_aliquota_42.xlsx');
+
+        $tipi  = new EAuditor();
+        Excel::import($tipi, 'storage/tipi.xls');
+
+        $ret['desc_ncm_cliente_capitulo']   = $this->buscaDescNcmClienteCapitulo($tipi, $predict['label']);
+        $ret['desc_ncm_cliente_posicao']    = $this->buscaDescNcmClientePosicao($tipi, $predict['label']);
+        $ret['desc_ncm_cliente_subposicao'] = $this->buscaDescNcmClienteSubPosicao($tipi, $predict['label']);
+        $ret['desc_ncm_cliente_subitem']    = $this->buscaDescNcmClienteSubItem($tipi, $predict['label']);
+
+        $ret['ret_convenio_142']            = $this->buscaCovenio142($convenio_142, $predict['label']);
+
+        $ret['ret_aliquota_42']             = $this->buscaAliquota42($produtos_aliquota_42, $predict['label']);
+
+        $ret['ret_monofasico']              = $this->buscaMonofasico($predict['label']);
+
+        return response()->json($ret);
+    }
+
+    public function retornaDadosPlanilhaIa($ncm){
+
+        if(empty($ncm)) return response()->json(['success' => false,'msg' => 'Necessário NCM']);
+
+        $ret = ['success' => true];
+
+        $convenio_142  = new EAuditor();
+        Excel::import($convenio_142, 'storage/icms_convenio_142_2018.xls');
+
+        $produtos_aliquota_42  = new EAuditor();
+        Excel::import($produtos_aliquota_42, 'storage/produtos_com_aliquota_42.xlsx');
+
+        $tipi  = new EAuditor();
+        Excel::import($tipi, 'storage/tipi.xls');
+
+        $ret['desc_ncm_cliente_capitulo']   = $this->buscaDescNcmClienteCapitulo($tipi, $ncm);
+        $ret['desc_ncm_cliente_posicao']    = $this->buscaDescNcmClientePosicao($tipi, $ncm);
+        $ret['desc_ncm_cliente_subposicao'] = $this->buscaDescNcmClienteSubPosicao($tipi, $ncm);
+        $ret['desc_ncm_cliente_subitem']    = $this->buscaDescNcmClienteSubItem($tipi, $ncm);
+
+        $ret['ret_convenio_142']            = $this->buscaCovenio142($convenio_142, $ncm);
+
+        $ret['ret_aliquota_42']             = $this->buscaAliquota42($produtos_aliquota_42, $ncm);
+
+        $ret['ret_monofasico']              = $this->buscaMonofasico($ncm);
+
+        return response()->json($ret);
     }
 }
