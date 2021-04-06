@@ -31,13 +31,15 @@
     <title>Guardia Tributário</title>
 
     <!-- vendor css -->
-    <link href="lib/font-awesome/css/font-awesome.css" rel="stylesheet">
-    <link href="lib/Ionicons/css/ionicons.css" rel="stylesheet">
-    <link href="lib/chartist/css/chartist.css" rel="stylesheet">
-    <link href="lib/rickshaw/css/rickshaw.min.css" rel="stylesheet">
+    <link href="{{ URL('lib/font-awesome/css/font-awesome.css') }}" rel="stylesheet">
+    <link href="{{ URL('lib/Ionicons/css/ionicons.css') }}" rel="stylesheet">
+    <link href="{{ URL('lib/chartist/css/chartist.css') }}" rel="stylesheet">
+    <link href="{{ URL('lib/rickshaw/css/rickshaw.min.css')}}" rel="stylesheet">
 
     <!-- Slim CSS -->
-    <link rel="stylesheet" href="css/slim.css">
+    <link rel="stylesheet" href="{{ URL('css/slim.css') }}">
+
+    <link rel="stylesheet" href="{{ URL('js/dropzone/dist/dropzone.css') }}">
 
   </head>
   <body>
@@ -46,7 +48,7 @@
       <div class="container">
         <div class="slim-header-left">
           <h2 class="slim-logo">
-            <a href="index.html">
+            <a href="{{ URL('/') }}">
               <img src="https://guardiaotributario.com.br/wp-content/uploads/2019/06/guardia%CC%83o_tributario_logotipo.png" style="width:100px" class="img-responsive">
             </a>
           </h2>
@@ -197,17 +199,20 @@
       </div><!-- container -->
     </div><!-- slim-footer -->
 
-    <script src="lib/jquery/js/jquery.js"></script>
-    <script src="lib/popper.js/js/popper.js"></script>
-    <script src="lib/bootstrap/js/bootstrap.js"></script>
-    <script src="lib/jquery.cookie/js/jquery.cookie.js"></script>
-    <script src="lib/chartist/js/chartist.js"></script>
-    <script src="lib/d3/js/d3.js"></script>
-    <script src="lib/rickshaw/js/rickshaw.min.js"></script>
-    <script src="lib/jquery.sparkline.bower/js/jquery.sparkline.min.js"></script>
+    <script src="{{ URL('lib/jquery/js/jquery.js') }} "></script>
+    
+    <script src="{{ URL('lib/popper.js/js/popper.js') }}"></script>
+    <script src="{{ URL('lib/bootstrap/js/bootstrap.js') }}"></script>
+    <script src="{{ URL('lib/jquery.cookie/js/jquery.cookie.js') }}"></script>
+    
+    <script src="{{ URL('lib/d3/js/d3.js') }}"></script>
+    <script src="{{ URL('lib/rickshaw/js/rickshaw.min.js') }}"></script>
+    <script src="{{ URL('lib/jquery.sparkline.bower/js/jquery.sparkline.min.js') }}"></script>
 
-    <script src="js/ResizeSensor.js"></script>
-    <script src="js/dashboard.js"></script>
-    <script src="js/slim.js"></script>
+    <script src="{{ URL('js/ResizeSensor.js') }}"></script>
+    <script src="{{ URL('js/slim.js') }}"></script>
+    <script src="{{ URL('js/dropzone/dist/dropzone.js') }}"></script>
+    @stack('post-scripts')
+
   </body>
 </html>

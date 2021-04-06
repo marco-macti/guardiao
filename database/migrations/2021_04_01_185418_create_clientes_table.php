@@ -9,7 +9,7 @@ class CreateClientesTable extends Migration
     public function up()
     {
         Schema::create('clientes', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->increments('id');
             $table->string('cep')->nullable();
             $table->string('endereco')->nullable();
             $table->string('numero')->nullable();

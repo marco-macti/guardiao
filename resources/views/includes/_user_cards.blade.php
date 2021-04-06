@@ -4,7 +4,7 @@
               <i class="icon fa fa-sliders"></i>
               <div class="dash-content">
                 <label class="tx-primary">
-                  <a href="">Inteligência Artificial & <br/>Auditoria de NCM</a>
+                  <a href="{{ URL('/lotes') }}">Inteligência Artificial & <br/>Auditoria de NCM</a>
                 </label>
               </div><!-- dash-content -->
             </div><!-- col-3 -->

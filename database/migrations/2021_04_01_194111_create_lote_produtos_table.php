@@ -9,7 +9,7 @@ class CreateLoteProdutosTable extends Migration
     public function up()
     {
         Schema::create('lote_produtos', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->increments('id');
             $table->string('codigo_interno_do_cliente');
             $table->longText('descricao_do_produto');
             $table->string('ncm',8);

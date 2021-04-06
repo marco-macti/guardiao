@@ -13,13 +13,15 @@ class IaController extends Controller
     public $arrJsonAtual;
     public function __construct()
     {
-        $smsJSON            = file_get_contents('trainingbkp.json');
+        $smsJSON            = @file_get_contents('trainingbkp.json');
         $this->arrJsonAtual = json_decode($smsJSON);
 
-        $this->classifier = new TNTClassifier();
+        if(!empty($this->arrJsonAtual)){
+            $this->classifier = new TNTClassifier();
 
-        for ($i = 0; $i < count($this->arrJsonAtual) -1; $i++) {
-            $this->classifier->learn($this->arrJsonAtual[$i]->nome, $this->arrJsonAtual[$i]->cod_ncm);
+            for ($i = 0; $i < count($this->arrJsonAtual) -1; $i++) {
+                $this->classifier->learn($this->arrJsonAtual[$i]->nome, $this->arrJsonAtual[$i]->cod_ncm);
+            }
         }
     }
 
