@@ -28,7 +28,7 @@
               <th>Imagem </th>
               <th>Descrição</th>
               <th>Código</th>
-              <th>NCM do Cliente</th>
+              <th>NCM Cliente</th>
               <th>NCM IA</th>
               <th>Acurácia</th>
               <th>Acertou?</th>
@@ -44,8 +44,8 @@
               </td>
               <td>Bolo Re no Pote</td>
               <td>158659</td>
-              <td>1909006</td>
-              <td>1908555</td>
+              <td><a href="" data-toggle="modal" data-target="#modaldemo2"><i class="fa fa-info-circle"></i></a> 1909006 </td>
+              <td><a href="" data-toggle="modal" data-target="#modaldemo2"><i class="fa fa-info-circle"></i></a> 1415166 </td>
               <td style="color:red">66%</td>
               <td style="color:red">AUDITAR</td>
               <td>
@@ -60,8 +60,8 @@
               </td>
               <td>Cup Cake Unidade</td>
               <td>158659</td>
-              <td>1909006</td>
-              <td>1908555</td>
+              <td><a href="" data-toggle="modal" data-target="#modaldemo2"><i class="fa fa-info-circle"></i></a> 1909006 </td>
+              <td><a href="" data-toggle="modal" data-target="#modaldemo2"><i class="fa fa-info-circle"></i></a> 1909006 </td>
               <td style="color:green">96%</td>
               <td style="color:green">NCM CORRETO</td>
               <td>
@@ -100,6 +100,49 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-primary">Treinar</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div><!-- modal-dialog -->
+</div>
+
+<div id="modaldemo2" class="modal fade">
+  <div class="modal-dialog modal-dialog-vertical-center" role="document">
+    <div class="modal-content bd-0 tx-14">
+      <div class="modal-header">
+        <h6 class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">Descricao do NCM</h6>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body pd-25">
+        <table class="table">
+          <tbody>
+            <tr>
+              <th scope="row">Capítulo </th>
+              <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</td>
+              
+            </tr>
+            <tr>
+              <th scope="row">Posição </th>
+              <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</td>
+              
+            </tr>
+            <tr>
+              <th>Subposição </th>
+              <td>Outros</td>
+              
+            </tr>
+            <tr>
+              <th>Subitem </th>
+              <td>Outros</td>
+              
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
       </div>
     </div>
   </div><!-- modal-dialog -->

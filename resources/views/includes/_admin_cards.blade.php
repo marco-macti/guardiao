@@ -11,31 +11,31 @@
             <div class="col-lg-2">
               <i class="icon fa fa-users"></i>
               <div class="dash-content">
-                <a href="">Usuários</a>
+                <span>Usuários</span>
               </div><!-- dash-content -->
             </div><!-- col-3 -->
             <div class="col-lg-2">
               <i class="icon fa fa-barcode"></i>
               <div class="dash-content">
-                <a href="">Clientes</a>
+                <span>Clientes</span>
               </div><!-- dash-content -->
             </div><!-- col-3 -->
             <div class="col-lg-2">
               <i class="icon fa fa-database"></i>
               <div class="dash-content">
-                <a href="">Base Comparativa</a>
+                <span>Base Comparativa</span>
               </div><!-- dash-content -->
             </div><!-- col-3 -->
             <div class="col-lg-2">
               <i class="icon fa fa-file"></i>
               <div class="dash-content">
-                <a href="">Relatórios</a>
+                <span>Relatórios</span>
               </div><!-- dash-content -->
             </div><!-- col-3 -->
             <div class="col-lg-2">
               <i class="icon fa fa-cogs"></i>
               <div class="dash-content">
-                <a href="">Ajustes</a>
+                <span>Ajustes</span>
               </div><!-- dash-content -->
             </div><!-- col-3 -->
           </div><!-- row -->
