@@ -40,7 +40,7 @@
               <td>23/01/2021</td>
               <td>3</td>
               <td>NFE</td>
-              <td>0025988585584984984</td>
+              <td>NFe31181219231827000215550010000095291565130779-nfe</td>
               <td>
                 <div class="col-lg-2 mg-t-20 mg-lg-t-0">
                   <div class="btn-group" role="group" aria-label="Basic example">

@@ -26,62 +26,83 @@
           <thead>
             <tr>
               <th>Imagem </th>
-              <th>Número de Controle Interno</th>
               <th>Descrição</th>
-              <th>NCM Importado</th>
+              <th>Código</th>
+              <th>NCM do Cliente</th>
               <th>NCM IA</th>
-              <th>Opções</th>
+              <th>Acurácia</th>
+              <th>Acertou?</th>
+              <th>Treinar</th>
+              <th>Tributação</th>
+              <th>Monofásico</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <th><img style="width: 100px" src="{{ URL('img-default.jpeg') }}"></th>
-              <th>158863</th>
-              <td>Detergente Minuano</td>
-              <td>929069</td>
-              <td>929059</td>
               <td>
-                <div class="col-lg-2 mg-t-20 mg-lg-t-0">
-                  <div class="btn-group" role="group" aria-label="Basic example">
-                    <a style="color:white" class="btn btn-secondary"><i class="fa fa-eye"></i></a>
-                  </div>
-                </div>
+                <img style="width: 100px" src="{{ URL('img-default.jpeg') }}">
               </td>
+              <td>Bolo Re no Pote</td>
+              <td>158659</td>
+              <td>1909006</td>
+              <td>1908555</td>
+              <td style="color:red">66%</td>
+              <td style="color:red">AUDITAR</td>
+              <td>
+                <a style="color:white" href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1"><i class="fa fa-check"></i></a>
+              </td>
+              <td>ST</td>
+              <td>Não</td>
             </tr>
             <tr>
-              <th><img style="width: 100px" src="{{ URL('img-default.jpeg') }}"></th>
-              <th>158863</th>
-              <td>Água Oxigendada Oxygen</td>
-              <td>929069</td>
-              <td>929059</td>
               <td>
-                <div class="col-lg-2 mg-t-20 mg-lg-t-0">
-                  <div class="btn-group" role="group" aria-label="Basic example">
-                    <a style="color:white" class="btn btn-secondary"><i class="fa fa-eye"></i></a>
-                  </div>
-                </div>
+                <img style="width: 100px" src="{{ URL('img-default.jpeg') }}">
               </td>
-            </tr>
-            <tr>
-              <th><img style="width: 100px" src="{{ URL('img-default.jpeg') }}"></th>
-              <th>158863</th>
-              <td>Bucha Higiênica</td>
-              <td>929069</td>
-              <td>929059</td>
+              <td>Cup Cake Unidade</td>
+              <td>158659</td>
+              <td>1909006</td>
+              <td>1908555</td>
+              <td style="color:green">96%</td>
+              <td style="color:green">NCM CORRETO</td>
               <td>
-                <div class="col-lg-2 mg-t-20 mg-lg-t-0">
-                  <div class="btn-group" role="group" aria-label="Basic example">
-                    <a style="color:white" class="btn btn-secondary"><i class="fa fa-eye"></i></a>
-                  </div>
-                </div>
+                <a style="color:white" href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1"><i class="fa fa-check"></i></a>
               </td>
+              <td>ST</td>
+              <td>Não</td>
             </tr>
           </tbody>
         </table>
       </div><!-- table-responsive -->
     </div>
-
   </div><!-- container -->
 </div><!-- slim-mainpanel -->
+
+
+<div id="modaldemo1" class="modal fade">
+  <div class="modal-dialog modal-dialog-vertical-center" role="document">
+    <div class="modal-content bd-0 tx-14">
+      <div class="modal-header">
+        <h6 class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">Upload de arquivos</h6>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body pd-25">
+        <h5 class="lh-3 mg-b-20"><a href="" class="tx-inverse hover-primary">Importando seus arquivos de lotes</a></h5>
+        <p class="mg-b-5">São permitidos para informar produtos do lote , arquivos oficiais do tipo Speed Fiscal ( .txt ), Sintegra ( .txt ) e Notas Fiscais de Produtos ( .xml ). </p>
+        <form action="/lote/1/upload-planilha" id="dropzone" class="dropzone">
+          <div class="fallback">
+            <input name="file" type="file" multiple />
+          </div>
+        </form>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div><!-- modal-dialog -->
+</div>
 
 @stop
