@@ -88,18 +88,18 @@
         </button>
       </div>
       <div class="modal-body pd-25">
-        <h5 class="lh-3 mg-b-20"><a href="" class="tx-inverse hover-primary">Importando seus arquivos de lotes</a></h5>
-        <p class="mg-b-5">São permitidos para informar produtos do lote , arquivos oficiais do tipo Speed Fiscal ( .txt ), Sintegra ( .txt ) e Notas Fiscais de Produtos ( .xml ). </p>
-        <form action="/lote/1/upload-planilha" id="dropzone" class="dropzone">
-          <div class="fallback">
-            <input name="file" type="file" multiple />
-          </div>
+        <h5 class="lh-3 mg-b-20"><a href="" class="tx-inverse hover-primary">Treinando a IA</a></h5>
+        <p class="mg-b-5">Informa o NCM correto para efetuar o treinamento da IA para este item. </p>
+        <br/>
+        <form action="#" id="treinar">
+          <label> NCM : </label>
+          <input name="ncm" type="text" id="ncm" class="form-control" />
         </form>
       </div>
       
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Save changes</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Treinar</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
       </div>
     </div>
   </div><!-- modal-dialog -->
