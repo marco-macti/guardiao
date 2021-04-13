@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 
 use App\Cliente as OldCliente;
 use App\Models\Cliente;
+use App\User;
 
 class HomeController extends Controller
 {

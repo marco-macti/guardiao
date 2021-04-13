@@ -11,6 +11,10 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('cliente_id');
+            $table->enum('is_superuser',[true,false]);
+            $table->enum('is_staff',[true,false]);
+            $table->enum('is_active',[true,false]);
+            $table->enum('confirmed',[true,false]);
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();

@@ -29,12 +29,11 @@
               <th>Descrição</th>
               <th>Código</th>
               <th>NCM Cliente</th>
+              <th>Diferença entre NCMs</th>
               <th>NCM IA</th>
               <th>Acurácia</th>
               <th>Acertou?</th>
-              <th>Treinar</th>
-              <th>Tributação</th>
-              <th>Monofásico</th>
+              <th>Auditar</th>
             </tr>
           </thead>
           <tbody>
@@ -44,15 +43,16 @@
               </td>
               <td>Bolo Re no Pote</td>
               <td>158659</td>
-              <td><a href="" data-toggle="modal" data-target="#modaldemo2"><i class="fa fa-info-circle"></i></a> 1909006 </td>
-              <td><a href="" data-toggle="modal" data-target="#modaldemo2"><i class="fa fa-info-circle"></i></a> 1415166 </td>
+              <td>1909006 </td>
+              <td>
+                <a href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo2"><i class="fa fa-arrows-h"></i></a>
+              </td>
+              <td>1415166 </td>
               <td style="color:red">66%</td>
               <td style="color:red">AUDITAR</td>
               <td>
                 <a style="color:white" href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1"><i class="fa fa-check"></i></a>
               </td>
-              <td>ST</td>
-              <td>Não</td>
             </tr>
             <tr>
               <td>
@@ -60,15 +60,16 @@
               </td>
               <td>Cup Cake Unidade</td>
               <td>158659</td>
-              <td><a href="" data-toggle="modal" data-target="#modaldemo2"><i class="fa fa-info-circle"></i></a> 1909006 </td>
-              <td><a href="" data-toggle="modal" data-target="#modaldemo2"><i class="fa fa-info-circle"></i></a> 1909006 </td>
+              <td>1909006 </td>
+              <td>
+                <a href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo2"><i class="fa fa-arrows-h"></i></a>
+              </td>
+              <td>1415166 </td>
               <td style="color:green">96%</td>
               <td style="color:green">NCM CORRETO</td>
               <td>
                 <a style="color:white" href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1"><i class="fa fa-check"></i></a>
               </td>
-              <td>ST</td>
-              <td>Não</td>
             </tr>
           </tbody>
         </table>
@@ -118,24 +119,29 @@
         <table class="table">
           <tbody>
             <tr>
-              <th scope="row">Capítulo </th>
-              <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</td>
-              
+              <th scope="row">NCM IMPORTADO : 1909006 </th>
+              <th style="text-align: center" scope="row"><i class="fa fa-arrows-h"></i> </th>
+              <th scope="row">NCM IA  : 1415166	 </th>
             </tr>
             <tr>
-              <th scope="row">Posição </th>
-              <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</td>
-              
+              <td><b>Capítulo TIPI : </b> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</td>
+              <th style="text-align: center" scope="row"><i class="fa fa-arrows-h"></i> </th>
+              <td><b>Capítulo TIPI : </b> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</td>
             </tr>
             <tr>
-              <th>Subposição </th>
-              <td>Outros</td>
-              
+              <td><b>Posição TIPI : </b> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</td>
+              <th style="text-align: center" scope="row"><i class="fa fa-arrows-h"></i> </th>
+              <td><b>Posição TIPI : </b> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</td>
             </tr>
             <tr>
-              <th>Subitem </th>
-              <td>Outros</td>
-              
+              <td><b>Subposiçao TIPI : </b> Outros </td>
+              <th style="text-align: center" scope="row"><i class="fa fa-arrows-h"></i> </th>
+              <td><b>Subposiçao TIPI : </b> Outros </td>
+            </tr>
+            <tr>
+              <td><b>Subitem TIPI : </b> Outros </td>
+              <th style="text-align: center" scope="row"><i class="fa fa-arrows-h"></i> </th>
+              <td><b>Subitem TIPI : </b> Outros </td>
             </tr>
           </tbody>
         </table>
