@@ -10,9 +10,13 @@ class CreateLotesTable extends Migration
     {
         
         Schema::create('lotes', function (Blueprint $table) {
+
             $table->increments('id');
             $table->unsignedInteger('numero_do_lote');
             $table->unsignedInteger('cliente_id');
+            $table->unsignedInteger('quantidade_de_produtos');
+            $table->string('tipo_documento');
+            $table->string('competencia_ou_numeracao');
             $table->timestamps();
 
             $table->foreign('cliente_id')->references('id')->on('clientes');

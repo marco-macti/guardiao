@@ -35,36 +35,26 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td>23/01/2021</td>
-              <td>3</td>
-              <td>NFE</td>
-              <td>NFe31181219231827000215550010000095291565130779-nfe</td>
-              <td>
-                <div class="col-lg-2 mg-t-20 mg-lg-t-0">
-                  <div class="btn-group" role="group" aria-label="Basic example">
-                    <a href="{{ URL('/lotes/1/edit') }}" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye"></i></a>
-                    <a style="color:white" class="btn btn-secondary"><i class="fa fa-remove"></i></a>
+            @forelse ($lotes as $lote)
+              <tr>
+                <th scope="row">{{ $lote->numero_do_lote }}</th>
+                <td>{{ $lote->created_at->format('d/m/Y') }}</td>
+                <td>{{ $lote->quantidade_de_produtos }}</td>
+                <td>{{ $lote->tipo_documento }}</td>
+                <td>{{ $lote->competencia_ou_numeracao }}</td>
+                <td>
+                  <div class="col-lg-2 mg-t-20 mg-lg-t-0">
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                      <a href="{{ URL("/lotes/$lote->id/edit") }}" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye"></i></a>
+                      <a style="color:white" class="btn btn-secondary"><i class="fa fa-remove"></i></a>
+                    </div>
                   </div>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">1</th>
-              <td>23/01/2021</td>
-              <td>3</td>
-              <td>SPEED</td>
-              <td>03/21</td>
-              <td>
-                <div class="col-lg-2 mg-t-20 mg-lg-t-0">
-                  <div class="btn-group" role="group" aria-label="Basic example">
-                    <a href="{{ URL('/lotes/1/edit') }}" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye"></i></a>
-                    <a style="color:white" class="btn btn-secondary"><i class="fa fa-remove"></i></a>
-                  </div>
-                </div>
-              </td>
-            </tr>
+                </td>
+              </tr>
+            @empty
+              <tr colspan="6">Nenhum lote importado</tr>
+            @endforelse
+            
           </tbody>
         </table>
       </div><!-- table-responsive -->
@@ -75,47 +65,132 @@
 <div id="modaldemo1" class="modal fade">
   <div class="modal-dialog modal-dialog-vertical-center" role="document">
     <div class="modal-content bd-0 tx-14">
-      <div class="modal-header">
-        <h6 class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">Upload de arquivos</h6>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span>
-        </button>
-      </div>
-      <div class="modal-body pd-25">
-        <h5 class="lh-3 mg-b-20"><a href="" class="tx-inverse hover-primary">Importando seus arquivos de lotes</a></h5>
-        <p class="mg-b-5">São permitidos para informar produtos do lote , arquivos oficiais do tipo Speed Fiscal ( .txt ), Sintegra ( .txt ) e Notas Fiscais de Produtos ( .xml ). </p>
-        <form action="/lote/1/upload-planilha" id="dropzone" class="dropzone">
-          <div class="fallback">
-            <input name="file" type="file" multiple />
-          </div>
-        </form>
-      </div>
+
       
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Save changes</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <div class="modal-header">
+          <h6 class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">Upload de arquivos</h6>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body pd-25">
+
+        <div id="pre-loader">
+
+          <h5 class="lh-3 mg-b-20"><a href="" class="tx-inverse hover-primary">Importando seus arquivos de lotes</a></h5>
+          <p class="mg-b-5">São permitidos para informar produtos do lote , arquivos oficiais do tipo Speed Fiscal ( .txt ), Sintegra ( .txt ) e Notas Fiscais de Produtos ( .xml ). </p>
+            
+            <br/>
+
+            <label>Tipo de Arquivo : </label>
+            <select class="tipo_arquivo form-control">
+              <option>[-SELECIONE-]</option>
+              <option value="SPEED">Speed Fiscal</option>  
+              <option style="display:none" value="SINTEGRA">Sintegra</option>  
+              <option value="NFXML">Nota Fiscal XML </option>  
+            </select>
+
+            <br/>
+
+            <form method="POST" action="/lotes" enctype="multipart/form-data" id="dropzone" class="dropzone">
+
+              @csrf
+
+              <input type="hidden" class="tipo_arquivo_dropzone" name="tipo_arquivo" value="">
+
+              <div class="fallback">
+                <input name="file" type="file" multiple />
+              </div>
+            </form>
+
+            <br/>
+
+            <hr/>
+
+            <br/>
+
+            <form method="POST" action="/lotes" enctype="multipart/form-data" >
+
+              @csrf
+
+              <input type="hidden" class="tipo_arquivo_dropzone" name="tipo_arquivo" value="">
+
+              <label>Tipo de Arquivo : </label>
+              
+              <select class="tipo_arquivo form-control">
+                <option>[-SELECIONE-]</option>
+                <option value="SPEED">Speed Fiscal</option>  
+                <option style="display:none" value="SINTEGRA">Sintegra</option>  
+                <option value="NFXML">Nota Fiscal XML </option>  
+              </select>
+
+              <br/>
+
+              <div class="fallback">
+                <input class="form-control" name="file" type="file" multiple />
+              </div>
+
+              <br/>
+
+              <button class="btn btn-primary" type="submit">Enviar</button>
+
+            </form>
+         
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary">Save changes</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+
+
+        <div id="loader" style="text-align: center;display:none">
+
+          <img style="width: 200px" src="{{ URL('img/loader.gif') }}">
+          <h6 class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">Aguarde enquanto os produtos são importados.</h6>
+          <br/>
+          <br/>
+  
+        </div>
+
       </div>
+
+      
+
+     
     </div>
   </div><!-- modal-dialog -->
 </div>
 
 @push('post-scripts')
 
-  <!-- https://www.dropzonejs.com/#usage -->
-
   <script type="text/javascript">
 
-    $(function() {
-      
-      var myDropzone = new Dropzone("#dropzone");
+    $(document).ready(function() {
 
-      myDropzone.on("addedfile", function(file) {
+        $(".tipo_arquivo").change(function(){
 
-        alert("Arquivo inputado.")
-        
-      });
+          var tipo = $(this).find(":selected").val();
 
-  })
+          $(".tipo_arquivo_dropzone").val(tipo);
+
+        });
+
+        $("#dropzone").dropzone({
+            maxFiles: 1,
+            url: "/lotes",
+            sending: function(file, response){
+              $("#pre-loader").hide();
+              $("#loader").show();
+              $("#frm-dropzone").submit();
+            },
+            success: function(file, response){
+                console.log(response);
+            }
+        });
+     
+    });
+
 
   </script>  
 

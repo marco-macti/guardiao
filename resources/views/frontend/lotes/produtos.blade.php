@@ -37,13 +37,14 @@
             </tr>
           </thead>
           <tbody>
+            @forelse ($produtos as $produto)
             <tr>
               <td>
                 <img style="width: 100px" src="{{ URL('img-default.jpeg') }}">
               </td>
-              <td>Bolo Re no Pote</td>
-              <td>158659</td>
-              <td>1909006 </td>
+              <td>{{ $produto->descricao_do_produto }}</td>
+              <td>{{ $produto->codigo_interno_do_cliente }}</td>
+              <td>{{ $produto->ncm_importado  }} </td>
               <td>
                 <a href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo2"><i class="fa fa-arrows-h"></i></a>
               </td>
@@ -54,25 +55,13 @@
                 <a style="color:white" href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1"><i class="fa fa-check"></i></a>
               </td>
             </tr>
-            <tr>
-              <td>
-                <img style="width: 100px" src="{{ URL('img-default.jpeg') }}">
-              </td>
-              <td>Cup Cake Unidade</td>
-              <td>158659</td>
-              <td>1909006 </td>
-              <td>
-                <a href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo2"><i class="fa fa-arrows-h"></i></a>
-              </td>
-              <td>1415166 </td>
-              <td style="color:green">96%</td>
-              <td style="color:green">NCM CORRETO</td>
-              <td>
-                <a style="color:white" href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1"><i class="fa fa-check"></i></a>
-              </td>
-            </tr>
+            @empty
+              <tr colspan="6">Nenhum produto neste lote</tr>
+            @endforelse
           </tbody>
         </table>
+
+        {{ $produtos->links()}}
       </div><!-- table-responsive -->
     </div>
   </div><!-- container -->
