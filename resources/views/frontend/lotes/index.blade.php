@@ -54,9 +54,10 @@
             @empty
               <tr colspan="6">Nenhum lote importado</tr>
             @endforelse
-            
           </tbody>
         </table>
+
+        {{ $lotes->links() }}
       </div><!-- table-responsive -->
     </div>
   </div><!-- container -->
@@ -103,40 +104,42 @@
               </div>
             </form>
 
-            <br/>
-
-            <hr/>
-
-            <br/>
-
-            <form method="POST" action="/lotes" enctype="multipart/form-data" >
-
-              @csrf
-
-              <input type="hidden" class="tipo_arquivo_dropzone" name="tipo_arquivo" value="">
-
-              <label>Tipo de Arquivo : </label>
-              
-              <select class="tipo_arquivo form-control">
-                <option>[-SELECIONE-]</option>
-                <option value="SPEED">Speed Fiscal</option>  
-                <option style="display:none" value="SINTEGRA">Sintegra</option>  
-                <option value="NFXML">Nota Fiscal XML </option>  
-              </select>
+            <div style="display: none">
 
               <br/>
-
-              <div class="fallback">
-                <input class="form-control" name="file" type="file" multiple />
-              </div>
-
+              <hr/>
               <br/>
 
-              <button class="btn btn-primary" type="submit">Enviar</button>
+              <form method="POST" action="/lotes" enctype="multipart/form-data" >
 
-            </form>
-         
-            <div class="modal-footer">
+                @csrf
+
+                <input type="hidden" class="tipo_arquivo_dropzone" name="tipo_arquivo" value="">
+
+                <label>Tipo de Arquivo : </label>
+                
+                <select class="tipo_arquivo form-control">
+                  <option>[-SELECIONE-]</option>
+                  <option value="SPEED">Speed Fiscal</option>  
+                  <option style="display:none" value="SINTEGRA">Sintegra</option>  
+                  <option value="NFXML">Nota Fiscal XML </option>  
+                </select>
+
+                <br/>
+
+                <div class="fallback">
+                  <input class="form-control" name="file" type="file" multiple />
+                </div>
+
+                <br/>
+
+                <button class="btn btn-primary" type="submit">Enviar</button>
+
+              </form>
+
+            </div>
+            
+            <div style="display: none" class="modal-footer">
               <button type="button" class="btn btn-primary">Save changes</button>
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
@@ -147,7 +150,7 @@
         <div id="loader" style="text-align: center;display:none">
 
           <img style="width: 200px" src="{{ URL('img/loader.gif') }}">
-          <h6 class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">Aguarde enquanto os produtos são importados.</h6>
+          <h6 id="msg-upload" class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">Aguarde enquanto os produtos são importados.</h6>
           <br/>
           <br/>
   
@@ -155,9 +158,6 @@
 
       </div>
 
-      
-
-     
     </div>
   </div><!-- modal-dialog -->
 </div>
@@ -185,7 +185,21 @@
               $("#frm-dropzone").submit();
             },
             success: function(file, response){
-                console.log(response);
+
+              if(response.success){
+                
+                $("#msg-upload").html(response.msg);
+
+                setTimeout(() => {
+                  location.href = response.url_redirect;
+                }, 2000);
+
+              }else{
+
+                $("#msg-upload").html(response.msg);
+
+              }
+              
             }
         });
      
