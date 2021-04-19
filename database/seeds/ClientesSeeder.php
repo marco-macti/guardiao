@@ -8,11 +8,11 @@ class ClientesSeeder extends Seeder
 {
     public function run()
     {
-        $antigosClientes = OldCliente::all();
+        //$antigosClientes = OldCliente::all();
 
-        foreach ($antigosClientes as $key => $oldX) {
+        //foreach ($antigosClientes as $key => $oldX) {
 
-            Cliente::create([
+            /*Cliente::create([
                 'cep'                  => $oldX->cep,
                 'endereco'             => $oldX->rua,
                 'numero'               => $oldX->numero,
@@ -34,8 +34,32 @@ class ClientesSeeder extends Seeder
                 'estado_destino'       => $oldX->estado_destino,
                 'anotacoes'            => $oldX->anotacoes,
                 'numero_de_lotes'      => 0          
-            ]);
+            ]);*/
 
-        }
+        //}
+
+        Cliente::create([
+            'cep'                  => '3280944',
+            'endereco'             => 'Rua Sagrado Coracao de Maria',
+            'numero'               => '67',
+            'complemento'          => 'Casa A',
+            'bairro'               => 'Santa Cecília',
+            'cidade'               => 'Esmeraldas',   
+            'estado'               => 'MG', 
+            'cnpj'                 => '29692093000144', 
+            'nome_fantasia'        => 'Green Signal',
+            'razao_social'         => 'Green Signal Softwares LTDA',
+            'inscricao_estadual'   => '9999999999',
+            'ativo'                => 'S',
+            'nome_do_responsavel'  => 'Bruno Santos da Fonseca',
+            'tel1'                 => '031994570974',
+            'tel2'                 => '031983316820',
+            'email_cliente'        => 'contato@greensignal.com.br',
+            'dt_nascimento'        => '1992-12-23',
+            'operacao'             => 'Venda',
+            'estado_destino'       => 'MG',
+            'anotacoes'            => 'Melhor empresa do brasil.',
+            'numero_de_lotes'      => 0          
+        ]);
     }
 }

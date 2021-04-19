@@ -179,10 +179,13 @@
               <span>André</span>
               <i class="fa fa-angle-down"></i>
             </a>
+            
             <div class="dropdown-menu dropdown-menu-right">
               <nav class="nav">
-                <a href="page-profile.html" class="nav-link"><i class="icon ion-person"></i> Meus Dados</a>
-                <a href="page-signin.html" class="nav-link"><i class="icon ion-forward"></i> Sair</a>
+                <a href="page-profile.html" class="nav-link"><i class="fa fa-file"></i> &nbsp;Meus Dados</a>
+                <a href="page-signin.html" class="nav-link"><i class="fa fa-users"></i>&nbsp; Usuários</a>
+                <a href="page-signin.html" class="nav-link"><i class="fa fa-cog"></i>&nbsp; Ajustes</a>
+                <a href="page-signin.html" class="nav-link"><i class="fa fa-exit"></i> &nbsp; Sair</a>
               </nav>
             </div><!-- dropdown-menu -->
           </div><!-- dropdown -->

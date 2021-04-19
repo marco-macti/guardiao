@@ -88,6 +88,7 @@
               <option>[-SELECIONE-]</option>
               <option value="SPEED">Speed Fiscal</option>  
               <option style="display:none" value="SINTEGRA">Sintegra</option>  
+              <option value="CSV">Arquivo CSV</option>  
               <option value="NFXML">Nota Fiscal XML </option>  
             </select>
 
@@ -104,7 +105,7 @@
               </div>
             </form>
 
-            <div style="display: none">
+            <div style="display: block">
 
               <br/>
               <hr/>
@@ -122,6 +123,7 @@
                   <option>[-SELECIONE-]</option>
                   <option value="SPEED">Speed Fiscal</option>  
                   <option style="display:none" value="SINTEGRA">Sintegra</option>  
+                  <option value="CSV">Arquivo CSV</option>  
                   <option value="NFXML">Nota Fiscal XML </option>  
                 </select>
 
