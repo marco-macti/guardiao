@@ -105,7 +105,7 @@
               </div>
             </form>
 
-            <div style="display: block">
+            <div style="display: none">
 
               <br/>
               <hr/>

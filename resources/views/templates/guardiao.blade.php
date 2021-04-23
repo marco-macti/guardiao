@@ -175,8 +175,8 @@
           </div><!-- dropdown -->
           <div class="dropdown dropdown-c">
             <a href="#" class="logged-user" data-toggle="dropdown">
-              <img src="http://via.placeholder.com/500x500" alt="">
-              <span>André</span>
+              <img class="img-responsive" src="https://guardiaotributario.com.br/wp-content/uploads/2019/06/guardia%CC%83o_tributario_logotipo.png" alt="">
+              <span>{{ auth()->user()->name }}</span>
               <i class="fa fa-angle-down"></i>
             </a>
             
@@ -185,7 +185,7 @@
                 <a href="page-profile.html" class="nav-link"><i class="fa fa-file"></i> &nbsp;Meus Dados</a>
                 <a href="page-signin.html" class="nav-link"><i class="fa fa-users"></i>&nbsp; Usuários</a>
                 <a href="page-signin.html" class="nav-link"><i class="fa fa-cog"></i>&nbsp; Ajustes</a>
-                <a href="page-signin.html" class="nav-link"><i class="fa fa-exit"></i> &nbsp; Sair</a>
+                <a href="/logout" class="nav-link"><i class="fa fa-exit"></i> &nbsp; Sair</a>
               </nav>
             </div><!-- dropdown-menu -->
           </div><!-- dropdown -->

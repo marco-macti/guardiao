@@ -94,71 +94,181 @@
     </div>
   </div><!-- container -->
 </div><!-- slim-mainpanel -->
-
 <div id="modaldemo1" class="modal fade">
   <div class="modal-dialog modal-dialog-vertical-center" role="document">
     <div class="modal-content bd-0 tx-14">
-      <div class="modal-header">
-        <h6 class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">Upload de arquivos</h6>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span>
-        </button>
+
+        <div class="modal-header">
+          <h6 class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">Upload de arquivos</h6>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body pd-25">
+
+        <div id="pre-loader">
+
+          <h5 class="lh-3 mg-b-20"><a href="" class="tx-inverse hover-primary">Importando seus arquivos de lotes</a></h5>
+          <p class="mg-b-5">São permitidos para informar produtos do lote , arquivos oficiais do tipo Speed Fiscal ( .txt ), Sintegra ( .txt ) e Notas Fiscais de Produtos ( .xml ). </p>
+            
+            <br/>
+
+            <label>Tipo de Arquivo : </label>
+            <select class="tipo_arquivo form-control ">
+              <option>[-SELECIONE-]</option>
+              <option value="SPEED">Speed Fiscal</option>  
+              <option style="display:none" value="SINTEGRA">Sintegra</option>  
+              <option value="CSV">Arquivo CSV</option>  
+              <option value="NFXML">Nota Fiscal XML </option>  
+            </select>
+
+            <br/>
+
+            <label>Cliente : </label>
+            <select class="cliente_id form-control">
+              <option>[-SELECIONE-]</option>
+              @foreach ($clientes as $cliente )
+                <option value="{{ $cliente->id }}">{{ $cliente->cnpj }} - {{ $cliente->nome_fantasia }}</option>  
+              @endforeach
+            </select>
+
+            <br/>
+
+            <form method="POST" action="/lotes" enctype="multipart/form-data" id="dropzone" class="dropzone">
+
+              @csrf
+
+              <input type="hidden" class="tipo_arquivo_dropzone" name="tipo_arquivo" value="">
+              <input type="hidden" class="cliente_id_dropzone" name="cliente_id" value="">
+
+              <div class="fallback">
+                <input name="file" type="file" multiple />
+              </div>
+            </form>
+
+            <div style="display: none">
+
+              <br/>
+              <hr/>
+              <br/>
+
+              <form method="POST" action="/lotes" enctype="multipart/form-data" >
+
+                @csrf
+
+                <input type="hidden" class="tipo_arquivo_dropzone" name="tipo_arquivo" value="">
+                <input type="hidden" class="cliente_id_dropzone" name="cliente_id" value="">
+
+                <label>Tipo de Arquivo : </label>
+                
+                <select class="tipo_arquivo form-control">
+                  <option>[-SELECIONE-]</option>
+                  <option value="SPEED">Speed Fiscal</option>  
+                  <option style="display:none" value="SINTEGRA">Sintegra</option>  
+                  <option value="CSV">Arquivo CSV</option>  
+                  <option value="NFXML">Nota Fiscal XML </option>  
+                </select>
+
+                <br/>
+
+                <label>Cliente : </label>
+                <select class="cliente_id form-control">
+                  <option>[-SELECIONE-]</option>
+                  @foreach ($clientes as $cliente )
+                    <option value="{{ $cliente->id }}">{{ $cliente->cnpj }} - {{ $cliente->nome_fantasia }}</option>  
+                  @endforeach
+                </select>
+
+                <br/>
+
+                <div class="fallback">
+                  <input class="form-control" name="file" type="file" multiple />
+                </div>
+
+                <br/>
+
+                <button class="btn btn-primary" type="submit">Enviar</button>
+
+              </form>
+
+            </div>
+            
+            <div style="display: none" class="modal-footer">
+              <button type="button" class="btn btn-primary">Save changes</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+
+
+        <div id="loader" style="text-align: center;display:none">
+
+          <img style="width: 200px" src="{{ URL('img/loader.gif') }}">
+          <h6 id="msg-upload" class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">Aguarde enquanto os produtos são importados.</h6>
+          <br/>
+          <br/>
+  
+        </div>
+
       </div>
-      <div class="modal-body pd-25">
-        <h5 class="lh-3 mg-b-20"><a href="" class="tx-inverse hover-primary">Importando seus arquivos de lotes</a></h5>
-        <p class="mg-b-5">São permitidos para informar produtos do lote , arquivos oficiais do tipo Speed Fiscal ( .txt ), Sintegra ( .txt ) e Notas Fiscais de Produtos ( .xml ). </p>
 
-        <br/>
-
-        <label>Cliente : </label>
-        <select class="form-control">
-          <option>[-SELECIONE-]</option>
-          @foreach ($clientes as $cliente )
-            <option value="{{ $cliente->id }}">{{ $cliente->cnpj }} - {{ $cliente->nome_fantasia }}</option>  
-          @endforeach
-        
-        </select>
-
-        <br/>
-
-        <form  action="/lote/1/upload-planilha" id="dropzone" class="dropzone">
-
-          
-          <div class="fallback">
-            <input name="file" type="file" multiple />
-          </div>
-        </form>
-      </div>
-      
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Save changes</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
     </div>
   </div><!-- modal-dialog -->
 </div>
 
 @push('post-scripts')
 
-  <!-- https://www.dropzonejs.com/#usage -->
-
   <script type="text/javascript">
 
-    $(function() {
-      
-      var myDropzone = new Dropzone("#dropzone");
+    $(document).ready(function() {
 
-      myDropzone.on("addedfile", function(file) {
+        $(".tipo_arquivo").change(function(){
 
-        alert("Arquivo inputado.")
-        
-      });
+          var tipo = $(this).find(":selected").val();
 
-  })
+          $(".tipo_arquivo_dropzone").val(tipo);
+
+        });
+
+        $(".cliente_id").change(function(){
+
+          var tipo = $(this).find(":selected").val();
+
+          $(".cliente_id_dropzone").val(tipo);
+
+        });
+
+        $("#dropzone").dropzone({
+            maxFiles: 1,
+            url: "/admin/lotes",
+            sending: function(file, response){
+              $("#pre-loader").hide();
+              $("#loader").show();
+              $("#frm-dropzone").submit();
+            },
+            success: function(file, response){
+
+              if(response.success){
+                
+                $("#msg-upload").html(response.msg);
+
+                setTimeout(() => {
+                  location.href = response.url_redirect;
+                }, 2000);
+
+              }else{
+
+                $("#msg-upload").html(response.msg);
+
+              }
+              
+            }
+        });
+     
+    });
+
 
   </script>  
 
 @endpush
-
-
 @stop

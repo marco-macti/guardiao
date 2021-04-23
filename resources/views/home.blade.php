@@ -10,12 +10,11 @@
           </ol>
           <h6 class="slim-pagetitle">Bem Vindo(a) ao Guardião Tributário!</h6>
         </div><!-- slim-pageheader -->
-        <h1> Visão do Usuário </h1>
-        @include('includes._user_cards')
-        <br/>
-        <h1> Visão do Admin </h1>
-        @include('includes._admin_cards')
-
+        @if(auth()->user()->is_superuser == 'Y') 
+          @include('includes._admin_cards')
+        @else
+          @include('includes._user_cards')
+        @endif
       </div><!-- container -->
     </div><!-- slim-mainpanel -->
 

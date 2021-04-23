@@ -14,7 +14,7 @@ class CreateLoteProdutosTable extends Migration
             $table->unsignedInteger('lote_id');
             $table->string('codigo_interno_do_cliente');
             $table->longText('descricao_do_produto');
-            $table->string('ncm_importado',8);
+            $table->string('ncm_importado');
             $table->timestamps();
 
             $table->foreign('lote_id')->references('id')->on('lotes');

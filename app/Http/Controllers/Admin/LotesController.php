@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Cliente;
+use App\Models\Lote;
+use App\Models\LoteProduto;
+
 
 class LotesController extends Controller
 {
@@ -21,7 +24,8 @@ class LotesController extends Controller
 
     public function store(Request $request){
 
-        $arquivo = $request->file('file')->getRealPath();
+        $arquivo   = $request->file('file')->getRealPath();
+        $clienteId = $request->cliente_id;
 
         $ret = [
             'success'      => false,
@@ -55,8 +59,6 @@ class LotesController extends Controller
 
                     }
                 }
-
-                $clienteId = 1;
 
                 $qtdsLotes = Lote::where('cliente_id',$clienteId)->count();
 
@@ -104,8 +106,6 @@ class LotesController extends Controller
 
                 if(is_array($produtos) && !empty($produtos)){
 
-                    $clienteId = 1;
-
                     $qtdsLotes = Lote::where('cliente_id',$clienteId)->count();
 
                     $proximoLote = ($qtdsLotes == 0) ? 1 : $qtdsLotes++;
@@ -144,8 +144,6 @@ class LotesController extends Controller
                     }
                 }else{
 
-                    $clienteId = 1;
-
                     $qtdsLotes = Lote::where('cliente_id',$clienteId)->count();
 
                     $proximoLote = ($qtdsLotes == 0) ? 1 : $qtdsLotes++;
@@ -183,12 +181,53 @@ class LotesController extends Controller
 
                 break;
 
-            case 'ARQUIVO':
-            
-                $xml = simplexml_load_string(file_get_contents($arquivo));
+            case 'CSV':
 
-                dd($xml);
-                break;
+                $qtdsLotes = Lote::where('cliente_id',$clienteId)->count();
+
+                $proximoLote = ($qtdsLotes == 0) ? 1 : $qtdsLotes++;
+
+                try {
+
+                    $csv = array_map('str_getcsv', file($arquivo));
+                    array_walk($csv, function(&$a) use ($csv) {
+                        $a = array_combine($csv[0], $a);
+                    });
+                    
+                    $lote = Lote::create([
+                        'numero_do_lote'           => $proximoLote,
+                        'cliente_id'               => $clienteId,
+                        'quantidade_de_produtos'   => count($csv),
+                        'tipo_documento'           => 'ARQUIVO DO CLIENTE',
+                        'competencia_ou_numeracao' => date('m/Y') // TODO : Pegar por dentro do arquivo a competencia
+                    ]);
+ 
+                    unset($csv[0]);
+
+                    foreach ($csv as $item) {
+
+                        LoteProduto::create([
+                            'lote_id'                   => $lote->id,
+                            'codigo_interno_do_cliente' => $item['CODIGO_NO_CLIENTE'],
+                            'descricao_do_produto'      => $item['DESCRICAO_DO_PRODUTO'],
+                            'ncm_importado'             => $item['NCM_NO_CLIENTE']
+                        ]);
+                    }
+
+                    $ret['success']      = true;
+                    $ret['msg']          = count($csv).' importados com sucesso.';
+                    $ret['url_redirect'] = URL("/lotes/$lote->id/edit");
+                    
+                } catch (\Throwable $th) {
+
+                    $ret['success']      = false;
+                    $ret['msg']          = "Erro: ".$th->getMessage();
+                    $ret['url_redirect'] = URL("/lotes");
+
+                }
+
+                
+                
         }
 
         return response()->json($ret);

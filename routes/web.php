@@ -57,13 +57,27 @@ Route::any('/ia/retorna-dados'                         ,'IaController@retornaDad
 Route::any('/ia/retorna-dados-planilha/{ncm}'          ,'IaController@retornaDadosPlanilhaIa');
 
 
-Route::group(['namespace' => 'Frontend'], function(){
-    Route::resource('/lotes', 'LotesController');
-});
+// v2.0
 
-Route::prefix('admin')->group(function () {
-    Route::group(['namespace' => 'Admin'], function(){
+Auth::routes();
+Route::get('logout', 'Auth\LoginController@logout');
+
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('/home'          , 'HomeController@index')->name('home');
+    Route::group(['namespace' => 'Frontend'], function(){
         Route::resource('/lotes', 'LotesController');
     });
+    
+    Route::prefix('admin')->group(function () {
+        Route::group(['namespace' => 'Admin'], function(){
+            Route::resource('/lotes', 'LotesController');
+        });
+    });
 });
+
+
+
+
+
+
 
