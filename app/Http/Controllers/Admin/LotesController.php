@@ -8,6 +8,8 @@ use App\Models\Cliente;
 use App\Models\Lote;
 use App\Models\LoteProduto;
 
+use App\Helpers\FormatValue;
+
 
 class LotesController extends Controller
 {
@@ -23,7 +25,6 @@ class LotesController extends Controller
     }
 
     public function store(Request $request){
-
         $arquivo   = $request->file('file')->getRealPath();
         $clienteId = $request->cliente_id;
 
@@ -49,9 +50,18 @@ class LotesController extends Controller
 
                 // Efetua Limpeza dos dados , pegando apenas Produtos ; 
 
+                $competencia = '';
+
                 foreach(file($arquivo) as $line) {
 
                     $lineExp = explode('|',$line);
+
+                    if(isset($lineExp[1]) && $lineExp[1] == '0000')
+                    {
+                        $data_inicio = FormatValue::stringToDateBr($lineExp[4]);
+                        $data_fim = FormatValue::stringToDateBr($lineExp[5]);
+                        $competencia .= $data_inicio.' - '.$data_fim;
+                    }
 
                     if(isset($lineExp[1]) && $lineExp[1] == '0200'){
 
@@ -71,7 +81,7 @@ class LotesController extends Controller
                         'cliente_id'               => $clienteId,
                         'quantidade_de_produtos'   => count($arrProdutos),
                         'tipo_documento'        => $request->tipo_arquivo,
-                        'competencia_ou_numeracao' => date('m/Y') // TODO : Pegar por dentro do arquivo a competencia
+                        'competencia_ou_numeracao' => $competencia // TODO : Pegar por dentro do arquivo a competencia
                     ]);
 
                     foreach ($arrProdutos as $key => $produto) {
@@ -99,10 +109,12 @@ class LotesController extends Controller
 
             case 'NFXML':
                 
-                $xml = simplexml_load_string(file_get_contents($arquivo));
-
-                $produtos = (array) $xml->NFe->infNFe;
-                $produtos = !empty($produtos['det']) ? $produtos['det'] : [] ;
+                $xml = simplexml_load_file($arquivo);
+                $xml = json_encode($xml);
+                $xml = json_decode($xml, true);
+                
+                $competencia = substr($xml['NFe']['infNFe']['ide']['dhEmi'], 0, 10);
+                $produtos = !empty($xml['NFe']['infNFe']['det']) ? $xml['NFe']['infNFe']['det'] : [] ;
 
                 if(is_array($produtos) && !empty($produtos)){
 
@@ -117,16 +129,15 @@ class LotesController extends Controller
                             'cliente_id'               => $clienteId,
                             'quantidade_de_produtos'   => count($produtos),
                             'tipo_documento'           => $request->tipo_arquivo,
-                            'competencia_ou_numeracao' => date('m/Y') // TODO : Pegar por dentro do arquivo a competencia
+                            'competencia_ou_numeracao' => $competencia // TODO : Pegar por dentro do arquivo a competencia
                         ]);
 
                         foreach ($produtos as $key => $obj) {
-
                             LoteProduto::create([
                                 'lote_id'                   => $lote->id,
-                                'codigo_interno_do_cliente' => $obj->prod->cProd,
-                                'descricao_do_produto'      => $obj->prod->xProd,
-                                'ncm_importado'             => $obj->prod->NCM
+                                'codigo_interno_do_cliente' => $obj['prod']['cProd'],
+                                'descricao_do_produto'      => $obj['prod']['xProd'],
+                                'ncm_importado'             => $obj['prod']['NCM']
                             ]);
 
                         }
@@ -161,9 +172,9 @@ class LotesController extends Controller
 
                         LoteProduto::create([
                             'lote_id'                   => $lote->id,
-                            'codigo_interno_do_cliente' => $produtos->prod->cProd,
-                            'descricao_do_produto'      => $produtos->prod->xProd,
-                            'ncm_importado'             => $produtos->prod->NCM
+                            'codigo_interno_do_cliente' => $produtos['prod']['cProd'],
+                            'descricao_do_produto'      => $produtos['prod']['xProd'],
+                            'ncm_importado'             => $produtos['prod']['NCM']
                         ]);
 
                         $ret['success']      = true;
