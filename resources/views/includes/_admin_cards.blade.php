@@ -8,18 +8,23 @@
           </label>
         </div><!-- dash-content -->
       </div><!-- col-3 -->
+     
       <div class="col-lg-3">
         <i class="icon fa fa-barcode"></i>
         <div class="dash-content">
-          <span>Clientes</span>
+          <label class="tx-primary">
+            <a href="{{route('admin.clientes.index')}}">Clientes</a>
+          </label>
         </div><!-- dash-content -->
       </div><!-- col-3 -->
+      
       <div class="col-lg-3">
         <i class="icon fa fa-database"></i>
         <div class="dash-content">
           <span>Base Comparativa</span>
         </div><!-- dash-content -->
       </div><!-- col-3 -->
+      
       <div class="col-lg-3">
         <i class="icon fa fa-file"></i>
         <div class="dash-content">

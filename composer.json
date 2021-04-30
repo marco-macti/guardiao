@@ -15,7 +15,8 @@
         "maatwebsite/excel": "^3.1",
         "phpmailer/phpmailer": "^6.1",
         "phpoffice/phpspreadsheet": "^1.11",
-        "teamtnt/tntsearch": "^2.4"
+        "teamtnt/tntsearch": "^2.4",
+        "laravelcollective/html": "5.8.*"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",

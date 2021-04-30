@@ -62,15 +62,36 @@ Route::any('/ia/retorna-dados-planilha/{ncm}'          ,'IaController@retornaDad
 Auth::routes();
 Route::get('logout', 'Auth\LoginController@logout');
 
-Route::group(['middleware' => 'auth'], function () {
-    Route::get('/home'          , 'HomeController@index')->name('home');
+Route::group([
+    'middleware' => 'auth'
+], function () {
+    
+    Route::get('/home', 'HomeController@index')->name('home');
+    
     Route::group(['namespace' => 'Frontend'], function(){
         Route::resource('/lotes', 'LotesController');
     });
     
-    Route::prefix('admin')->group(function () {
-        Route::group(['namespace' => 'Admin'], function(){
-            Route::resource('/lotes', 'LotesController');
+    Route::group([
+        'prefix' => 'admin',
+        'namespace' => 'Admin'
+    ], function () {
+
+        /**
+         * Lotes
+         */
+        Route::resource('/lotes', 'LotesController');
+
+        /**
+         * Clientes
+         */
+        Route::group([
+            'prefix' => 'clientes'
+        ],function () {
+            Route::get('/', 'ClientesController@index')->name('admin.clientes.index');
+            Route::get('/formulario', 'ClientesController@formulario')->name('admin.clientes.formulario');
+            Route::post('/cadastrar', 'ClientesController@cadastraCliente')->name('admin.clientes.cadastrar');
+            Route::get('/detalhes/{id}', 'ClientesController@detalhesCliente')->name('admin.clientes.detalhes');
         });
     });
 });

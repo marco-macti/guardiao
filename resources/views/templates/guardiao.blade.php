@@ -193,6 +193,14 @@
       </div><!-- container -->
     </div><!-- slim-header -->
 
+    <div class="container mt-4">
+      <div class="row">
+        <div class="col-md-12">
+          @include('templates.componentes.alerts')
+        </div>
+      </div>
+    </div>
+
     @yield('conteudo')
   
     <div class="slim-footer">
@@ -215,6 +223,7 @@
     <script src="{{ URL('js/ResizeSensor.js') }}"></script>
     <script src="{{ URL('js/slim.js') }}"></script>
     <script src="{{ URL('js/dropzone/dist/dropzone.js') }}"></script>
+    <script src="{{ URL('js/jquery.mask.min.js') }}"></script>
     
     @stack('post-scripts')
 
