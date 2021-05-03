@@ -80,7 +80,11 @@ Route::group([
         /**
          * Lotes
          */
-        Route::resource('/lotes', 'LotesController');
+        Route::resource('/lotes', 'LotesController', [
+            'names' => [
+                'edit' => 'admin.lotes.edit'
+            ]
+        ]);
 
         /**
          * Clientes
@@ -92,6 +96,11 @@ Route::group([
             Route::get('/formulario', 'ClientesController@formulario')->name('admin.clientes.formulario');
             Route::post('/cadastrar', 'ClientesController@cadastraCliente')->name('admin.clientes.cadastrar');
             Route::get('/detalhes/{id}', 'ClientesController@detalhesCliente')->name('admin.clientes.detalhes');
+
+            Route::post('/add-user', 'ClientesController@adduser')->name('admin.clientes.adduser');
+            Route::get('/remove-user/{id}', 'ClientesController@removeUser')->name('admin.clientes.removeUser');
+            Route::get('/info-user', 'ClientesController@infoUser')->name('admin.clientes.infoUser');
+            Route::post('/edit-user', 'ClientesController@edituser')->name('admin.clientes.edituser');
         });
     });
 });

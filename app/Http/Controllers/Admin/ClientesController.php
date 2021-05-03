@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\Sanitize;
-
+use Illuminate\Support\Facades\Hash;
 
 //Models
 use App\Models\Cliente;
@@ -81,18 +81,99 @@ class ClientesController extends Controller
 
     }
 
-    public function detalhesCliente($id)
+    public function detalhesCliente(Request $request, $id)
     {
         $id = decrypt($id);
-        
         $data['cliente'] = Cliente::find($id);
 
         if(!$data['cliente'])
             return back()->withErrors("Cliente não localizado!");
 
-        $data['lotes'] = Lote::where('cliente_id', $id)->paginate(15);
-        $data['usuarios'] = User::where('cliente_id', $id)->paginate(15);
+        if($request->has('page'))
+        {
+            $page = $request->get('page');
+            $modulo = $request->get('modulo');
+            $current_page = $request->get('current_page');
+
+            switch ($modulo) {
+                case 'user':
+                    $data['lotes'] = Lote::where('cliente_id', $id)->paginate(10, ['*'], 'page', $current_page);
+                    $data['usuarios'] = User::where('cliente_id', $id)->paginate(10, ['*'], 'page', $page);
+                    break;
+                case 'lote':
+                    $data['lotes'] = Lote::where('cliente_id', $id)->paginate(10, ['*'], 'page', $page);
+                    $data['usuarios'] = User::where('cliente_id', $id)->paginate(10, ['*'], 'page', $current_page);
+                    break;
+            }
+        }else{
+            $data['lotes'] = Lote::where('cliente_id', $id)->paginate(10);
+            $data['usuarios'] = User::where('cliente_id', $id)->paginate(1);
+        }
         
         return view('admin.clientes.detalhes',$data);
+    }
+
+    public function adduser(Request $request)
+    {
+        $dados = $request->get('dados');
+
+        $verificaCliente = User::where('email', $dados['email'])->where('cliente_id', $dados['cliente_id'])->first();
+
+        if($verificaCliente)
+            return back()->withErrors('O usuário informado ja está cadastrado no Cliente!');
+
+        $dados['is_superuser'] = 'N';
+        $dados['is_staff'] = 'Y';
+        $dados['is_active'] = 'Y';
+        $dados['confirmed'] = 'Y';
+        $dados['password'] = Hash::make('123456789');
+
+        $create = User::create($dados);
+        
+        if(!$create)
+            return back()->withErrors('Falha ao cadastrar novo usuário!');
+
+        return back()->withSuccess('Usuário cadastrado com sucesso!');
+    }
+
+    public function removeUser($id)
+    {
+        $user = User::find(decrypt($id));
+
+        if(!$user)
+            return back()->withErrors("Usuário não localizado!");
+
+        $delete = $user->delete();
+
+        if(!$delete)
+            return back()->withErrors("Falha ao excluir usuario!");
+
+        return back()->withSuccess("Usuário excluído com sucesso!");
+    }
+
+    public function infoUser(Request $request)
+    {
+        $user = User::find(decrypt($request->get('id')));
+
+        if(!$user)
+            return response()->json(["msg" => "Usuário não localizado!"], 400);
+
+        return response()->json(["user" => $user], 200);
+    }
+
+    public function edituser(Request $request)
+    {
+        $dados = $request->get('dados');
+        $user = User::find($dados['user_id']);
+
+        if(!$user)
+            return response()->withErrors("Usuário não localizado!");
+
+        $user->update([
+            'name' => $dados['name'],
+            'email' => $dados['email'],
+        ]);
+
+        return back()->withSuccess("Usuário editado com sucesso!");
     }
 }

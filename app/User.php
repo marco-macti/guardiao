@@ -17,6 +17,17 @@ class User extends Authenticatable
 
     protected $hidden = [ 'password', 'remember_token'];
 
+    protected $fillable = [
+        'cliente_id',
+        'is_superuser',
+        'is_staff',
+        'is_active',
+        'confirmed',
+        'password',
+        'email',
+        'name'
+    ];
+
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
