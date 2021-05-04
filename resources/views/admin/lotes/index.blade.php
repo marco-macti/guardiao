@@ -1,4 +1,23 @@
 @extends('templates.guardiao')
+
+@push('post-scripts')
+    <script>
+      $('.tipo_arquivo').on('change', function(){
+          var valor = $(this).val();
+          var url = '{{asset("modelo.csv")}}';
+          if(valor == 'CSV')
+          {
+            $('#link-area').empty();
+            $('#link-area').append('<a target="_blank" href="'+url+'" class="h3"><strong>Baixe o Model CSV</strong></a>');
+          }else{
+            $('#link-area').empty();
+          }
+          
+        console.log();
+      });
+    </script>
+@endpush
+
 @section('conteudo')
 
 <div class="slim-mainpanel">
@@ -37,60 +56,35 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Green Signal Softwares</td>
-              <td>29.692.093/0001-44</td>
-              <th scope="row">25</th>
-              <td>23/01/2021</td>
-              <td>3</td>
-              <td>NFE</td>
-              <td>0025988585584984984</td>
-              <td>
-                <div class="col-lg-2 mg-t-20 mg-lg-t-0">
-                  <div class="btn-group" role="group" aria-label="Basic example">
-                    <a href="{{ URL('admin/lotes/1/edit') }}" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye"></i></a>
-                    <a style="color:white" class="btn btn-secondary"><i class="fa fa-remove"></i></a>
+            @foreach ($lotes as $lote)
+              @php
+                  $cliente_dados = $lote->cliente;
+              @endphp
+              <tr>
+                <td>{{$cliente_dados->razao_social}}</td>
+                <td>{{$cliente_dados->cnpj}}</td>
+                <th scope="row">{{$lote->id}}</th>
+                <td>{{$lote->created_at->format('d/m/Y')}}</td>
+                <td>{{$lote->quantidade_de_produtos}}</td>
+                <td>{{$lote->tipo_documento}}</td>
+                <td>{{$lote->competencia_ou_numeracao}}</td>
+                <td>
+                  <div class="col-lg-2 mg-t-20 mg-lg-t-0">
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                      <a href="{{ route('admin.lotes.edit', $lote->id) }}" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye"></i></a>
+                      <a style="color:white" class="btn btn-secondary"><i class="fa fa-remove"></i></a>
+                    </div>
                   </div>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>Supermercados Supermir LTDA</td>
-              <td>29.691.052/0001-44</td>
-              <th scope="row">1</th>
-              <td>23/01/2021</td>
-              <td>2500</td>
-              <td>SPEED</td>
-              <td>01/20</td>
-              <td>
-                <div class="col-lg-2 mg-t-20 mg-lg-t-0">
-                  <div class="btn-group" role="group" aria-label="Basic example">
-                    <a href="{{ URL('admin/lotes/1/edit') }}" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye"></i></a>
-                    <a style="color:white" class="btn btn-secondary"><i class="fa fa-remove"></i></a>
-                  </div>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>EPA</td>
-              <td>21.005.589/0051-44</td>
-              <th scope="row">1</th>
-              <td>23/01/2021</td>
-              <td>1680</td>
-              <td>SINTEGRA</td>
-              <td>03/19</td>
-              <td>
-                <div class="col-lg-2 mg-t-20 mg-lg-t-0">
-                  <div class="btn-group" role="group" aria-label="Basic example">
-                    <a href="{{ URL('admin/lotes/1/edit') }}" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye"></i></a>
-                    <a style="color:white" class="btn btn-secondary"><i class="fa fa-remove"></i></a>
-                  </div>
-                </div>
-              </td>
-            </tr>
+                </td>
+              </tr>
+            @endforeach
           </tbody>
         </table>
       </div><!-- table-responsive -->
+
+      <div class="row justify-content-center">
+        {{$lotes->links()}}
+      </div>
     </div>
   </div><!-- container -->
 </div><!-- slim-mainpanel -->
@@ -132,6 +126,7 @@
               @endforeach
             </select>
 
+            <div id="link-area" class="text-center my-3 bg-default"></div>
             <br/>
 
             <form method="POST" action="/lotes" enctype="multipart/form-data" id="dropzone" class="dropzone">

@@ -7,7 +7,7 @@
       <ol class="breadcrumb slim-breadcrumb">
         <li class="breadcrumb-item"><a href="#">Home</a></li>
         <li class="breadcrumb-item active" aria-current="page">Lotes</li>
-        <li class="breadcrumb-item active" aria-current="page">Lote 1</li>
+        <li class="breadcrumb-item active" aria-current="page">Lote {{$lote->id}}</li>
       </ol>
       <h6 class="slim-pagetitle">Lotes de produtos</h6>
     </div><!-- slim-pageheader -->
@@ -38,41 +38,39 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>
-                <img style="width: 100px" src="{{ URL('img-default.jpeg') }}">
-              </td>
-              <td>Bolo Re no Pote</td>
-              <td>158659</td>
-              <td><a href="" data-toggle="modal" data-target="#modaldemo2"><i class="fa fa-info-circle"></i></a> 1909006 </td>
-              <td><a href="" data-toggle="modal" data-target="#modaldemo2"><i class="fa fa-info-circle"></i></a> 1415166 </td>
-              <td style="color:red">66%</td>
-              <td style="color:red">AUDITAR</td>
-              <td>
-                <a style="color:white" href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1"><i class="fa fa-check"></i></a>
-              </td>
-              <td>ST</td>
-              <td>Não</td>
-            </tr>
-            <tr>
-              <td>
-                <img style="width: 100px" src="{{ URL('img-default.jpeg') }}">
-              </td>
-              <td>Cup Cake Unidade</td>
-              <td>158659</td>
-              <td><a href="" data-toggle="modal" data-target="#modaldemo2"><i class="fa fa-info-circle"></i></a> 1909006 </td>
-              <td><a href="" data-toggle="modal" data-target="#modaldemo2"><i class="fa fa-info-circle"></i></a> 1909006 </td>
-              <td style="color:green">96%</td>
-              <td style="color:green">NCM CORRETO</td>
-              <td>
-                <a style="color:white" href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1"><i class="fa fa-check"></i></a>
-              </td>
-              <td>ST</td>
-              <td>Não</td>
-            </tr>
+            @foreach ($produtos as $produto)
+              <tr>
+                <td>
+                  <img style="width: 100px" src="{{ URL('img-default.jpeg') }}">
+                </td>
+                <td>{{$produto->descricao_do_produto}}</td>
+                <td>{{$produto->codigo_interno_do_cliente}}</td>
+                <td>
+                  <a href="" data-toggle="modal" data-target="#modaldemo2">
+                    <i class="fa fa-info-circle"></i>
+                  </a> {{$produto->ncm_importado}}
+                </td>
+                <td>
+                  <a href="" data-toggle="modal" data-target="#modaldemo2">
+                    <i class="fa fa-info-circle"></i>
+                  </a> 1415166 
+                </td>
+                <td style="color:red">66%</td>
+                <td style="color:red">AUDITAR</td>
+                <td>
+                  <a style="color:white" href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1"><i class="fa fa-check"></i></a>
+                </td>
+                <td>ST</td>
+                <td>Não</td>
+              </tr>
+            @endforeach
           </tbody>
         </table>
       </div><!-- table-responsive -->
+
+      <div class="row justify-content-center">
+        {{$produtos->links()}}
+      </div>
     </div>
   </div><!-- container -->
 </div><!-- slim-mainpanel -->

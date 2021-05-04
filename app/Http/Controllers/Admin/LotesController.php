@@ -15,13 +15,21 @@ class LotesController extends Controller
 {
     public function index(){
 
-        $clientes = Cliente::all();
+        $data['clientes'] = Cliente::all();
+        $data['lotes'] = Lote::paginate(10);
 
-        return view('admin.lotes.index')->with('clientes',$clientes);
+        return view('admin.lotes.index', $data);
     }
 
     public function edit($lote){
-        return view('admin.lotes.produtos');
+        $data['lote'] = Lote::find($lote);
+
+        if(!$data['lote'])
+            return back()->withErrors("Lote não localizado!");
+
+        $data['produtos'] = LoteProduto::where('lote_id', $data['lote']->id)->paginate(15);
+        
+        return view('admin.lotes.produtos',$data);
     }
 
     public function store(Request $request){
