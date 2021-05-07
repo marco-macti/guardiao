@@ -37,6 +37,12 @@
     <!-- Slim CSS -->
     <link rel="stylesheet" href="{{ URL('css/slim.css') }}">
 
+    <style>
+        .small-alert{
+            font-size: 0.8rem !important;
+        }
+    </style>
+
   </head>
   <body>
 
@@ -56,9 +62,9 @@
                     <input placeholder="Digite seu e-mail" id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
         
                     @error('email')
-                        <span class="invalid-feedback" role="alert">
+                        <small class="invalid-feedback small-alert" role="alert">
                             <strong>{{ $message }}</strong>
-                        </span>
+                        </small>
                     @enderror
         
                 </div><!-- form-group -->
@@ -67,7 +73,7 @@
                     <input placeholder="Digite sua senha" id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
         
                     @error('password')
-                        <span class="invalid-feedback" role="alert">
+                        <span class="invalid-feedback small-alert" role="alert">
                             <strong>{{ $message }}</strong>
                         </span>
                     @enderror

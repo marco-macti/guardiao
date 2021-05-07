@@ -9,12 +9,12 @@ use App\Models\Lote;
 use App\Models\LoteProduto;
 
 use App\Helpers\FormatValue;
-
+use App\Jobs\CadastraProdutoJob;
+use App\Http\Controllers\IA\IaController;
 
 class LotesController extends Controller
 {
     public function index(){
-
         $data['clientes'] = Cliente::all();
         $data['lotes'] = Lote::paginate(10);
 
@@ -35,7 +35,6 @@ class LotesController extends Controller
     public function store(Request $request){
         $arquivo   = $request->file('file')->getRealPath();
         $clienteId = $request->cliente_id;
-
         $ret = [
             'success'      => false,
             'msg'          => 'Ops! nenhum produto foi importado.',
@@ -93,12 +92,18 @@ class LotesController extends Controller
                     ]);
 
                     foreach ($arrProdutos as $key => $produto) {
-                        LoteProduto::create([
-                            'lote_id'                   => $lote->id,
-                            'codigo_interno_do_cliente' => $produto[2],
-                            'descricao_do_produto'      => $produto[3],
-                            'ncm_importado'             => $produto[8]
-                        ]);
+                        // $reponse = $ia_instance->retornaDadosIa($produto[3], $produto[8]);
+                        
+                        // LoteProduto::create([
+                        //     'lote_id'                   => $lote->id,
+                        //     'codigo_interno_do_cliente' => $produto[2],
+                        //     'descricao_do_produto'      => $produto[3],
+                        //     'ncm_importado'             => $produto[8],
+                        //     'ia_ncm'                    => $reponse['probabilidade_ia'],
+                        //     'acuracia'                  => $reponse['ncm_ia'],
+                        // ]);
+                        $job = (new CadastraProdutoJob($produto, $lote->id))->onQueue('high');
+                        dispatch($job);
                     }
                     
                     $ret['success']      = true;
@@ -141,6 +146,8 @@ class LotesController extends Controller
                         ]);
 
                         foreach ($produtos as $key => $obj) {
+                            $reponse = json_decode($ia_instance->retornaDadosIa($obj['prod']['xProd'], $obj['prod']['NCM']));
+                            dd($reponse);
                             LoteProduto::create([
                                 'lote_id'                   => $lote->id,
                                 'codigo_interno_do_cliente' => $obj['prod']['cProd'],

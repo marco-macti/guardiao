@@ -54,8 +54,9 @@ Route::get('/ia/registra-ia'                           ,'IaController@registraIa
 // Retorno parao Guardião
 
 Route::any('/ia/retorna-dados'                         ,'IaController@retornaDadosIa');
-Route::any('/ia/retorna-dados-planilha/{ncm}'          ,'IaController@retornaDadosPlanilhaIa');
+Route::any('/ia/retorna-dados-planilha/{ncm}'          ,'IaController@retornaDadosPlanilhaIa')->name('ia.retorna-dados-planilha');
 
+Route::get('/ia/consulta-ncm' ,'IA\IaController@comparaNcm')->name('ia.consulta.ncm');
 
 // v2.0
 

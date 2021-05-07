@@ -1,6 +1,63 @@
 @extends('templates.guardiao')
 @section('conteudo')
 
+@push('post-scripts')
+    <script>
+      $('.diferenca').on('click', function(){
+
+        Swal.fire({
+          title: 'Aguarde',
+          html: 'Consulta de NCM em progresso...',
+          timerProgressBar: true,
+          didOpen: () => {
+            Swal.showLoading()
+          }
+        });
+
+        var ncmimportado = $(this).data('ncmimportado');
+        var ncmia = $(this).data('ncmia');
+
+        var url = '{{route("ia.consulta.ncm")}}'+'/?ia='+ncmia+'&importado='+ncmimportado;
+
+        $.ajax({
+          url: url,
+          success: function(response){
+            $('#th-ncm-importado').empty();
+            $('#th-ncm-importado').append('NCM IMPORTADO : '+ncmimportado);
+            $('#th-ncm-ia').empty();
+            $('#th-ncm-ia').append('NCM IA : '+ncmia);
+
+            $('#td-captulo-importado').empty();
+            $('#td-captulo-importado').append(response.importado.desc_ncm_cliente_capitulo.ex_capitulo);
+            $('#td-captulo-ia').empty();
+            $('#td-captulo-ia').append(response.ncm.desc_ncm_cliente_capitulo.ex_capitulo);
+
+            $('#td-posicao-importado').empty();
+            $('#td-posicao-importado').append(response.importado.desc_ncm_cliente_posicao.ex_posicao);
+            $('#td-posicao-ia').empty();
+            $('#td-posicao-ia').append(response.ncm.desc_ncm_cliente_posicao.ex_posicao);
+
+            $('#td-suposicao-importado').empty();
+            $('#td-suposicao-importado').append(response.importado.desc_ncm_cliente_subposicao.ex_subposicao);
+            $('#td-suposicao-ia').empty();
+            $('#td-suposicao-ia').append(response.ncm.desc_ncm_cliente_subposicao.ex_subposicao);
+
+            $('#td-subitem-importado').empty();
+            $('#td-subitem-importado').append(response.importado.desc_ncm_cliente_subitem.ex_sub_item);
+            $('#td-subitem-ia').empty();
+            $('#td-subitem-ia').append(response.ncm.desc_ncm_cliente_subitem.ex_sub_item);
+            
+            Swal.close();
+            $('#modaldemo2').modal('show');
+          }
+        });
+        console.log("teste");
+
+        return false;
+      });
+    </script>
+@endpush
+
 <div class="slim-mainpanel">
   <div class="container">
     <div class="slim-pageheader">
@@ -46,10 +103,10 @@
               <td>{{ $produto->codigo_interno_do_cliente }}</td>
               <td>{{ $produto->ncm_importado  }} </td>
               <td>
-                <a href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo2"><i class="fa fa-arrows-h"></i></a>
+                <a data-ncmia="{{$produto->ia_ncm}}" data-ncmimportado="{{$produto->ncm_importado}}" href="#" class="btn btn-secondary btn-block mg-b-10 diferenca"><i class="fa fa-arrows-h"></i></a>
               </td>
-              <td>1415166 </td>
-              <td style="color:red">66%</td>
+              <td>{{ $produto->ia_ncm  }} </td>
+              <td style="color:red">{{ $produto->acuracia  }}</td>
               <td style="color:red">AUDITAR</td>
               <td>
                 <a style="color:white" href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1"><i class="fa fa-check"></i></a>
@@ -108,29 +165,29 @@
         <table class="table">
           <tbody>
             <tr>
-              <th scope="row">NCM IMPORTADO : 1909006 </th>
+              <th class="text-nowrap" id="th-ncm-importado" scope="row"></th>
               <th style="text-align: center" scope="row"><i class="fa fa-arrows-h"></i> </th>
-              <th scope="row">NCM IA  : 1415166	 </th>
+              <th class="text-nowrap" id="th-ncm-ia" scope="row"></th>
             </tr>
             <tr>
-              <td><b>Capítulo TIPI : </b> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</td>
+              <td><b>Capítulo TIPI : </b> <p id="td-captulo-importado"></p></td>
               <th style="text-align: center" scope="row"><i class="fa fa-arrows-h"></i> </th>
-              <td><b>Capítulo TIPI : </b> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</td>
+              <td><b>Capítulo TIPI : </b> <p id="td-captulo-ia"></p></td>
             </tr>
             <tr>
-              <td><b>Posição TIPI : </b> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</td>
+              <td><b>Posição TIPI : </b><p id="td-posicao-importado"></p></td>
               <th style="text-align: center" scope="row"><i class="fa fa-arrows-h"></i> </th>
-              <td><b>Posição TIPI : </b> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</td>
+              <td><b>Posição TIPI : </b><p id="td-posicao-ia"></p></td>
             </tr>
             <tr>
-              <td><b>Subposiçao TIPI : </b> Outros </td>
+              <td><b>Subposiçao TIPI : </b> <p id="td-suposicao-importado"></p> </td>
               <th style="text-align: center" scope="row"><i class="fa fa-arrows-h"></i> </th>
-              <td><b>Subposiçao TIPI : </b> Outros </td>
+              <td><b>Subposiçao TIPI : </b> <p id="td-suposicao-ia"></p> </td>
             </tr>
             <tr>
-              <td><b>Subitem TIPI : </b> Outros </td>
+              <td><b>Subitem TIPI : </b> <p id="td-subitem-importado"></p> </td>
               <th style="text-align: center" scope="row"><i class="fa fa-arrows-h"></i> </th>
-              <td><b>Subitem TIPI : </b> Outros </td>
+              <td><b>Subitem TIPI : </b> <p id="td-subitem-ia"></p> </td>
             </tr>
           </tbody>
         </table>

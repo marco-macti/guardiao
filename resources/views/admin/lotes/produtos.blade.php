@@ -53,9 +53,9 @@
                 <td>
                   <a href="" data-toggle="modal" data-target="#modaldemo2">
                     <i class="fa fa-info-circle"></i>
-                  </a> 1415166 
+                  </a> {{$produto->ia_ncm}} 
                 </td>
-                <td style="color:red">66%</td>
+                <td style="color:red">{{$produto->acuracia}}</td>
                 <td style="color:red">AUDITAR</td>
                 <td>
                   <a style="color:white" href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1"><i class="fa fa-check"></i></a>

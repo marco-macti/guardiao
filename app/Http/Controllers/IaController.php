@@ -805,7 +805,8 @@ class IaController extends Controller
 
     public function retornaDadosIa(Request $request){
 
-        if(empty($request->produto) && empty($request->ncm)) return response()->json(['success' => false,'msg' => 'Necessário enviar produto e NCM']);
+        if(empty($request->produto) && empty($request->ncm))
+            return response()->json(['success' => false,'msg' => 'Necessário enviar produto e NCM']);
 
         $ret = ['success' => true];
 
@@ -846,13 +847,13 @@ class IaController extends Controller
         $ret = ['success' => true];
 
         $convenio_142  = new EAuditor();
-        Excel::import($convenio_142, 'storage/icms_convenio_142_2018.xls');
+        Excel::import($convenio_142, storage_path('icms_convenio_142_2018.xls'));
 
         $produtos_aliquota_42  = new EAuditor();
-        Excel::import($produtos_aliquota_42, 'storage/produtos_com_aliquota_42.xlsx');
+        Excel::import($produtos_aliquota_42, storage_path('produtos_com_aliquota_42.xlsx'));
 
         $tipi  = new EAuditor();
-        Excel::import($tipi, 'storage/tipi.xls');
+        Excel::import($tipi, storage_path('tipi.xls'));
 
         $ret['desc_ncm_cliente_capitulo']   = $this->buscaDescNcmClienteCapitulo($tipi, $ncm);
         $ret['desc_ncm_cliente_posicao']    = $this->buscaDescNcmClientePosicao($tipi, $ncm);

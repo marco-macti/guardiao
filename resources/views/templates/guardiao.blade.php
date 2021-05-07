@@ -40,6 +40,7 @@
     <link rel="stylesheet" href="{{ URL('css/slim.css') }}">
 
     <link rel="stylesheet" href="{{ URL('js/dropzone/dist/dropzone.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.16.6/sweetalert2.min.css">
 
   </head>
   <body>
@@ -224,6 +225,7 @@
     <script src="{{ URL('js/slim.js') }}"></script>
     <script src="{{ URL('js/dropzone/dist/dropzone.js') }}"></script>
     <script src="{{ URL('js/jquery.mask.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.16.6/sweetalert2.min.js"></script>
     
     @stack('post-scripts')
 
