@@ -57,6 +57,7 @@ Route::any('/ia/retorna-dados'                         ,'IaController@retornaDad
 Route::any('/ia/retorna-dados-planilha/{ncm}'          ,'IaController@retornaDadosPlanilhaIa')->name('ia.retorna-dados-planilha');
 
 Route::get('/ia/consulta-ncm' ,'IA\IaController@comparaNcm')->name('ia.consulta.ncm');
+Route::get('/ia/consulta-ncm-unico' ,'IA\IaController@consultaNcm')->name('ia.consulta.ncm-unico');
 
 // v2.0
 

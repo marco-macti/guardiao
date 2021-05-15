@@ -39,13 +39,13 @@ class CadastraProdutoJob implements ShouldQueue
     public function handle()
     {
         $ia_instance = new IaController();
-        $reponse = $ia_instance->retornaDadosIa($this->produto[3], $this->produto[8]);
+        $reponse = $ia_instance->retornaDadosIa($this->produto[1], $this->produto[2]);
         
         $create = LoteProduto::create([
             'lote_id'                   => $this->lote_id,
-            'codigo_interno_do_cliente' => $this->produto[2],
-            'descricao_do_produto'      => $this->produto[3],
-            'ncm_importado'             => $this->produto[8],
+            'codigo_interno_do_cliente' => $this->produto[0],
+            'descricao_do_produto'      => $this->produto[1],
+            'ncm_importado'             => $this->produto[2],
             'ia_ncm'                    => $reponse['ncm_ia'],
             'acuracia'                  => $reponse['probabilidade_ia'],
         ]);

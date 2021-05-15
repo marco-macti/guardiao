@@ -102,7 +102,7 @@ class LotesController extends Controller
                         //     'ia_ncm'                    => $reponse['probabilidade_ia'],
                         //     'acuracia'                  => $reponse['ncm_ia'],
                         // ]);
-                        $job = (new CadastraProdutoJob($produto, $lote->id))->onQueue('high');
+                        $job = (new CadastraProdutoJob([$produto[2], $produto[3], $produto[8]], $lote->id))->onQueue('high');
                         dispatch($job);
                     }
                     
@@ -121,6 +121,7 @@ class LotesController extends Controller
                 break;
 
             case 'NFXML':
+                $ia_instance = new IaController();
                 
                 $xml = simplexml_load_file($arquivo);
                 $xml = json_encode($xml);
@@ -146,14 +147,19 @@ class LotesController extends Controller
                         ]);
 
                         foreach ($produtos as $key => $obj) {
-                            $reponse = json_decode($ia_instance->retornaDadosIa($obj['prod']['xProd'], $obj['prod']['NCM']));
-                            dd($reponse);
-                            LoteProduto::create([
-                                'lote_id'                   => $lote->id,
-                                'codigo_interno_do_cliente' => $obj['prod']['cProd'],
-                                'descricao_do_produto'      => $obj['prod']['xProd'],
-                                'ncm_importado'             => $obj['prod']['NCM']
-                            ]);
+                            // $reponse = $ia_instance->retornaDadosIa($obj['prod']['xProd'], $obj['prod']['NCM']);
+                            
+                            // LoteProduto::create([
+                            //     'lote_id'                   => $lote->id,
+                            //     'codigo_interno_do_cliente' => $obj['prod']['cProd'],
+                            //     'descricao_do_produto'      => $obj['prod']['xProd'],
+                            //     'ncm_importado'             => $obj['prod']['NCM'],
+                            //     'ia_ncm'                    => $reponse['ncm_ia'],
+                            //     'acuracia'                  => $reponse['probabilidade_ia'],
+                            // ]);
+
+                            $job = (new CadastraProdutoJob([$obj['prod']['cProd'], $obj['prod']['xProd'], $obj['prod']['NCM']], $lote->id))->onQueue('high');
+                            dispatch($job);
 
                         }
 
