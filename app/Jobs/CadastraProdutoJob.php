@@ -17,18 +17,21 @@ class CadastraProdutoJob implements ShouldQueue
 
     protected $produto;
     protected $lote_id;
+    protected $tipo;
+    protected $data;
     public $tries = 2;
-    public $timeout = 60;
+    public $timeout = 0;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($produto, $lote_id)
+    public function __construct($lote_id,$data,$tipo)
     {
-        $this->produto = $produto;
         $this->lote_id = $lote_id;
+        $this->data    = $data;
+        $this->tipo    = $tipo;
     }
 
     /**
@@ -39,15 +42,56 @@ class CadastraProdutoJob implements ShouldQueue
     public function handle()
     {
         $ia_instance = new IaController();
-        $reponse = $ia_instance->retornaDadosIa($this->produto[1], $this->produto[2]);
-        
-        $create = LoteProduto::create([
-            'lote_id'                   => $this->lote_id,
-            'codigo_interno_do_cliente' => $this->produto[0],
-            'descricao_do_produto'      => $this->produto[1],
-            'ncm_importado'             => $this->produto[2],
-            'ia_ncm'                    => $reponse['ncm_ia'],
-            'acuracia'                  => $reponse['probabilidade_ia'],
-        ]);
+
+        if($this->tipo == "CSV"){
+
+            foreach ($this->data as $item) {
+
+                $reponse = $ia_instance->retornaDadosIa($item['DESCRICAO_DO_PRODUTO'], $item['NCM_NO_CLIENTE']);
+
+                $create = LoteProduto::create([
+                    'lote_id'                   => $this->lote_id,
+                    'codigo_interno_do_cliente' => $item['CODIGO_NO_CLIENTE'],
+                    'descricao_do_produto'      => $item['DESCRICAO_DO_PRODUTO'],
+                    'ncm_importado'             => $item['NCM_NO_CLIENTE'],
+                    'ia_ncm'                    => $reponse['ncm_ia'],
+                    'acuracia'                  => $reponse['probabilidade_ia'],
+                ]);
+            }
+
+        }elseif($this->tipo == "NFXML"){
+
+            foreach ($this->data as $key => $obj) {
+
+                 $reponse = $ia_instance->retornaDadosIa($obj['prod']['xProd'], $obj['prod']['NCM']);
+
+                 LoteProduto::create([
+                     'lote_id'                   => $this->lote_id,
+                     'codigo_interno_do_cliente' => $obj['prod']['cProd'],
+                     'descricao_do_produto'      => $obj['prod']['xProd'],
+                     'ncm_importado'             => $obj['prod']['NCM'],
+                     'ia_ncm'                    => $reponse['ncm_ia'],
+                     'acuracia'                  => $reponse['probabilidade_ia'],
+                 ]);
+            }
+
+        }elseif($this->tipo == "SPEED"){
+
+            foreach ($this->data as $key => $produto) {
+
+                 $reponse = $ia_instance->retornaDadosIa($produto[3], $produto[8]);
+
+                 LoteProduto::create([
+                     'lote_id'                   => $this->lote_id,
+                     'codigo_interno_do_cliente' => $produto[2],
+                     'descricao_do_produto'      => $produto[3],
+                     'ncm_importado'             => $produto[8],
+                     'ia_ncm'                    => $reponse['probabilidade_ia'],
+                     'acuracia'                  => $reponse['ncm_ia'],
+                 ]);
+
+            }
+
+        }
     }
 }

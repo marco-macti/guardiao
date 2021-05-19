@@ -12,7 +12,7 @@
           }else{
             $('#link-area').empty();
           }
-          
+
         console.log();
       });
     </script>
@@ -52,6 +52,7 @@
               <th>Quantidade de Produtos</th>
               <th>Tipo do Documento</th>
               <th>Competência ou Numeração</th>
+              <th>Status da Importação </th>
               <th>Opções</th>
             </tr>
           </thead>
@@ -61,13 +62,14 @@
                   $cliente_dados = $lote->cliente;
               @endphp
               <tr>
-                <td>{{$cliente_dados->razao_social}}</td>
-                <td>{{$cliente_dados->cnpj}}</td>
-                <th scope="row">{{$lote->id}}</th>
-                <td>{{$lote->created_at->format('d/m/Y')}}</td>
-                <td>{{$lote->quantidade_de_produtos}}</td>
-                <td>{{$lote->tipo_documento}}</td>
-                <td>{{$lote->competencia_ou_numeracao}}</td>
+                <td>{{ $cliente_dados->razao_social}}</td>
+                <td>{{ $cliente_dados->cnpj}}</td>
+                <th scope="row">{{ $lote->id}}</th>
+                <td>{{ $lote->created_at->format('d/m/Y')}}</td>
+                <td>{{ $lote->quantidade_de_produtos}}</td>
+                <td>{{ $lote->tipo_documento}}</td>
+                <td>{{ $lote->competencia_ou_numeracao}}</td>
+                <td><i style="color: {{ $lote->statusImport()['color'] }}" class="{{ $lote->statusImport()['icon'] }}"></i> {{ $lote->statusImport()['status'] }}</td>
                 <td>
                   <div class="col-lg-2 mg-t-20 mg-lg-t-0">
                     <div class="btn-group" role="group" aria-label="Basic example">
@@ -104,16 +106,16 @@
 
           <h5 class="lh-3 mg-b-20"><a href="" class="tx-inverse hover-primary">Importando seus arquivos de lotes</a></h5>
           <p class="mg-b-5">São permitidos para informar produtos do lote , arquivos oficiais do tipo Speed Fiscal ( .txt ), Sintegra ( .txt ) e Notas Fiscais de Produtos ( .xml ). </p>
-            
+
             <br/>
 
             <label>Tipo de Arquivo : </label>
             <select class="tipo_arquivo form-control ">
               <option>[-SELECIONE-]</option>
-              <option value="SPEED">Speed Fiscal</option>  
-              <option style="display:none" value="SINTEGRA">Sintegra</option>  
-              <option value="CSV">Arquivo CSV</option>  
-              <option value="NFXML">Nota Fiscal XML </option>  
+              <option value="SPEED">Speed Fiscal</option>
+              <option style="display:none" value="SINTEGRA">Sintegra</option>
+              <option value="CSV">Arquivo CSV</option>
+              <option value="NFXML">Nota Fiscal XML </option>
             </select>
 
             <br/>
@@ -122,7 +124,7 @@
             <select class="cliente_id form-control">
               <option>[-SELECIONE-]</option>
               @foreach ($clientes as $cliente )
-                <option value="{{ $cliente->id }}">{{ $cliente->cnpj }} - {{ $cliente->nome_fantasia }}</option>  
+                <option value="{{ $cliente->id }}">{{ $cliente->cnpj }} - {{ $cliente->nome_fantasia }}</option>
               @endforeach
             </select>
 
@@ -155,13 +157,13 @@
                 <input type="hidden" class="cliente_id_dropzone" name="cliente_id" value="">
 
                 <label>Tipo de Arquivo : </label>
-                
+
                 <select class="tipo_arquivo form-control">
                   <option>[-SELECIONE-]</option>
-                  <option value="SPEED">Speed Fiscal</option>  
-                  <option style="display:none" value="SINTEGRA">Sintegra</option>  
-                  <option value="CSV">Arquivo CSV</option>  
-                  <option value="NFXML">Nota Fiscal XML </option>  
+                  <option value="SPEED">Speed Fiscal</option>
+                  <option style="display:none" value="SINTEGRA">Sintegra</option>
+                  <option value="CSV">Arquivo CSV</option>
+                  <option value="NFXML">Nota Fiscal XML </option>
                 </select>
 
                 <br/>
@@ -170,7 +172,7 @@
                 <select class="cliente_id form-control">
                   <option>[-SELECIONE-]</option>
                   @foreach ($clientes as $cliente )
-                    <option value="{{ $cliente->id }}">{{ $cliente->cnpj }} - {{ $cliente->nome_fantasia }}</option>  
+                    <option value="{{ $cliente->id }}">{{ $cliente->cnpj }} - {{ $cliente->nome_fantasia }}</option>
                   @endforeach
                 </select>
 
@@ -187,7 +189,7 @@
               </form>
 
             </div>
-            
+
             <div style="display: none" class="modal-footer">
               <button type="button" class="btn btn-primary">Save changes</button>
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -202,7 +204,7 @@
           <h6 id="msg-upload" class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">Aguarde enquanto os produtos são importados.</h6>
           <br/>
           <br/>
-  
+
         </div>
 
       </div>
@@ -244,7 +246,7 @@
             success: function(file, response){
 
               if(response.success){
-                
+
                 $("#msg-upload").html(response.msg);
 
                 setTimeout(() => {
@@ -256,14 +258,14 @@
                 $("#msg-upload").html(response.msg);
 
               }
-              
+
             }
         });
-     
+
     });
 
 
-  </script>  
+  </script>
 
 @endpush
 @stop

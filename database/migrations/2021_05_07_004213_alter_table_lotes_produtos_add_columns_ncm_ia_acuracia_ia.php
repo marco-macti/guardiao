@@ -14,8 +14,8 @@ class AlterTableLotesProdutosAddColumnsNcmIaAcuraciaIa extends Migration
     public function up()
     {
         Schema::table('lote_produtos', function (Blueprint $table) {
-            $table->string('ia_ncm');
-            $table->float('acuracia');
+            $table->string('ia_ncm')->nullable();
+            $table->float('acuracia')->nullable();
         });
     }
 

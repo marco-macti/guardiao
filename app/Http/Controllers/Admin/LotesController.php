@@ -15,8 +15,9 @@ use App\Http\Controllers\IA\IaController;
 class LotesController extends Controller
 {
     public function index(){
-        $data['clientes'] = Cliente::all();
-        $data['lotes'] = Lote::paginate(10);
+
+        $data['clientes']      = Cliente::all();
+        $data['lotes']         = Lote::paginate(10);
 
         return view('admin.lotes.index', $data);
     }
@@ -28,11 +29,12 @@ class LotesController extends Controller
             return back()->withErrors("Lote não localizado!");
 
         $data['produtos'] = LoteProduto::where('lote_id', $data['lote']->id)->paginate(15);
-        
+
         return view('admin.lotes.produtos',$data);
     }
 
     public function store(Request $request){
+
         $arquivo   = $request->file('file')->getRealPath();
         $clienteId = $request->cliente_id;
         $ret = [
@@ -55,7 +57,7 @@ class LotesController extends Controller
 
                 $arrProdutos = [];
 
-                // Efetua Limpeza dos dados , pegando apenas Produtos ; 
+                // Efetua Limpeza dos dados , pegando apenas Produtos ;
 
                 $competencia = '';
 
@@ -82,7 +84,7 @@ class LotesController extends Controller
                 $proximoLote = ($qtdsLotes == 0) ? 1 : $qtdsLotes++;
 
                 try {
-                    
+
                     $lote = Lote::create([
                         'numero_do_lote'           => $proximoLote,
                         'cliente_id'               => $clienteId,
@@ -91,27 +93,15 @@ class LotesController extends Controller
                         'competencia_ou_numeracao' => $competencia // TODO : Pegar por dentro do arquivo a competencia
                     ]);
 
-                    foreach ($arrProdutos as $key => $produto) {
-                        // $reponse = $ia_instance->retornaDadosIa($produto[3], $produto[8]);
-                        
-                        // LoteProduto::create([
-                        //     'lote_id'                   => $lote->id,
-                        //     'codigo_interno_do_cliente' => $produto[2],
-                        //     'descricao_do_produto'      => $produto[3],
-                        //     'ncm_importado'             => $produto[8],
-                        //     'ia_ncm'                    => $reponse['probabilidade_ia'],
-                        //     'acuracia'                  => $reponse['ncm_ia'],
-                        // ]);
-                        $job = (new CadastraProdutoJob([$produto[2], $produto[3], $produto[8]], $lote->id))->onQueue('high');
-                        dispatch($job);
-                    }
-                    
+                    $job = (new CadastraProdutoJob($lote->id,$arrProdutos,$request->tipo_arquivo))->onQueue('high');
+                    dispatch($job);
+
                     $ret['success']      = true;
-                    $ret['msg']          = count($arrProdutos).' importados com sucesso.';
+                    $ret['msg']          = count($arrProdutos).' enviados para fila de importação.';
                     $ret['url_redirect'] = URL("/lotes/$lote->id/edit");
 
                 } catch (\Throwable $th) {
-                    
+
                     $ret['success']      = false;
                     $ret['msg']          = "Erro: ".$th->getMessage();
                     $ret['url_redirect'] = URL("/lotes");
@@ -121,12 +111,13 @@ class LotesController extends Controller
                 break;
 
             case 'NFXML':
+
                 $ia_instance = new IaController();
-                
+
                 $xml = simplexml_load_file($arquivo);
                 $xml = json_encode($xml);
                 $xml = json_decode($xml, true);
-                
+
                 $competencia = substr($xml['NFe']['infNFe']['ide']['dhEmi'], 0, 10);
                 $produtos = !empty($xml['NFe']['infNFe']['det']) ? $xml['NFe']['infNFe']['det'] : [] ;
 
@@ -137,7 +128,7 @@ class LotesController extends Controller
                     $proximoLote = ($qtdsLotes == 0) ? 1 : $qtdsLotes++;
 
                     try {
-                        
+
                         $lote = Lote::create([
                             'numero_do_lote'           => $proximoLote,
                             'cliente_id'               => $clienteId,
@@ -146,27 +137,13 @@ class LotesController extends Controller
                             'competencia_ou_numeracao' => $competencia // TODO : Pegar por dentro do arquivo a competencia
                         ]);
 
-                        foreach ($produtos as $key => $obj) {
-                            // $reponse = $ia_instance->retornaDadosIa($obj['prod']['xProd'], $obj['prod']['NCM']);
-                            
-                            // LoteProduto::create([
-                            //     'lote_id'                   => $lote->id,
-                            //     'codigo_interno_do_cliente' => $obj['prod']['cProd'],
-                            //     'descricao_do_produto'      => $obj['prod']['xProd'],
-                            //     'ncm_importado'             => $obj['prod']['NCM'],
-                            //     'ia_ncm'                    => $reponse['ncm_ia'],
-                            //     'acuracia'                  => $reponse['probabilidade_ia'],
-                            // ]);
-
-                            $job = (new CadastraProdutoJob([$obj['prod']['cProd'], $obj['prod']['xProd'], $obj['prod']['NCM']], $lote->id))->onQueue('high');
-                            dispatch($job);
-
-                        }
+                        $job = (new CadastraProdutoJob($lote->id,$produtos,$request->tipo_arquivo))->onQueue('high');
+                        dispatch($job);
 
                         $ret['success']      = true;
-                        $ret['msg']          = count($produtos).' importados com sucesso.';
+                        $ret['msg']          = count($produtos).' enviados para fila de importação.';
                         $ret['url_redirect'] = URL("/lotes/$lote->id/edit");
-                        
+
                     } catch (\Throwable $th) {
 
                         $ret['success']      = false;
@@ -180,9 +157,8 @@ class LotesController extends Controller
 
                     $proximoLote = ($qtdsLotes == 0) ? 1 : $qtdsLotes++;
 
-
                     try {
-                        
+
                         $lote = Lote::create([
                             'numero_do_lote'           => $proximoLote,
                             'cliente_id'               => $clienteId,
@@ -201,7 +177,7 @@ class LotesController extends Controller
                         $ret['success']      = true;
                         $ret['msg']          = '1 produto importado com sucesso.';
                         $ret['url_redirect'] = URL("/lotes/$lote->id/edit");
-                        
+
                     } catch (\Throwable $th) {
 
                         $ret['success']      = false;
@@ -225,7 +201,7 @@ class LotesController extends Controller
                     array_walk($csv, function(&$a) use ($csv) {
                         $a = array_combine($csv[0], $a);
                     });
-                    
+
                     $lote = Lote::create([
                         'numero_do_lote'           => $proximoLote,
                         'cliente_id'               => $clienteId,
@@ -233,23 +209,16 @@ class LotesController extends Controller
                         'tipo_documento'           => 'ARQUIVO DO CLIENTE',
                         'competencia_ou_numeracao' => date('m/Y') // TODO : Pegar por dentro do arquivo a competencia
                     ]);
- 
+
                     unset($csv[0]);
 
-                    foreach ($csv as $item) {
-
-                        LoteProduto::create([
-                            'lote_id'                   => $lote->id,
-                            'codigo_interno_do_cliente' => $item['CODIGO_NO_CLIENTE'],
-                            'descricao_do_produto'      => $item['DESCRICAO_DO_PRODUTO'],
-                            'ncm_importado'             => $item['NCM_NO_CLIENTE']
-                        ]);
-                    }
+                    $job = (new CadastraProdutoJob($lote->id,$csv,$request->tipo_arquivo))->onQueue('high');
+                    dispatch($job);
 
                     $ret['success']      = true;
-                    $ret['msg']          = count($csv).' importados com sucesso.';
+                    $ret['msg']          = count($csv).' enviados para fila de importação.';
                     $ret['url_redirect'] = URL("/lotes/$lote->id/edit");
-                    
+
                 } catch (\Throwable $th) {
 
                     $ret['success']      = false;
@@ -257,9 +226,6 @@ class LotesController extends Controller
                     $ret['url_redirect'] = URL("/lotes");
 
                 }
-
-                
-                
         }
 
         return response()->json($ret);
