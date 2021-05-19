@@ -36,7 +36,7 @@ class IaController extends Controller
         $predict = $this->classifier->predict($produto);
 
         $probailidade = $this->getProbability($predict);
-        
+
         $ret['ncm_ia']           = $predict['label'];
         $ret['probabilidade_ia'] = $probailidade;
 
@@ -86,11 +86,11 @@ class IaController extends Controller
             $ret[$tipo]['desc_ncm_cliente_posicao']    = $this->buscaDescNcmClientePosicao($tipi, $ncm);
             $ret[$tipo]['desc_ncm_cliente_subposicao'] = $this->buscaDescNcmClienteSubPosicao($tipi, $ncm);
             $ret[$tipo]['desc_ncm_cliente_subitem']    = $this->buscaDescNcmClienteSubItem($tipi, $ncm);
-    
+
             $ret[$tipo]['ret_convenio_142']            = $this->buscaCovenio142($convenio_142, $ncm);
-    
+
             $ret[$tipo]['ret_aliquota_42']             = $this->buscaAliquota42($produtos_aliquota_42, $ncm);
-    
+
             $ret[$tipo]['ret_monofasico']              = $this->buscaMonofasico($ncm);
         }
 
@@ -168,7 +168,7 @@ class IaController extends Controller
                 $sub_item   = $value[0];
                 $ncm        = (strlen($ncm) <= 7) ? '0'.$ncm : $ncm;
 
-                
+
                 if($posicao == substr($ncm, 0, 4) && $rodou == false){
                     $ret['descricao_posicao']          = $value[2];
                     $ret['ex_posicao']                 = $value[1];
@@ -204,7 +204,7 @@ class IaController extends Controller
                 $sub_item   = $value[0];
                 $ncm        = (strlen($ncm) <= 7) ? '0'.$ncm : $ncm;
 
-                
+
                 if($subposicao == substr($ncm, 0, 6) && $rodou == false){
                     $ret['descricao_subposicao']          = $value[2];
                     $ret['ex_subposicao']                 = $value[1];
@@ -240,7 +240,7 @@ class IaController extends Controller
                 $sub_item   = str_replace(".","", $value[0]);
                 $ncm        = (strlen($ncm) <= 7) ? '0'.$ncm : $ncm;
 
-                
+
                 if($sub_item == $ncm && $rodou == false){
                     $ret['descricao_sub_item']          = $value[2];
                     $ret['ex_sub_item']                 = $value[1];
@@ -261,8 +261,8 @@ class IaController extends Controller
                 $ncm_planiha = str_replace(".", "", $value[2]);
                 if($ncm_planiha == $ncm){
                     $ret['item']      = $value[0];
-                    $ret['cest']      = $value[1];   
-                    $ret['descricao'] = $value[3];   
+                    $ret['cest']      = $value[1];
+                    $ret['descricao'] = $value[3];
                 }
             }
         }
@@ -280,13 +280,13 @@ class IaController extends Controller
                 $ncm_planiha = str_replace(".", "", $value[2]);
 
                 if(strlen($ncm_planiha) < 8){
-                    $ncm = substr($ncm, 0, strlen($ncm_planiha) + 1); 
-                } 
-                
+                    $ncm = substr($ncm, 0, strlen($ncm_planiha) + 1);
+                }
+
                 if($ncm_planiha == $ncm){
                     $ret['descricao'] = $value[1];
                     $ret['aliquota'] = $value[3];
-                } 
+                }
             }
         }
 

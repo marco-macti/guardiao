@@ -44,7 +44,7 @@
 
   </head>
   <body>
-  
+
     <div class="slim-header">
       <div class="container">
         <div class="slim-header-left">
@@ -180,12 +180,12 @@
               <span>{{ auth()->user()->name }}</span>
               <i class="fa fa-angle-down"></i>
             </a>
-            
+
             <div class="dropdown-menu dropdown-menu-right">
               <nav class="nav">
-                <a href="page-profile.html" class="nav-link"><i class="fa fa-file"></i> &nbsp;Meus Dados</a>
-                <a href="page-signin.html" class="nav-link"><i class="fa fa-users"></i>&nbsp; Usuários</a>
-                <a href="page-signin.html" class="nav-link"><i class="fa fa-cog"></i>&nbsp; Ajustes</a>
+                <a style="display: none" href="page-profile.html" class="nav-link"><i class="fa fa-file"></i> &nbsp;Meus Dados</a>
+                <a style="display: none" href="page-signin.html" class="nav-link"><i class="fa fa-users"></i>&nbsp; Usuários</a>
+                <a style="display: none" href="page-signin.html" class="nav-link"><i class="fa fa-cog"></i>&nbsp; Ajustes</a>
                 <a href="/logout" class="nav-link"><i class="fa fa-exit"></i> &nbsp; Sair</a>
               </nav>
             </div><!-- dropdown-menu -->
@@ -203,7 +203,7 @@
     </div>
 
     @yield('conteudo')
-  
+
     <div class="slim-footer">
       <div class="container">
         <p>Copyright {{ date('Y')}} &copy; Todos os direitos reservados</p>
@@ -212,11 +212,11 @@
     </div><!-- slim-footer -->
 
     <script src="{{ URL('lib/jquery/js/jquery.js') }} "></script>
-    
+
     <script src="{{ URL('lib/popper.js/js/popper.js') }}"></script>
     <script src="{{ URL('lib/bootstrap/js/bootstrap.js') }}"></script>
     <script src="{{ URL('lib/jquery.cookie/js/jquery.cookie.js') }}"></script>
-    
+
     <script src="{{ URL('lib/d3/js/d3.js') }}"></script>
     <script src="{{ URL('lib/rickshaw/js/rickshaw.min.js') }}"></script>
     <script src="{{ URL('lib/jquery.sparkline.bower/js/jquery.sparkline.min.js') }}"></script>
@@ -226,7 +226,7 @@
     <script src="{{ URL('js/dropzone/dist/dropzone.js') }}"></script>
     <script src="{{ URL('js/jquery.mask.min.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.16.6/sweetalert2.min.js"></script>
-    
+
     @stack('post-scripts')
 
   </body>

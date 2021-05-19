@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\IA\IaController;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -23,6 +24,11 @@ class HomeController extends Controller
      */
     public function index()
     {
+
+        /*$ia_instance = new IaController();\
+        $response = $ia_instance->retornaDadosIa('REFRI FANTA 2L LA','22021000');
+        dd($response);*/
+
         return view('home');
     }
 }

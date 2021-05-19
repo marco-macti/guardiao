@@ -37,6 +37,7 @@ class LotesController extends Controller
 
         $arquivo   = $request->file('file')->getRealPath();
         $clienteId = $request->cliente_id;
+
         $ret = [
             'success'      => false,
             'msg'          => 'Ops! nenhum produto foi importado.',

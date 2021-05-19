@@ -21,7 +21,7 @@ class ClientesController extends Controller
     public function index()
     {
         $data['clientes'] = Cliente::paginate(15);
-        
+
         return view('admin.clientes.index', $data);
     }
 
@@ -77,7 +77,9 @@ class ClientesController extends Controller
             return back()->withErrors("Falha ao cadastrar cliente!");
 
 
-        return back()->withSuccess("Cliente Cadastrado com sucesso!");
+        $hash = encrypt($create->id);
+
+        return redirect()->to("/admin/clientes/detalhes/{$hash}")->withSuccess("Cliente Cadastrado com sucesso!");
 
     }
 
@@ -109,7 +111,7 @@ class ClientesController extends Controller
             $data['lotes'] = Lote::where('cliente_id', $id)->paginate(10);
             $data['usuarios'] = User::where('cliente_id', $id)->paginate(1);
         }
-        
+
         return view('admin.clientes.detalhes',$data);
     }
 
@@ -129,7 +131,7 @@ class ClientesController extends Controller
         $dados['password'] = Hash::make('123456789');
 
         $create = User::create($dados);
-        
+
         if(!$create)
             return back()->withErrors('Falha ao cadastrar novo usuário!');
 

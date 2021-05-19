@@ -46,7 +46,7 @@
             $('#td-subitem-importado').append(response.importado.desc_ncm_cliente_subitem.ex_sub_item);
             $('#td-subitem-ia').empty();
             $('#td-subitem-ia').append(response.ncm.desc_ncm_cliente_subitem.ex_sub_item);
-            
+
             Swal.close();
             $('#modaldemo2').modal('show');
           }
@@ -75,7 +75,7 @@
           <label class="section-title">Produtos deste lote</label>
           <p class="mg-b-20 mg-sm-b-40">Lista dos Produtos importados neste lote</p>
         </div>
-        
+
       </div>
 
       <div class="table-responsive">
@@ -106,10 +106,48 @@
                 <a data-ncmia="{{$produto->ia_ncm}}" data-ncmimportado="{{$produto->ncm_importado}}" href="#" class="btn btn-secondary btn-block mg-b-10 diferenca"><i class="fa fa-arrows-h"></i></a>
               </td>
               <td>{{ $produto->ia_ncm  }} </td>
-              <td style="color:red">{{ $produto->acuracia  }}</td>
-              <td style="color:red">AUDITAR</td>
+              @php
+
+                // Trata do retorno da acuracia
+
+                $classAcuracia  = '';
+                $totalAcuracia  = 0;
+                $classAcertou   = '';
+                $acertou        = '';
+                $permiteAuditar = false;
+
+                if($produto->acuracia >= 90.00 ){
+                    $classAcuracia = 'success';
+                    $totalAcuracia = '100%';
+                }elseif ($produto->acuracia >= 80.00 && $produto->acuracia < 90.00) {
+                    $classAcuracia = 'warning';
+                    $totalAcuracia = $produto->acuracia;
+                }elseif ($produto->acuracia < 80.00) {
+                    $classAcuracia = 'danger';
+                    $totalAcuracia = $produto->acuracia;
+                }
+
+                // informa se acertou ou nao
+
+
+                if($produto->ia_ncm == $produto->ncm_importado ){
+                    $classAcertou =  'success';
+                    $acertou      =  'Acertou';
+                }elseif ($produto->ia_ncm != $produto->ncm_importado) {
+                    $classAcertou =  'danger';
+                    $acertou      =  'Errou';
+                    $permiteAuditar = true;
+                }
+
+              @endphp
+              <td><span class="badge badge-{{ $classAcuracia}}"> {{ $totalAcuracia  }} %</span></td>
+              <td><span class="badge badge-{{ $classAcertou}}"> {{ $acertou  }} </span></td>
               <td>
-                <a style="color:white" href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1"><i class="fa fa-check"></i></a>
+                    @if($permiteAuditar != false)
+                        <a title="Produto necessita de auditoria" style="color:white" href="" class="btn btn-warning btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1"><i class="fa fa-edit"></i></a>
+                    @else
+                        <a title="Produto possui NCM correto" href="#" style="color:white" href="" class="btn btn-success btn-block mg-b-10"><i class="fa fa-check"></i></a>
+                    @endif
               </td>
             </tr>
             @empty
@@ -143,7 +181,7 @@
           <input name="ncm" type="text" id="ncm" class="form-control" />
         </form>
       </div>
-      
+
       <div class="modal-footer">
         <button type="button" class="btn btn-primary">Treinar</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -192,7 +230,7 @@
           </tbody>
         </table>
       </div>
-      
+
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
       </div>
