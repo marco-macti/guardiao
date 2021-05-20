@@ -176,7 +176,7 @@
           </div><!-- dropdown -->
           <div class="dropdown dropdown-c">
             <a href="#" class="logged-user" data-toggle="dropdown">
-              <img class="img-responsive" src="https://guardiaotributario.com.br/wp-content/uploads/2019/06/guardia%CC%83o_tributario_logotipo.png" alt="">
+              <img class="img-responsive" src="{{ URL('img/default-user.png')}}" alt="">
               <span>{{ auth()->user()->name }}</span>
               <i class="fa fa-angle-down"></i>
             </a>

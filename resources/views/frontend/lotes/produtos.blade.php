@@ -1,63 +1,6 @@
 @extends('templates.guardiao')
 @section('conteudo')
 
-@push('post-scripts')
-    <script>
-      $('.diferenca').on('click', function(){
-
-        Swal.fire({
-          title: 'Aguarde',
-          html: 'Consulta de NCM em progresso...',
-          timerProgressBar: true,
-          didOpen: () => {
-            Swal.showLoading()
-          }
-        });
-
-        var ncmimportado = $(this).data('ncmimportado');
-        var ncmia = $(this).data('ncmia');
-
-        var url = '{{route("ia.consulta.ncm")}}'+'/?ia='+ncmia+'&importado='+ncmimportado;
-
-        $.ajax({
-          url: url,
-          success: function(response){
-            $('#th-ncm-importado').empty();
-            $('#th-ncm-importado').append('NCM IMPORTADO : '+ncmimportado);
-            $('#th-ncm-ia').empty();
-            $('#th-ncm-ia').append('NCM IA : '+ncmia);
-
-            $('#td-captulo-importado').empty();
-            $('#td-captulo-importado').append(response.importado.desc_ncm_cliente_capitulo.ex_capitulo);
-            $('#td-captulo-ia').empty();
-            $('#td-captulo-ia').append(response.ncm.desc_ncm_cliente_capitulo.ex_capitulo);
-
-            $('#td-posicao-importado').empty();
-            $('#td-posicao-importado').append(response.importado.desc_ncm_cliente_posicao.ex_posicao);
-            $('#td-posicao-ia').empty();
-            $('#td-posicao-ia').append(response.ncm.desc_ncm_cliente_posicao.ex_posicao);
-
-            $('#td-suposicao-importado').empty();
-            $('#td-suposicao-importado').append(response.importado.desc_ncm_cliente_subposicao.ex_subposicao);
-            $('#td-suposicao-ia').empty();
-            $('#td-suposicao-ia').append(response.ncm.desc_ncm_cliente_subposicao.ex_subposicao);
-
-            $('#td-subitem-importado').empty();
-            $('#td-subitem-importado').append(response.importado.desc_ncm_cliente_subitem.ex_sub_item);
-            $('#td-subitem-ia').empty();
-            $('#td-subitem-ia').append(response.ncm.desc_ncm_cliente_subitem.ex_sub_item);
-
-            Swal.close();
-            $('#modaldemo2').modal('show');
-          }
-        });
-        console.log("teste");
-
-        return false;
-      });
-    </script>
-@endpush
-
 <div class="slim-mainpanel">
   <div class="container">
     <div class="slim-pageheader">
@@ -75,8 +18,12 @@
           <label class="section-title">Produtos deste lote</label>
           <p class="mg-b-20 mg-sm-b-40">Lista dos Produtos importados neste lote</p>
         </div>
-
       </div>
+
+      <span style="color: black">
+        * A responsabilidade civil , administrativa quanto ao NCM auditado e de total responsabilidade do Auditor nos termos da LEI LGPD 13709 de 14 de Agosto de 2018
+        e LEI 13853 de 2019
+      </span>
 
       <div class="table-responsive">
         <table class="table mg-b-0">
@@ -143,11 +90,7 @@
               <td><span class="badge badge-{{ $classAcuracia}}"> {{ $totalAcuracia  }} %</span></td>
               <td><span class="badge badge-{{ $classAcertou}}"> {{ $acertou  }} </span></td>
               <td>
-                    @if($permiteAuditar != false)
-                        <a title="Produto necessita de auditoria" style="color:white" href="" class="btn btn-warning btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1"><i class="fa fa-edit"></i></a>
-                    @else
-                        <a title="Produto possui NCM correto" href="#" style="color:white" href="" class="btn btn-success btn-block mg-b-10"><i class="fa fa-check"></i></a>
-                    @endif
+                <a title="Produto necessita de auditoria" style="color:white" href="" class="btn btn-warning btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1"><i class="fa fa-edit"></i></a>
               </td>
             </tr>
             @empty
@@ -159,7 +102,9 @@
         {{ $produtos->links()}}
       </div><!-- table-responsive -->
     </div>
+
   </div><!-- container -->
+
 </div><!-- slim-mainpanel -->
 
 
@@ -178,7 +123,7 @@
         <br/>
         <form action="#" id="treinar">
           <label> NCM : </label>
-          <input name="ncm" type="text" id="ncm" class="form-control" />
+          <input name="ncm_auditoria" type="text" id="ncm_auditoria" class="form-control" />
         </form>
       </div>
 
@@ -237,5 +182,62 @@
     </div>
   </div><!-- modal-dialog -->
 </div>
+
+@push('post-scripts')
+    <script>
+
+      $('.diferenca').on('click', function(){
+
+        Swal.fire({
+          title: 'Aguarde',
+          html: 'Consulta de NCM em progresso...',
+          timerProgressBar: true,
+          didOpen: () => {
+            Swal.showLoading()
+          }
+        });
+
+        var ncmimportado = $(this).data('ncmimportado');
+        var ncmia = $(this).data('ncmia');
+
+        var url = '{{route("ia.consulta.ncm")}}'+'/?ia='+ncmia+'&importado='+ncmimportado;
+
+        $.ajax({
+          url: url,
+          success: function(response){
+            $('#th-ncm-importado').empty();
+            $('#th-ncm-importado').append('NCM IMPORTADO : '+ncmimportado);
+            $('#th-ncm-ia').empty();
+            $('#th-ncm-ia').append('NCM IA : '+ncmia);
+
+            $('#td-captulo-importado').empty();
+            $('#td-captulo-importado').append(response.importado.desc_ncm_cliente_capitulo.ex_capitulo);
+            $('#td-captulo-ia').empty();
+            $('#td-captulo-ia').append(response.ncm.desc_ncm_cliente_capitulo.ex_capitulo);
+
+            $('#td-posicao-importado').empty();
+            $('#td-posicao-importado').append(response.importado.desc_ncm_cliente_posicao.ex_posicao);
+            $('#td-posicao-ia').empty();
+            $('#td-posicao-ia').append(response.ncm.desc_ncm_cliente_posicao.ex_posicao);
+
+            $('#td-suposicao-importado').empty();
+            $('#td-suposicao-importado').append(response.importado.desc_ncm_cliente_subposicao.ex_subposicao);
+            $('#td-suposicao-ia').empty();
+            $('#td-suposicao-ia').append(response.ncm.desc_ncm_cliente_subposicao.ex_subposicao);
+
+            $('#td-subitem-importado').empty();
+            $('#td-subitem-importado').append(response.importado.desc_ncm_cliente_subitem.ex_sub_item);
+            $('#td-subitem-ia').empty();
+            $('#td-subitem-ia').append(response.ncm.desc_ncm_cliente_subitem.ex_sub_item);
+
+            Swal.close();
+            $('#modaldemo2').modal('show');
+          }
+        });
+
+        return false;
+      });
+    </script>
+@endpush
 
 @stop

@@ -43,7 +43,10 @@
                 <td>{{ $lote->quantidade_de_produtos }}</td>
                 <td>{{ $lote->tipo_documento }}</td>
                 <td>{{ $lote->competencia_ou_numeracao }}</td>
-                <td><i style="color: {{ $lote->statusImport()['color'] }}" class="{{ $lote->statusImport()['icon'] }}"></i> {{ $lote->statusImport()['status'] }}</td>
+                <td>
+                    <span class="badge badge-{{ $lote->statusImport()['class'] }}"> <i class="{{ $lote->statusImport()['icon'] }}"></i>  {{ $lote->statusImport()['status'] }} </span>
+
+                </td>
                 <td>
                   <div class="col-lg-2 mg-t-20 mg-lg-t-0">
                     <div class="btn-group" role="group" aria-label="Basic example">
