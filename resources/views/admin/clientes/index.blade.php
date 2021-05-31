@@ -29,7 +29,7 @@
               <a href="{{route('admin.clientes.formulario')}}" class="btn btn-primary btn-block mg-b-10">Novo Cliente</a>
             </div>
           </div>
-    
+
           <div class="table-responsive">
             <table class="table mg-b-0">
               <thead>
@@ -69,7 +69,7 @@
   <div id="modaldemo1" class="modal fade">
     <div class="modal-dialog modal-dialog-vertical-center" role="document">
       <div class="modal-content bd-0 tx-14">
-  
+
           <div class="modal-header">
             <h6 class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">Cadastro de Cliente</h6>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -95,7 +95,7 @@
             <button class="btn btn-sm btn-primary">Cadastrar</button>
           </div>
         </div>
-  
+
       </div>
     </div><!-- modal-dialog -->
   </div>

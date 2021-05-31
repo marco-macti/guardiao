@@ -24,22 +24,22 @@ class ClienteRequest extends FormRequest
     public function rules()
     {
         return [
-            'dados.cnpj' => 'required|max:18|min:18',
-            'dados.inscricao_estadual' => 'required|max:9|min:9',
-            'dados.email_cliente' => 'required|email',
-            'dados.operacao' => 'required',
-            'dados.estado_destino' => 'required',
-            'dados.razao_social' => 'required',
-            'dados.nome_fantasia' => 'required',
+            'dados.cnpj'                => 'required|max:18|min:18',
+            'dados.inscricao_estadual'  => 'required|max:9|min:9',
+            'dados.email_cliente'       => 'required|email',
+            'dados.operacao'            => 'required',
+            'dados.estado_origem'       => 'required',
+            'dados.estado_destino'      => 'required',
+            'dados.razao_social'        => 'required',
+            'dados.nome_fantasia'       => 'required',
             'dados.nome_do_responsavel' => 'required',
-            'dados.tel1' => 'required',
-
-            'dados.cep' => 'required|max:9|min:9',
-            'dados.endereco' => 'required',
-            'dados.endereco' => 'required',
-            'dados.bairro' => 'required',
-            'dados.cidade' => 'required',
-            'dados.estado' => 'required',
+            'dados.tel1'                => 'required',
+            'dados.cep'                 => 'required|max:9|min:9',
+            'dados.endereco'            => 'required',
+            'dados.endereco'            => 'required',
+            'dados.bairro'              => 'required',
+            'dados.cidade'              => 'required',
+            'dados.estado'              => 'required'
         ];
     }
 }

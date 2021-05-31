@@ -15,6 +15,8 @@ use App\User;
 
 //Requests
 use App\Http\Requests\ClienteRequest;
+use App\Mail\NovoCadastro;
+use Illuminate\Support\Facades\Mail;
 
 class ClientesController extends Controller
 {
@@ -124,15 +126,21 @@ class ClientesController extends Controller
         if($verificaCliente)
             return back()->withErrors('O usuário informado ja está cadastrado no Cliente!');
 
+        $senha = 'Gu3a$d1an21';
+
         $dados['is_superuser'] = 'N';
-        $dados['is_staff'] = 'Y';
-        $dados['is_active'] = 'Y';
-        $dados['confirmed'] = 'Y';
-        $dados['password'] = Hash::make('123456789');
+        $dados['is_staff']     = 'Y';
+        $dados['is_active']    = 'Y';
+        $dados['confirmed']    = 'Y';
+        $dados['password']     = Hash::make($senha);
 
-        $create = User::create($dados);
+        $user = User::create($dados);
 
-        if(!$create)
+        $user->senha = $senha;
+
+        Mail::to($user->email)->send(new NovoCadastro($user));
+
+        if(!$user)
             return back()->withErrors('Falha ao cadastrar novo usuário!');
 
         return back()->withSuccess('Usuário cadastrado com sucesso!');

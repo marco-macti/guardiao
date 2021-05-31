@@ -28,6 +28,8 @@ class CreateClientesTable extends Migration
             $table->string('email_cliente')->nullable();
             $table->date('dt_nascimento')->nullable();
             $table->string('operacao')->nullable();
+            $table->string('enquadramento_tributario')->nullable();
+            $table->string('estado_origem')->nullable();
             $table->string('estado_destino')->nullable();
             $table->longText('anotacoes')->nullable();
             $table->unsignedInteger('numero_de_lotes')->nullable();

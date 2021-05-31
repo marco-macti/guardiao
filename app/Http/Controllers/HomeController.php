@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Cosmos;
 use App\Http\Controllers\IA\IaController;
+use App\Mail\NovoCadastro;
+use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class HomeController extends Controller
 {
@@ -22,13 +26,9 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index(Request $request)
     {
-
-        /*$ia_instance = new IaController();\
-        $response = $ia_instance->retornaDadosIa('REFRI FANTA 2L LA','22021000');
-        dd($response);*/
-
         return view('home');
+
     }
 }
