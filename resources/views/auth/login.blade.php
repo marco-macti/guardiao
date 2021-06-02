@@ -44,10 +44,12 @@
     </style>
 
   </head>
-  <body>
+  <body style="background-image: url('https://guardiaotributario.com.br/wp-content/uploads/2019/05/119.jpg');background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: 100%">
 
     <div class="signin-wrapper">
-        
+
 
       <div class="signin-box">
         <h2 class="slim-logo">
@@ -60,30 +62,30 @@
                 @csrf
                 <div class="form-group">
                     <input placeholder="Digite seu e-mail" id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
-        
+
                     @error('email')
                         <small class="invalid-feedback small-alert" role="alert">
                             <strong>{{ $message }}</strong>
                         </small>
                     @enderror
-        
+
                 </div><!-- form-group -->
-        
+
                 <div class="form-group mg-b-50">
                     <input placeholder="Digite sua senha" id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
-        
+
                     @error('password')
                         <span class="invalid-feedback small-alert" role="alert">
                             <strong>{{ $message }}</strong>
                         </span>
                     @enderror
                 </div><!-- form-group -->
-        
+
                 <button type="submit" class="btn btn-primary btn-block btn-signin">Entrar</button>
-                
-            </form>        
-        
-       
+
+            </form>
+
+
       </div><!-- signin-box -->
 
     </div><!-- signin-wrapper -->
