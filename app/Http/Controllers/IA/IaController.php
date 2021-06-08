@@ -35,7 +35,9 @@ class IaController extends Controller
 
         $predict = $this->classifier->predict($produto);
 
-        $probailidade = $this->getProbability($predict);
+        if($predict['likelihood'] < 0) $probailidade = $predict['likelihood'] * -1;
+
+        //$probailidade = $this->getProbability($predict);
 
         $ret['ncm_ia']           = $predict['label'];
         $ret['probabilidade_ia'] = $probailidade;
@@ -101,14 +103,15 @@ class IaController extends Controller
         $bestMatch = [];
 
         foreach ($probability as $key => $classified) {
-        if (count($bestMatch) == 0 && $classified <= 1) {
-            $bestMatch['nome'] = $key;
-            $bestMatch['acuracia'] = $classified;
-        } elseif ($classified <= 1 && ((1 - $classified) < (1 - $bestMatch['acuracia']))) {
-            $bestMatch['nome'] = $key;
-            $bestMatch['acuracia'] = $classified;
+            if (count($bestMatch) == 0 && $classified <= 1) {
+                $bestMatch['nome'] = $key;
+                $bestMatch['acuracia'] = $classified;
+            } elseif ($classified <= 1 && ((1 - $classified) < (1 - $bestMatch['acuracia']))) {
+                $bestMatch['nome'] = $key;
+                $bestMatch['acuracia'] = $classified;
+            }
         }
-        }
+
         $bestMatch['acuracia'] = (float) number_format($bestMatch['acuracia'] * 100, 2);
         return $bestMatch['acuracia'];
     }

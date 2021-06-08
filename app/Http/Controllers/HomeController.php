@@ -28,6 +28,14 @@ class HomeController extends Controller
      */
     public function index(Request $request)
     {
+
+        /*$ia_instance = new IaController();
+
+        $reponse = $ia_instance->retornaDadosIa("ABRID. DE LATA E GARRAFA CLINCK 9CM","82055100");
+
+        dd($reponse);
+        */
+
         return view('home');
 
     }
