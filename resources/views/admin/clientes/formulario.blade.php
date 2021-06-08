@@ -145,6 +145,7 @@
                 </div>
 
                 {{-- Endereço --}}
+
                 <div class="row">
                     <div class="col-12 mb-2 mt-3">
                         <h5>Dados da Empresa</h5>
@@ -180,6 +181,35 @@
                         {!! Form::text('dados[complemento]', null, ['class' => 'form-control form-control-sm', 'id' => 'complemento']) !!}
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-12 mb-2 mt-3">
+                        <h5>Situação do Cadastro</h5>
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="form-group col-3">
+                        {!! Form::label('em_degustacao', 'Em degustacao') !!}
+                        {!! Form::select('dados[em_degustacao]', ['S' => 'Sim','N' => 'Não'], 'N', ['class' => 'custom-select custom-select-sm', 'id' => 'em_degustacao']) !!}
+                    </div>
+
+                    <div class="form-group col-3">
+                        {!! Form::label('data', 'Data Inicio') !!}
+                        {!! Form::date('dados[dt_nascimento]', null, ['class' => 'form-control form-control-sm', 'id' => 'data_nascimento']) !!}
+                    </div>
+
+                    <div class="form-group col-3">
+                        {!! Form::label('data_nascimento', 'Data Fim') !!}
+                        {!! Form::date('dados[dt_nascimento]', null, ['class' => 'form-control form-control-sm', 'id' => 'data_nascimento']) !!}
+                    </div>
+
+                    <div class="form-group col-3">
+                        {!! Form::label('cidade', 'Quantidade de NCMs') !!}
+                        {!! Form::text('dados[cidade]', null, ['class' => 'form-control form-control-sm', 'id' => 'cidade']) !!}
+                    </div>
+                </div>
+
                 <div class="row mt-4">
                     <div class="col-12">
                         <button class="btn btn-sm btn-primary pull-right" type="submit">Cadastrar Cliente</button>

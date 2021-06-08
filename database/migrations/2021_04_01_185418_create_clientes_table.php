@@ -33,6 +33,10 @@ class CreateClientesTable extends Migration
             $table->string('estado_destino')->nullable();
             $table->longText('anotacoes')->nullable();
             $table->unsignedInteger('numero_de_lotes')->nullable();
+            $table->enum('em_degustacao',['S','N'])->default('N');
+            $table->date('dt_inicio_degustacao')->nullable();
+            $table->date('qtd_ncms_degustacao')->nullable();
+
             $table->timestamps();
         });
     }
