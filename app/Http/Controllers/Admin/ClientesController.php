@@ -27,7 +27,7 @@ class ClientesController extends Controller
         return view('admin.clientes.index', $data);
     }
 
-    public function formulario()
+    public function edit(Cliente $cliente)
     {
         $data['estados'] = [
             "AC" => "AC",
@@ -59,11 +59,49 @@ class ClientesController extends Controller
             "TO" => "TO"
         ];
 
-        return view('admin.clientes.formulario',$data);
+        $data['cliente'] = $cliente;
+
+        return view('admin.clientes.edit',$data);
     }
 
-    public function cadastraCliente(ClienteRequest $request)
+    public function create()
     {
+        $data['estados'] = [
+            "AC" => "AC",
+            "AL" => "AL",
+            "AM" => "AM",
+            "AP" => "AP",
+            "BA" => "BA",
+            "CE" => "CE",
+            "DF" => "DF",
+            "ES" => "ES",
+            "GO" => "GO",
+            "MA" => "MA",
+            "MT" => "MT",
+            "MS" => "MS",
+            "MG" => "MG",
+            "PA" => "PA",
+            "PB" => "PB",
+            "PR" => "PR",
+            "PE" => "PE",
+            "PI" => "PI",
+            "RJ" => "RJ",
+            "RN" => "RN",
+            "RO" => "RO",
+            "RS" => "RS",
+            "RR" => "RR",
+            "SC" => "SC",
+            "SE" => "SE",
+            "SP" => "SP",
+            "TO" => "TO"
+        ];
+
+        return view('admin.clientes.create',$data);
+    }
+
+    public function store(ClienteRequest $request)
+    {
+
         $dados = $request->get('dados');
 
         $dados['cnpj'] = Sanitize::sanitizeValueForMask($dados['cnpj']);
@@ -81,13 +119,14 @@ class ClientesController extends Controller
 
         $hash = encrypt($create->id);
 
-        return redirect()->to("/admin/clientes/detalhes/{$hash}")->withSuccess("Cliente Cadastrado com sucesso!");
+        return redirect()->to("/admin/clientes/show/{$hash}")->withSuccess("Cliente Cadastrado com sucesso!");
 
     }
 
-    public function detalhesCliente(Request $request, $id)
+    public function show(Request $request, $id)
     {
-        $id = decrypt($id);
+        $data['id'] = $id = decrypt($id);
+
         $data['cliente'] = Cliente::find($id);
 
         if(!$data['cliente'])
@@ -114,8 +153,10 @@ class ClientesController extends Controller
             $data['usuarios'] = User::where('cliente_id', $id)->paginate(1);
         }
 
-        return view('admin.clientes.detalhes',$data);
+        return view('admin.clientes.show',$data);
     }
+
+    /* Acoes de adicao e edicao de usuario */
 
     public function adduser(Request $request)
     {

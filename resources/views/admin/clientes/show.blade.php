@@ -63,7 +63,7 @@
                     <label class="section-title">Dados Cadastrais</label>
                   </div>
                   <div class="col-md-6">
-                    <a href="#" class="btn btn-primary btn-block mg-b-10 col-3 pull-right">Editar</a>
+                    <a href="{{ route('admin.clientes.edit',$id) }}" class="btn btn-primary btn-block mg-b-10 col-3 pull-right">Editar</a>
                   </div>
                 </div>
                 <div class="row row-sm mg-t-20">

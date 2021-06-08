@@ -1,13 +1,5 @@
 @extends('templates.guardiao')
 
-@push('post-scripts')
-    <script>
-      $(document).ready(function(){
-        $('.cnpj').mask('00.000.000/0000-00', {reverse: true});
-      });
-    </script>
-@endpush
-
 @section('conteudo')
 
   <div class="slim-mainpanel">
@@ -26,7 +18,7 @@
               <p class="mg-b-20 mg-sm-b-40">Aqui você tem a listagem completa de clientes cadastrados.</p>
             </div>
             <div class="col-md-6">
-              <a href="{{route('admin.clientes.formulario')}}" class="btn btn-primary btn-block mg-b-10">Novo Cliente</a>
+              <a href="{{route('admin.clientes.create')}}" class="btn btn-primary btn-block mg-b-10">Novo Cliente</a>
             </div>
           </div>
 
@@ -50,7 +42,7 @@
                   <td>{{$cliente->email_cliente}}</td>
                   <td>{{$cliente->estado}}</td>
                   <td>
-                    <a href="{{route('admin.clientes.detalhes', encrypt($cliente->id))}}" class="btn btn-sm btn-primary">
+                    <a href="{{route('admin.clientes.show', encrypt($cliente->id))}}" class="btn btn-sm btn-primary">
                       <i class="fa fa-eye"></i>
                     </a>
                     <a href="" class="btn btn-sm btn-danger excluir-cliente">
@@ -101,3 +93,11 @@
   </div>
 
 @endsection
+
+@push('post-scripts')
+    <script>
+      $(document).ready(function(){
+        $('.cnpj').mask('00.000.000/0000-00', {reverse: true});
+      });
+    </script>
+@endpush

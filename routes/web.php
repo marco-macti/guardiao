@@ -67,42 +67,36 @@ Route::get('logout', 'Auth\LoginController@logout');
 Route::group([
     'middleware' => 'auth'
 ], function () {
-    
+
     Route::get('/home', 'HomeController@index')->name('home');
-    
+
     Route::group(['namespace' => 'Frontend'], function(){
         Route::resource('/lotes', 'LotesController');
     });
-    
-    Route::group([
-        'prefix' => 'admin',
-        'namespace' => 'Admin'
-    ], function () {
+
+    Route::group(['prefix' => 'admin','namespace' => 'Admin'], function () {
 
         /**
          * Lotes
          */
-        Route::resource('/lotes', 'LotesController', [
-            'names' => [
-                'edit' => 'admin.lotes.edit'
-            ]
-        ]);
+        Route::resource('/lotes', 'LotesController', ['names' => ['edit' => 'admin.lotes.edit']]);
 
         /**
          * Clientes
          */
-        Route::group([
-            'prefix' => 'clientes'
-        ],function () {
-            Route::get('/', 'ClientesController@index')->name('admin.clientes.index');
-            Route::get('/formulario', 'ClientesController@formulario')->name('admin.clientes.formulario');
-            Route::post('/cadastrar', 'ClientesController@cadastraCliente')->name('admin.clientes.cadastrar');
-            Route::get('/detalhes/{id}', 'ClientesController@detalhesCliente')->name('admin.clientes.detalhes');
+        Route::group(['prefix' => 'clientes'],function () {
 
-            Route::post('/add-user', 'ClientesController@adduser')->name('admin.clientes.adduser');
+            Route::get('/'               , 'ClientesController@index')->name('admin.clientes.index');
+            Route::get('/create'         , 'ClientesController@create')->name('admin.clientes.create');
+            Route::post('/store'         , 'ClientesController@store')->name('admin.clientes.store');
+            Route::get('/edit/{cliente}' , 'ClientesController@edit')->name('admin.clientes.edit');
+            Route::put('/update'         , 'ClientesController@update')->name('admin.clientes.update');
+            Route::get('/show/{id}'      , 'ClientesController@show')->name('admin.clientes.show');
+
+            Route::post('/add-user'       , 'ClientesController@adduser')->name('admin.clientes.adduser');
             Route::get('/remove-user/{id}', 'ClientesController@removeUser')->name('admin.clientes.removeUser');
-            Route::get('/info-user', 'ClientesController@infoUser')->name('admin.clientes.infoUser');
-            Route::post('/edit-user', 'ClientesController@edituser')->name('admin.clientes.edituser');
+            Route::get('/info-user'       , 'ClientesController@infoUser')->name('admin.clientes.infoUser');
+            Route::post('/edit-user'      , 'ClientesController@edituser')->name('admin.clientes.edituser');
         });
     });
 });
