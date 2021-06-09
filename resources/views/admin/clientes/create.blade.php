@@ -14,7 +14,7 @@
             <h6 class="slim-pagetitle">Cadastro de Clientes</h6>
         </div><!-- slim-pageheader -->
         <div class="section-wrapper">
-            @include('admin.clientes._form',['method' => 'POST','action' => route('admin.clientes.store')])
+            @include('admin.clientes._form',['method' => 'POST','action' => route('admin.clientes.store'), 'estados'=> $estados , 'cliente' => $cliente ])
         </div>
     </div>
 </div>

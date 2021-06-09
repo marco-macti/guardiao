@@ -1,6 +1,6 @@
 <?php
 
-Route::get('/'                                        ,'HomeController@index');
+
 Route::get('/relatorio-lote/{lote}'                   ,'ClienteLoteController@relatorioLote');
 Route::get('/relatorio-lote-passo-4/{lote}'           ,'ClienteLoteController@relatorioLotePasso4');
 
@@ -62,41 +62,39 @@ Route::get('/ia/consulta-ncm-unico' ,'IA\IaController@consultaNcm')->name('ia.co
 // v2.0
 
 Auth::routes();
-Route::get('logout', 'Auth\LoginController@logout');
+Route::get('logout'                  , 'Auth\LoginController@logout');
+//Route::get('/auth/confirm/{user}'    ,'Auth\RegisterController@confirm')->name('confirme.user');
 
-Route::group([
-    'middleware' => 'auth'
-], function () {
+Route::group(['middleware' => 'auth'], function () {
 
-    Route::get('/home', 'HomeController@index')->name('home');
+    Route::group(['middleware' => 'checkFirstAccess'], function () {
 
-    Route::group(['namespace' => 'Frontend'], function(){
-        Route::resource('/lotes', 'LotesController');
-    });
+        Route::get('/'                 , 'HomeController@index');
+        Route::get('/home'             , 'HomeController@index')->name('home');
+        Route::any('/atualizar-senha'  , 'HomeController@atualizarSenha')->name('atualizar.senha');
 
-    Route::group(['prefix' => 'admin','namespace' => 'Admin'], function () {
+        Route::group(['namespace' => 'Frontend'], function(){
+            Route::resource('/lotes', 'LotesController');
+        });
 
-        /**
-         * Lotes
-         */
-        Route::resource('/lotes', 'LotesController', ['names' => ['edit' => 'admin.lotes.edit']]);
+        Route::group(['prefix' => 'admin','namespace' => 'Admin'], function () {
 
-        /**
-         * Clientes
-         */
-        Route::group(['prefix' => 'clientes'],function () {
+            Route::resource('/lotes', 'LotesController', ['names' => ['edit' => 'admin.lotes.edit']]);
 
-            Route::get('/'               , 'ClientesController@index')->name('admin.clientes.index');
-            Route::get('/create'         , 'ClientesController@create')->name('admin.clientes.create');
-            Route::post('/store'         , 'ClientesController@store')->name('admin.clientes.store');
-            Route::get('/edit/{cliente}' , 'ClientesController@edit')->name('admin.clientes.edit');
-            Route::put('/update'         , 'ClientesController@update')->name('admin.clientes.update');
-            Route::get('/show/{id}'      , 'ClientesController@show')->name('admin.clientes.show');
+            Route::group(['prefix' => 'clientes'],function () {
 
-            Route::post('/add-user'       , 'ClientesController@adduser')->name('admin.clientes.adduser');
-            Route::get('/remove-user/{id}', 'ClientesController@removeUser')->name('admin.clientes.removeUser');
-            Route::get('/info-user'       , 'ClientesController@infoUser')->name('admin.clientes.infoUser');
-            Route::post('/edit-user'      , 'ClientesController@edituser')->name('admin.clientes.edituser');
+                Route::get('/'                 , 'ClientesController@index')->name('admin.clientes.index');
+                Route::get('/create'           , 'ClientesController@create')->name('admin.clientes.create');
+                Route::post('/store'           , 'ClientesController@store')->name('admin.clientes.store');
+                Route::get('/edit/{cliente}'   , 'ClientesController@edit')->name('admin.clientes.edit');
+                Route::put('/update/{cliente}' , 'ClientesController@update')->name('admin.clientes.update');
+                Route::get('/show/{id}'        , 'ClientesController@show')->name('admin.clientes.show');
+
+                Route::post('/add-user'       , 'ClientesController@adduser')->name('admin.clientes.adduser');
+                Route::get('/remove-user/{id}', 'ClientesController@removeUser')->name('admin.clientes.removeUser');
+                Route::get('/info-user'       , 'ClientesController@infoUser')->name('admin.clientes.infoUser');
+                Route::post('/edit-user'      , 'ClientesController@edituser')->name('admin.clientes.edituser');
+            });
         });
     });
 });

@@ -27,42 +27,6 @@ class ClientesController extends Controller
         return view('admin.clientes.index', $data);
     }
 
-    public function edit(Cliente $cliente)
-    {
-        $data['estados'] = [
-            "AC" => "AC",
-            "AL" => "AL",
-            "AM" => "AM",
-            "AP" => "AP",
-            "BA" => "BA",
-            "CE" => "CE",
-            "DF" => "DF",
-            "ES" => "ES",
-            "GO" => "GO",
-            "MA" => "MA",
-            "MT" => "MT",
-            "MS" => "MS",
-            "MG" => "MG",
-            "PA" => "PA",
-            "PB" => "PB",
-            "PR" => "PR",
-            "PE" => "PE",
-            "PI" => "PI",
-            "RJ" => "RJ",
-            "RN" => "RN",
-            "RO" => "RO",
-            "RS" => "RS",
-            "RR" => "RR",
-            "SC" => "SC",
-            "SE" => "SE",
-            "SP" => "SP",
-            "TO" => "TO"
-        ];
-
-        $data['cliente'] = $cliente;
-
-        return view('admin.clientes.edit',$data);
-    }
 
     public function create()
     {
@@ -96,7 +60,48 @@ class ClientesController extends Controller
             "TO" => "TO"
         ];
 
+        $data['cliente'] = new Cliente;
+
         return view('admin.clientes.create',$data);
+    }
+
+    public function edit(Cliente $cliente)
+    {
+        $data['estados'] = [
+            "AC" => "AC",
+            "AL" => "AL",
+            "AM" => "AM",
+            "AP" => "AP",
+            "BA" => "BA",
+            "CE" => "CE",
+            "DF" => "DF",
+            "ES" => "ES",
+            "GO" => "GO",
+            "MA" => "MA",
+            "MT" => "MT",
+            "MS" => "MS",
+            "MG" => "MG",
+            "PA" => "PA",
+            "PB" => "PB",
+            "PR" => "PR",
+            "PE" => "PE",
+            "PI" => "PI",
+            "RJ" => "RJ",
+            "RN" => "RN",
+            "RO" => "RO",
+            "RS" => "RS",
+            "RR" => "RR",
+            "SC" => "SC",
+            "SE" => "SE",
+            "SP" => "SP",
+            "TO" => "TO"
+        ];
+
+
+
+        $data['cliente'] = $cliente;
+
+        return view('admin.clientes.edit',$data);
     }
 
     public function store(ClienteRequest $request)
@@ -118,6 +123,26 @@ class ClientesController extends Controller
 
 
         $hash = encrypt($create->id);
+
+        return redirect()->to("/admin/clientes/show/{$hash}")->withSuccess("Cliente Cadastrado com sucesso!");
+
+    }
+
+    public function update(ClienteRequest $request,Cliente $cliente)
+    {
+
+        $dados = $request->get('dados');
+
+        try {
+
+            $cliente->update($dados);
+
+        } catch (\Throwable $th) {
+
+            return back()->withErrors("Falha ao atualizar cliente!");
+        }
+
+        $hash = encrypt($cliente->id);
 
         return redirect()->to("/admin/clientes/show/{$hash}")->withSuccess("Cliente Cadastrado com sucesso!");
 
@@ -171,8 +196,8 @@ class ClientesController extends Controller
 
         $dados['is_superuser'] = 'N';
         $dados['is_staff']     = 'Y';
-        $dados['is_active']    = 'Y';
-        $dados['confirmed']    = 'Y';
+        $dados['is_active']    = 'N';
+        $dados['confirmed']    = 'N';
         $dados['password']     = Hash::make($senha);
 
         $user = User::create($dados);

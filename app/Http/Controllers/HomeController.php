@@ -7,27 +7,27 @@ use App\Http\Controllers\IA\IaController;
 use App\Mail\NovoCadastro;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
 class HomeController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index(Request $request)
     {
+
+        if(\Auth::check()){
+
+            $loggedUser = auth()->user();
+
+            if($loggedUser->confirmed == 'N' && $loggedUser->is_superuser == 'N'){
+                return redirect()->to('atualizar-senha');
+            }
+        }
 
         /*$ia_instance = new IaController();
 
@@ -37,6 +37,29 @@ class HomeController extends Controller
         */
 
         return view('home');
+
+    }
+
+    public function atualizarSenha(Request $request){
+
+        if(empty($request->all())){
+
+            return view('auth.confirm');
+
+        }else{
+
+            if($request->has('senha')){
+
+                auth()->user()->update([
+                    'password'  => bcrypt($request->senha),
+                    'confirmed' => 'Y',
+                    'is_active' => 'Y'
+                ]);
+            }
+
+            return redirect()->to('/home');
+
+        }
 
     }
 }

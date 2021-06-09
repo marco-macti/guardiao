@@ -15,7 +15,7 @@
         </div><!-- slim-pageheader -->
         <div class="section-wrapper">
 
-            @include('admin.clientes._form',['method' => 'PUT','action' => route('admin.clientes.update'),'estados'=> $estados])
+            @include('admin.clientes._form',['method' => 'PUT','action' => route('admin.clientes.update',$cliente->id),'estados'=> $estados , 'cliente' => $cliente ])
 
         </div>
     </div>
