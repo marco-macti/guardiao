@@ -11,6 +11,40 @@
       <h6 class="slim-pagetitle">Lotes de produtos</h6>
     </div><!-- slim-pageheader -->
 
+    <div class="card card-dash-one mg-t-20">
+        <div class="row no-gutters">
+            <div class="col-lg-3">
+            <i class="icon ion-ios-analytics-outline"></i>
+            <div class="dash-content">
+                <label class="tx-primary">Total de produtos Importados</label>
+                <h2>0</h2>
+            </div><!-- dash-content -->
+            </div><!-- col-3 -->
+            <div class="col-lg-3">
+            <i class="icon ion-ios-pie-outline"></i>
+            <div class="dash-content">
+                <label class="tx-success">Total de Produtos Auditados</label>
+                <h2>0</h2>
+            </div><!-- dash-content -->
+            </div><!-- col-3 -->
+            <div class="col-lg-3">
+            <i class="icon ion-star"></i>
+            <div class="dash-content">
+                <label class="tx-purple">Quantidade de Acertos</label>
+                <h2>0</h2>
+            </div><!-- dash-content -->
+            </div><!-- col-3 -->
+            <div class="col-lg-3">
+            <i class="icon ion-close"></i>
+            <div class="dash-content">
+                <label class="tx-danger">Quantidade de erros</label>
+                <h2>0</h2>
+            </div><!-- dash-content -->
+            </div><!-- col-3 -->
+        </div><!-- row -->
+    </div>
+    <br/>
+
     <div class="section-wrapper">
       <div class="row row-sm mg-t-20">
         <div class="col-md-6">
@@ -29,6 +63,8 @@
               <th>Número deste lote</th>
               <th>Data de Criação</th>
               <th>Quantidade de Produtos</th>
+              <th>Quantidade de Acertos</th>
+              <th>Quantidade de Erros</th>
               <th>Tipo do Documento</th>
               <th>Competência ou Numeração</th>
               <th>Status da Importação </th>
@@ -41,6 +77,8 @@
                 <th scope="row">{{ $lote->numero_do_lote }}</th>
                 <td>{{ $lote->created_at->format('d/m/Y') }}</td>
                 <td>{{ $lote->quantidade_de_produtos }}</td>
+                <td>{{ $lote->totalAcertos() }} </td>
+                <td>{{ $lote->totalErros() }} </td>
                 <td>{{ $lote->tipo_documento }}</td>
                 <td>{{ $lote->competencia_ou_numeracao }}</td>
                 <td>
@@ -50,7 +88,12 @@
                 <td>
                   <div class="col-lg-2 mg-t-20 mg-lg-t-0">
                     <div class="btn-group" role="group" aria-label="Basic example">
-                      <a href="{{ URL("/lotes/$lote->id/edit") }}" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye"></i></a>
+                        @if($lote->statusImport()['status'] == 'Importando')
+                            <a href="#" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye lote-em-importacao"></i></a>
+                        @else
+                            <a href="{{ URL("/lotes/$lote->id/edit") }}" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye"></i></a>
+                        @endif
+
                       <a style="color:white" class="btn btn-secondary"><i class="fa fa-remove"></i></a>
                     </div>
                   </div>
@@ -174,6 +217,15 @@
   <script type="text/javascript">
 
     $(document).ready(function() {
+
+        $(".lote-em-importacao").click(function(){
+            Swal.fire({
+                icon: 'info',
+                title: 'Aguarde',
+                text: 'Aguarde enquanto a Inteligencia Artificial audita os seus produtos. Este processo pode levar ate 2 horas',
+                footer: 'Guardiao Tributario'
+            })
+        })
 
         $(".tipo_arquivo").change(function(){
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Cliente;
+use Illuminate\Support\Facades\DB;
 
 class Lote extends Model
 {
@@ -28,5 +29,39 @@ class Lote extends Model
         }
 
         return $status;
+    }
+
+    public function totalAcertos(){
+
+        if($this->statusImport() == 'Importando'){
+            return 'N/A';
+        }else{
+
+            $acertos =  DB::select("SELECT COUNT(*) as acertos FROM lote_produtos WHERE ncm_importado = ia_ncm AND lote_id = $this->id");
+
+            return $acertos[0]->acertos;
+        }
+
+
+
+    }
+
+    public function totalErros(){
+
+        if($this->statusImport() == 'Importando'){
+            return 'N/A';
+        }else{
+
+            $erros = DB::select("SELECT COUNT(*) as erros FROM lote_produtos
+                                  WHERE ncm_importado <> ia_ncm
+                                 AND lote_id = $this->id");
+
+
+            return $erros[0]->erros;
+
+        }
+
+
+
     }
 }

@@ -107,7 +107,7 @@
 
     <div class="row">
         <div class="col-12 mb-2 mt-3">
-            <h5>Situação do Cadastro</h5>
+            <h5>Degustação</h5>
         </div>
     </div>
     <div class="row">

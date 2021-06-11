@@ -37,7 +37,7 @@
               <th>NCM IA</th>
               <th>Acurácia</th>
               <th>Acertou?</th>
-              <th>Auditar</th>
+              <th>Situação</th>
             </tr>
           </thead>
           <tbody>
@@ -50,7 +50,7 @@
               <td>{{ $produto->codigo_interno_do_cliente }}</td>
               <td>{{ $produto->ncm_importado  }} </td>
               <td>
-                <a data-ncmia="{{$produto->ia_ncm}}" data-ncmimportado="{{$produto->ncm_importado}}" href="#" class="btn btn-secondary btn-block mg-b-10 diferenca"><i class="fa fa-arrows-h"></i></a>
+                <a data-descricao="{{ $produto->descricao_do_produto }}" data-ncmia="{{$produto->ia_ncm}}" data-ncmimportado="{{$produto->ncm_importado}}" style="color: #212529;background-color: #a0abaa;border-color: #a0abaa;" href="#" class="btn btn-secondary btn-block mg-b-10 diferenca">NCM COMPARADO</a>
               </td>
               <td>{{ $produto->ia_ncm  }} </td>
               @php
@@ -90,7 +90,7 @@
               <td><span class="badge badge-{{ $classAcuracia}}"> {{ $totalAcuracia  }} %</span></td>
               <td><span class="badge badge-{{ $classAcertou}}"> {{ $acertou  }} </span></td>
               <td>
-                <a title="Produto necessita de auditoria" style="color:white" href="" class="btn btn-warning btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1"><i class="fa fa-edit"></i></a>
+                <a title="Produto necessita de auditoria" style="color: #212529;background-color: #a0abaa;border-color: #a0abaa;" href="" class="btn btn-warning btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1">AUDITAR</a>
               </td>
             </tr>
             @empty
@@ -128,15 +128,15 @@
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Treinar</button>
+        <button type="button" class="btn btn-primary">Auditar</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
       </div>
     </div>
   </div><!-- modal-dialog -->
 </div>
 
-<div id="modaldemo2" class="modal fade">
-  <div class="modal-dialog modal-dialog-vertical-center" role="document">
+<div id="modaldemo2" class="modal fade" >
+  <div class="modal-dialog modal-dialog-vertical-center" role="document" style="min-width: 70%">
     <div class="modal-content bd-0 tx-14">
       <div class="modal-header">
         <h6 class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">Descricao do NCM</h6>
@@ -145,8 +145,14 @@
         </button>
       </div>
       <div class="modal-body pd-25">
+
         <table class="table">
           <tbody>
+            <tr>
+                <td><img style="width: 300px" src="{{ URL('img-default.jpeg') }}">&nbsp;&nbsp;<span id="descricao-produto-ia"></span></td>
+                <th style="text-align: center" scope="row"></th>
+                <td></td>
+            </tr>
             <tr>
               <th class="text-nowrap" id="th-ncm-importado" scope="row"></th>
               <th style="text-align: center" scope="row"><i class="fa fa-arrows-h"></i> </th>
@@ -199,6 +205,9 @@
 
         var ncmimportado = $(this).data('ncmimportado');
         var ncmia = $(this).data('ncmia');
+        var descricao = $(this).data('descricao');
+
+        $("#descricao-produto-ia").html(descricao);
 
         var url = '{{route("ia.consulta.ncm")}}'+'/?ia='+ncmia+'&importado='+ncmimportado;
 

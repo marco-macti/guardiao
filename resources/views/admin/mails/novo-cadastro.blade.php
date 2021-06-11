@@ -27,7 +27,7 @@
       <p>Seu cadastro na plataforma Guardiao Tributario foi concluido com sucesso. Abaixo seus dados de acesso :</p>
       <strong>E-mail : {{ $user->email }} </strong>
       <br/>
-      <strong>Semha  : {{ $user->senha }} </strong>
+      <strong>Senha  : {{ $user->senha }} </strong>
       <br/>
       <br/>
       <p>Use os dados acima para fazer login na plataforma clicando <a href="http://guardiaotributario.com.br">AQUI</a>.</p>
@@ -38,7 +38,7 @@
           <br/>
           <span class="text-muted">Qualquer duvida estamos sempre a disposicao. </span>
           <br/>
-          <span class="text-muted">Atte,</span>
+          <span class="text-muted">Att,</span>
       </div>
     </footer>
   </body>
