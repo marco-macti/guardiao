@@ -11,19 +11,32 @@ use App\Models\LoteProduto;
 use App\Helpers\FormatValue;
 use App\Jobs\CadastraProdutoJob;
 use App\Http\Controllers\IA\IaController;
+use Illuminate\Support\Facades\DB;
 
 class LotesController extends Controller
 {
     public function index(){
 
+        $clienteId    = auth()->user()->cliente_id;
+        $lotesCliente = Lote::select('id')->where('cliente_id',$clienteId)->get()->toArray();
+
+        $totalProdutosImportados   = LoteProduto::whereIn('lote_id',$lotesCliente)->count();
+        $totalDeProdutosAuditados  = 0;
+        $totalDeProdutosCorretos   = DB::select("SELECT COUNT(*) as ACERTOS FROM lote_produtos WHERE ncm_importado = ia_ncm AND lote_id IN(SELECT id FROM lotes WHERE cliente_id = $clienteId)");
+        $totalDeProdutosIncorretos = DB::select("SELECT COUNT(*) as ERROS FROM lote_produtos WHERE ncm_importado <> ia_ncm AND lote_id IN(SELECT id FROM lotes WHERE cliente_id = $clienteId)");
+
         $lotes = Lote::where('cliente_id',auth()->user()->cliente_id)->paginate(10);
 
-        return view('frontend.lotes.index')->with('lotes',$lotes);
+        return view('frontend.lotes.index')
+                ->with('totalProdutosImportados',$totalProdutosImportados)
+                ->with('totalDeProdutosAuditados',$totalDeProdutosAuditados)
+                ->with('totalDeProdutosCorretos',$totalDeProdutosCorretos[0]->ACERTOS)
+                ->with('totalDeProdutosIncorretos',$totalDeProdutosIncorretos[0]->ERROS)
+                ->with('lotes',$lotes);
 
     }
 
     public function edit(Lote $lote){
-
 
         $produtos = LoteProduto::where('lote_id',$lote->id)->paginate(15);
 

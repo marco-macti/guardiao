@@ -17,34 +17,101 @@
             <i class="icon ion-ios-analytics-outline"></i>
             <div class="dash-content">
                 <label class="tx-primary">Total de produtos Importados</label>
-                <h2>0</h2>
+                <h2>{{ $totalProdutosImportados }} </h2>
             </div><!-- dash-content -->
             </div><!-- col-3 -->
             <div class="col-lg-3">
             <i class="icon ion-ios-pie-outline"></i>
             <div class="dash-content">
                 <label class="tx-success">Total de Produtos Auditados</label>
-                <h2>0</h2>
+                <h2>{{ $totalDeProdutosAuditados }}</h2>
             </div><!-- dash-content -->
             </div><!-- col-3 -->
             <div class="col-lg-3">
             <i class="icon ion-star"></i>
             <div class="dash-content">
                 <label class="tx-purple">Quantidade de Acertos</label>
-                <h2>0</h2>
+                <h2>{{ $totalDeProdutosCorretos }}</h2>
             </div><!-- dash-content -->
             </div><!-- col-3 -->
             <div class="col-lg-3">
             <i class="icon ion-close"></i>
             <div class="dash-content">
                 <label class="tx-danger">Quantidade de erros</label>
-                <h2>0</h2>
+                <h2>{{ $totalDeProdutosIncorretos }}</h2>
             </div><!-- dash-content -->
             </div><!-- col-3 -->
         </div><!-- row -->
     </div>
     <br/>
 
+    <!-- Filtros -->
+
+
+    <div id="accordion" class="accordion-one" role="tablist" aria-multiselectable="true">
+        <div class="card">
+          <div class="card-header" role="tab" id="headingOne">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne" class="tx-gray-800 transition collapsed">
+              Filtro dos Lotes
+            </a>
+          </div><!-- card-header -->
+
+          <div id="collapseOne" class="collapse" role="tabpanel" aria-labelledby="headingOne" style="">
+            <div class="card-body">
+                <div class="section-wrapper">
+                    <div class="form-layout">
+                      <div class="row mg-b-25">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label">Codigo interno do Cliente:</label>
+                                <input class="form-control" type="text" name="codigo_interno_do_cliente" value="" >
+                            </div>
+                        </div><!-- col-4 -->
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label">NCM do Cliente:</label>
+                                <input class="form-control" type="text" name="ncm_importado" value="" >
+                            </div>
+                        </div><!-- col-4 -->
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label">NCM da IA:</label>
+                                <input class="form-control" type="text" name="ncm_importado" value="" >
+                            </div>
+                        </div><!-- col-4 -->
+                        <div class="col-lg-4">
+                          <div class="form-group mg-b-10-force">
+                            <label class="form-control-label">Acurácia</label>
+                            <select class="form-control select2 select2-hidden-accessible" data-placeholder="Choose country" tabindex="-1" aria-hidden="true">
+                              <option label="Choose country"></option>
+                              <option value="1"><= 80%</option>
+                              <option value="2">United Kingdom</option>
+
+                              <option value="Japan">Japan</option>
+                            </select>
+                            <span class="select2 select2-container select2-container--default select2-container--above" dir="ltr" style="width: 323px;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-labelledby="select2-8ee4-container"><span class="select2-selection__rendered" id="select2-8ee4-container"><span class="select2-selection__placeholder">Choose country</span></span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
+                          </div>
+                        </div><!-- col-8 -->
+
+                      </div><!-- row -->
+
+                      <div class="form-layout-footer">
+                        <button class="btn btn-primary bd-0">Submit Form</button>
+                        <button class="btn btn-secondary bd-0">Cancel</button>
+                      </div><!-- form-layout-footer -->
+                    </div><!-- form-layout -->
+                  </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+
+
+    <!-- Fim Filtros -->
+
+    <br/>
     <div class="section-wrapper">
       <div class="row row-sm mg-t-20">
         <div class="col-md-6">

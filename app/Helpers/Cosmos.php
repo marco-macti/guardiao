@@ -19,7 +19,6 @@ class Cosmos extends Model
         $url = "https://api.cosmos.bluesoft.com.br/products?query=$descricao";
         //$url = 'https://api.cosmos.bluesoft.com.br/products?query=Abridor%20de%20Garrafa';
 
-
         $cosmosApiKey = env('COSMOS_API_KEY');
 
         $headers = array(

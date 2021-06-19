@@ -112,14 +112,14 @@
   <div class="modal-dialog modal-dialog-vertical-center" role="document">
     <div class="modal-content bd-0 tx-14">
       <div class="modal-header">
-        <h6 class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">Upload de arquivos</h6>
+        <h6 class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">Auditoria de NCM </h6>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">×</span>
         </button>
       </div>
       <div class="modal-body pd-25">
-        <h5 class="lh-3 mg-b-20"><a href="" class="tx-inverse hover-primary">Treinando a IA</a></h5>
-        <p class="mg-b-5">Informa o NCM correto para efetuar o treinamento da IA para este item. </p>
+
+        <p class="mg-b-5"> Informe o NCM correto para efetuar a auditoria deste item.</p>
         <br/>
         <form action="#" id="treinar">
           <label> NCM : </label>
