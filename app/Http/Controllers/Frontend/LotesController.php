@@ -110,7 +110,7 @@ class LotesController extends Controller
 
                     $ret['success']      = true;
                     $ret['msg']          = count($arrProdutos).' enviados para fila de importação.';
-                    $ret['url_redirect'] = URL("/lotes/$lote->id/edit");
+                    $ret['url_redirect'] = URL("/lotes");
 
                 } catch (\Throwable $th) {
 
@@ -154,7 +154,7 @@ class LotesController extends Controller
 
                         $ret['success']      = true;
                         $ret['msg']          = count($produtos).' enviados para fila de importação.';
-                        $ret['url_redirect'] = URL("/lotes/$lote->id/edit");
+                        $ret['url_redirect'] = URL("/lotes");
 
                     } catch (\Throwable $th) {
 
@@ -188,7 +188,7 @@ class LotesController extends Controller
 
                         $ret['success']      = true;
                         $ret['msg']          = '1 produto importado com sucesso.';
-                        $ret['url_redirect'] = URL("/lotes/$lote->id/edit");
+                        $ret['url_redirect'] = URL("/lotes");
 
                     } catch (\Throwable $th) {
 
@@ -229,7 +229,7 @@ class LotesController extends Controller
 
                     $ret['success']      = true;
                     $ret['msg']          = count($csv).' enviados para fila de importação.';
-                    $ret['url_redirect'] = URL("/lotes/$lote->id/edit");
+                    $ret['url_redirect'] = URL("/lotes");
 
                 } catch (\Throwable $th) {
 

@@ -320,9 +320,11 @@
 
                 $("#msg-upload").html(response.msg);
 
-                setTimeout(() => {
+                console.log(response.url_redirect);
+
+                /*setTimeout(() => {
                   location.href = response.url_redirect;
-                }, 2000);
+                }, 2000);*/
 
               }else{
 
