@@ -97,9 +97,9 @@
               <td><span class="badge badge-{{ $classAcertou}}"> {{ $acertou  }} </span></td>
               <td>
                   @if($produto->auditado() == true)
-                      <a title="Produto ja auditado" style="color: #212529;background-color: #green;" href="" class="btn btn-warning btn-block mg-b-10 btn-auditar" data-toggle="modal" data-target="#modaldemo1" data-pre-auditado="{{ $produto->preAuditado() }}" data-ncm-importado="{{$produto->ncm_importado}}" data-lote-id="{{ $produto->lote_id }}" data-lote-produto-id="{{ $produto->id }}">AUDITADO</a>
+                      <a title="Produto ja auditado" style="color: #212529;background-color: green;" href="" class="btn btn-warning btn-block mg-b-10 btn-auditar" data-toggle="modal" data-target="#modaldemo1" data-pre-auditado="{{ $produto->preAuditado() }}" data-ncm-importado="{{$produto->ncm_importado}}" data-lote-id="{{ $produto->lote_id }}" data-lote-produto-id="{{ $produto->id }}">AUDITADO</a>
                   @else
-                    <a title="Produto necessita de auditoria" style="color: #212529;background-color: #a0abaa;border-color: #a0abaa;" href="" class="btn btn-warning btn-block mg-b-10 btn-auditar" data-toggle="modal" data-target="#modaldemo1" data-pre-auditado="{{ $produto->preAuditado() }}" data-ncm-importado="{{$produto->ncm_importado}}" data-lote-id="{{ $produto->lote_id }}" data-lote-produto-id="{{ $produto->id }}">AUDITAR</a>
+                    <a title="Produto necessita de auditoria" style="color: #212529;background-color: red;" href="" class="btn btn-warning btn-block mg-b-10 btn-auditar" data-toggle="modal" data-target="#modaldemo1" data-pre-auditado="" data-ncm-importado="{{$produto->ncm_importado}}" data-lote-id="{{ $produto->lote_id }}" data-lote-produto-id="{{ $produto->id }}">AUDITAR</a>
                   @endif
               </td>
             </tr>
@@ -259,7 +259,7 @@
 
             var preAuditado = $(this).attr('data-pre-auditado');
 
-             if(preAuditado){
+             if(preAuditado != '' && preAuditado != 0){
                 Swal.fire({
                     icon: 'error',
                     title: 'Cuidado!',
