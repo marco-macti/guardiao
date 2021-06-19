@@ -17,4 +17,15 @@ class LoteProduto extends Model
         'ia_ncm',
         'acuracia'
     ];
+
+    public function auditado(){
+
+        $auditado =  LoteProdutoAuditoria::where('lote_id',$this->lote_id)
+                                    ->where('lote_produto_id',$this->id)
+                                    ->first();
+
+        return is_object($auditado) ? true : false;
+
+
+    }
 }

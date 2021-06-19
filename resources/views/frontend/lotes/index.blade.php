@@ -290,7 +290,7 @@
                 icon: 'info',
                 title: 'Aguarde',
                 text: 'Aguarde enquanto a Inteligencia Artificial audita os seus produtos. Este processo pode levar ate 2 horas',
-                footer: 'Guardiao Tributario'
+                footer: "<img width='200px' src='https://guardiaotributario.com.br/wp-content/uploads/2019/06/guardia%CC%83o_tributario_logotipo.png'>"
             })
         })
 

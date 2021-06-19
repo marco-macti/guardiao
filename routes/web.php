@@ -57,6 +57,7 @@ Route::any('/ia/retorna-dados'                         ,'IaController@retornaDad
 Route::any('/ia/retorna-dados-planilha/{ncm}'          ,'IaController@retornaDadosPlanilhaIa')->name('ia.retorna-dados-planilha');
 
 Route::get('/ia/consulta-ncm' ,'IA\IaController@comparaNcm')->name('ia.consulta.ncm');
+
 Route::get('/ia/consulta-ncm-unico' ,'IA\IaController@consultaNcm')->name('ia.consulta.ncm-unico');
 
 // v2.0
@@ -73,8 +74,11 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/home'             , 'HomeController@index')->name('home');
         Route::any('/atualizar-senha'  , 'HomeController@atualizarSenha')->name('atualizar.senha');
 
+
         Route::group(['namespace' => 'Frontend'], function(){
+            Route::get('/lotes/assumir-ncm'  , 'LotesController@assumirNcm')->name('assumir.ncm');
             Route::resource('/lotes', 'LotesController');
+
         });
 
         Route::group(['prefix' => 'admin','namespace' => 'Admin'], function () {

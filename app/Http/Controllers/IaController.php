@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Cosmos;
 use App\Imports\EAuditor;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -66,8 +67,8 @@ class IaController extends Controller
                     <td align="center">Acurácia</td>
                     <td align="center">ACERTOU?</td>
                 </tr>';
-        
-        for ($i=1000; $i < 3000; $i++) { 
+
+        for ($i=1000; $i < 3000; $i++) {
             $ncmBc        = $produtosBc[$i]->cod_ncm;
             $produtoBc    = $produtosBc[$i]->nome;
             $predict      = $this->classifier->predict($produtoBc);
@@ -111,14 +112,14 @@ class IaController extends Controller
         echo'<h1>Acertou '.$contAcertos.' de '.$totalItens.' - média de acurácia '.number_format($calcAcuraciaGlobal,2).'</h1>';
         echo '<h1>Itens acima de 80% '.$contOitenta.'</h1>';
 
-                
+
     }
 
 
     public function treinar(Request $request){
         $import = new EAuditor();
         Excel::import($import, request()->file('file'));
-        
+
         echo'<html>
             <body>
             <table border="1">
@@ -181,25 +182,25 @@ class IaController extends Controller
             $json  = $json.',';
             $atual = json_encode($this->arrJsonAtual);
             $novo  = substr_replace($atual, $json, 1, 0);
-            file_put_contents('trainingbkp.json', $novo, JSON_UNESCAPED_UNICODE); 
+            file_put_contents('trainingbkp.json', $novo, JSON_UNESCAPED_UNICODE);
         }
         echo'</table>';
         //echo json_encode($json);
         echo'<h1>Acertou '.$contAcertos.' de '.$totalItens.' - média de acurácia '.number_format($calcAcuraciaGlobal,2).'</h1>
 
-        
-        
+
+
         </body></html>';
 
         //$smsJSON            = file_get_contents('training.json');
         //$arrJsonAtualNew    = json_decode($smsJSON);
         /*foreach ($json as $key => $value) {
-            array_unshift($this->arrJsonAtual, $value);    
+            array_unshift($this->arrJsonAtual, $value);
         }*/
-        
-        //file_put_contents('training.json', json_encode($this->arrJsonAtual, JSON_UNESCAPED_UNICODE));        
-        
-                
+
+        //file_put_contents('training.json', json_encode($this->arrJsonAtual, JSON_UNESCAPED_UNICODE));
+
+
 
         /*if($calcAcuraciaGlobal < 99){
             //$this->importEAuditor($request);
@@ -207,7 +208,7 @@ class IaController extends Controller
             echo'<h1>Acertou '.$contAcertos.' de '.$totalItens.' - média de acurácia '.number_format($calcAcuraciaGlobal,2).'</h1>';
         }*/
 
-        
+
     }
 
     public function importEAuditor(Request $request){
@@ -217,14 +218,14 @@ class IaController extends Controller
         $convenio_142  = new EAuditor();
         Excel::import($convenio_142, 'storage/icms_convenio_142_2018.xls');
 
-        
+
         $produtos_aliquota_42  = new EAuditor();
         Excel::import($produtos_aliquota_42, 'storage/produtos_com_aliquota_42.xlsx');
 
         $tipi  = new EAuditor();
         Excel::import($tipi, 'storage/tipi.xls');
-        
-        
+
+
         echo'<html>
             <body>
             <table border="1">
@@ -258,7 +259,7 @@ class IaController extends Controller
                         <td align="center">'.$produto.'</td>
                         <td align="center">'.$value[1].'</td>
                         <td align="center">'.$predict['label'].'</td>';
-                        
+
                 if($probailidade > 70 && $probailidade < 90){
                     echo '<td align="center" style="background-color:yellow">'.$probailidade.'%</td>';
                 }elseif($probailidade > 90){
@@ -294,13 +295,13 @@ class IaController extends Controller
                 if(!empty($desc_ncm_cliente_capitulo)){
                     echo '<td align="center">
                             <strong>Capítulo:</strong> '.$desc_ncm_cliente_capitulo['ex_capitulo'].'<br />
-                            
+
                             <strong>Posição:</strong> '.$desc_ncm_cliente_posicao['ex_posicao'].'<br />
-                           
+
                             <strong>Subposição:</strong> '.$desc_ncm_cliente_subposicao['ex_subposicao'].'<br />
-                            
+
                             <strong>Subitem:</strong> '.$desc_ncm_cliente_subitem['ex_sub_item'].'<br />
-                            
+
                           </td>';
                 }else{
                     echo '<td> - </td>';
@@ -315,13 +316,13 @@ class IaController extends Controller
                 if(!empty($desc_ncm_cliente_capitulo)){
                     echo '<td align="center">
                             <strong>Capítulo:</strong> '.$desc_ncm_cliente_capitulo['ex_capitulo'].'<br />
-                            
+
                             <strong>Posição:</strong> '.$desc_ncm_cliente_posicao['ex_posicao'].'<br />
-                            
+
                             <strong>Subposição:</strong> '.$desc_ncm_cliente_subposicao['ex_subposicao'].'<br />
-                           
+
                             <strong>Subitem:</strong> '.$desc_ncm_cliente_subitem['ex_sub_item'].'<br />
-                            
+
                           </td>';
                 }else{
                     echo '<td> - </td>';
@@ -375,7 +376,7 @@ class IaController extends Controller
                             '.$aliquota.' %
                         </td>';
                     }
-                    
+
                 }else{
                     if(!empty($ret_convenio_142['cest'])){
                         echo'<td align="center">
@@ -383,7 +384,7 @@ class IaController extends Controller
                         </td>';
                     }else{
                         echo'<td align="center">
-                            TRIBUTADO 
+                            TRIBUTADO
                         </td>';
                     }
                 }
@@ -417,13 +418,13 @@ class IaController extends Controller
             $json  = $json.',';
             $atual = json_encode($this->arrJsonAtual);
             $novo  = substr_replace($atual, $json, 1, 0);
-            file_put_contents('trainingbkp.json', $novo, JSON_UNESCAPED_UNICODE); 
+            file_put_contents('trainingbkp.json', $novo, JSON_UNESCAPED_UNICODE);
         }*/
         echo'</table>';
         //echo json_encode($json);
         echo'<h1>Acertou '.$contAcertos.' de '.$totalItens.' - média de acurácia '.number_format($calcAcuraciaGlobal,2).'</h1>
 
-        
+
         <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
         <script>
@@ -439,7 +440,7 @@ class IaController extends Controller
                         confirmButtonText: "Salvar",
                         denyButtonText: "Cancelar",
                       }).then((result) => {
-                        
+
                         if (result.isConfirmed) {
                             if(produto != "" && ncm_correto != ""){
                                 $.ajax({
@@ -451,11 +452,11 @@ class IaController extends Controller
                                     },
                                     dataType: "json",
                                     success: function (response) {
-                                        
+
                                     }
                                 });
                             }
-                        } 
+                        }
                       })
                 })
             })
@@ -465,12 +466,12 @@ class IaController extends Controller
         //$smsJSON            = file_get_contents('training.json');
         //$arrJsonAtualNew    = json_decode($smsJSON);
         /*foreach ($json as $key => $value) {
-            array_unshift($this->arrJsonAtual, $value);    
+            array_unshift($this->arrJsonAtual, $value);
         }*/
-        
-        //file_put_contents('training.json', json_encode($this->arrJsonAtual, JSON_UNESCAPED_UNICODE));        
-        
-                
+
+        //file_put_contents('training.json', json_encode($this->arrJsonAtual, JSON_UNESCAPED_UNICODE));
+
+
 
         /*if($calcAcuraciaGlobal < 99){
             //$this->importEAuditor($request);
@@ -478,7 +479,7 @@ class IaController extends Controller
             echo'<h1>Acertou '.$contAcertos.' de '.$totalItens.' - média de acurácia '.number_format($calcAcuraciaGlobal,2).'</h1>';
         }*/
 
-        
+
     }
 
     public function buscaDescNcmCliente($tipi, $ncm){
@@ -552,7 +553,7 @@ class IaController extends Controller
                 $sub_item   = str_replace(".","", $value[0]);
                 $ncm        = (strlen($ncm) <= 7) ? '0'.$ncm : $ncm;
 
-                
+
                 if($sub_item == $ncm && $rodou == false){
                     $ret['descricao_sub_item']          = $value[2];
                     $ret['ex_sub_item']                 = $value[1];
@@ -588,7 +589,7 @@ class IaController extends Controller
                 $sub_item   = $value[0];
                 $ncm        = (strlen($ncm) <= 7) ? '0'.$ncm : $ncm;
 
-                
+
                 if($subposicao == substr($ncm, 0, 6) && $rodou == false){
                     $ret['descricao_subposicao']          = $value[2];
                     $ret['ex_subposicao']                 = $value[1];
@@ -624,7 +625,7 @@ class IaController extends Controller
                 $sub_item   = $value[0];
                 $ncm        = (strlen($ncm) <= 7) ? '0'.$ncm : $ncm;
 
-                
+
                 if($posicao == substr($ncm, 0, 4) && $rodou == false){
                     $ret['descricao_posicao']          = $value[2];
                     $ret['ex_posicao']                 = $value[1];
@@ -725,8 +726,8 @@ class IaController extends Controller
                 $ncm_planiha = str_replace(".", "", $value[2]);
                 if($ncm_planiha == $ncm){
                     $ret['item']      = $value[0];
-                    $ret['cest']      = $value[1];   
-                    $ret['descricao'] = $value[3];   
+                    $ret['cest']      = $value[1];
+                    $ret['descricao'] = $value[3];
                 }
             }
         }
@@ -777,13 +778,13 @@ class IaController extends Controller
                 $ncm_planiha = str_replace(".", "", $value[2]);
 
                 if(strlen($ncm_planiha) < 8){
-                    $ncm = substr($ncm, 0, strlen($ncm_planiha) + 1); 
-                } 
-                
+                    $ncm = substr($ncm, 0, strlen($ncm_planiha) + 1);
+                }
+
                 if($ncm_planiha == $ncm){
                     $ret['descricao'] = $value[1];
                     $ret['aliquota'] = $value[3];
-                } 
+                }
             }
         }
 
@@ -799,7 +800,7 @@ class IaController extends Controller
         $json  = '{"cod_ncm":'.$ncm_correto.',"descricao":"'.$produto.'", "nome":"'.$produto.'"},{"cod_ncm":'.$ncm_correto.',"descricao":"'.$produto.'", "nome":"'.$produto.'"},{"cod_ncm":'.$ncm_correto.',"descricao":"'.$produto.'", "nome":"'.$produto.'"},';
         $atual = json_encode($this->arrJsonAtual);
         $novo  = substr_replace($atual, $json, 1, 0);
-        file_put_contents('trainingbkp.json', $novo); 
+        file_put_contents('trainingbkp.json', $novo);
 
     }
 
@@ -813,7 +814,7 @@ class IaController extends Controller
         $predict = $this->classifier->predict($request->produto);
 
         $probailidade = $this->getProbability($predict['probability']);
-        
+
         $ret['ncm_ia']           = $predict['label'];
         $ret['probabilidade_ia'] = $probailidade;
 
@@ -865,6 +866,8 @@ class IaController extends Controller
         $ret['ret_aliquota_42']             = $this->buscaAliquota42($produtos_aliquota_42, $ncm);
 
         $ret['ret_monofasico']              = $this->buscaMonofasico($ncm);
+
+        $ret['cosmos'] = Cosmos::getByNCM($ncm);
 
         return response()->json($ret);
     }

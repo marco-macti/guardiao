@@ -76,16 +76,19 @@
 
                 // informa se acertou ou nao
 
-                if($produto->ia_ncm == $produto->ncm_importado ){
+                if($produto->ia_ncm == $produto->ncm_importado || $produto->auditado()){
 
                     $classAcuracia = 'success';
                     $totalAcuracia = '100%';
 
                     $classAcertou =  'success';
                     $acertou      =  'Acertou';
+
                 }elseif ($produto->ia_ncm != $produto->ncm_importado) {
+
                     $classAcertou =  'danger';
                     $acertou      =  'Errou';
+
                     $permiteAuditar = true;
                 }
 
@@ -93,7 +96,13 @@
               <td><span class="badge badge-{{ $classAcuracia}}"> {{ $totalAcuracia  }} %</span></td>
               <td><span class="badge badge-{{ $classAcertou}}"> {{ $acertou  }} </span></td>
               <td>
-                <a title="Produto necessita de auditoria" style="color: #212529;background-color: #a0abaa;border-color: #a0abaa;" href="" class="btn btn-warning btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1">AUDITAR</a>
+
+                  @if($produto->auditado() == true)
+                      <a title="Produto ja auditado" style="color: #212529;background-color: #green;" href="" class="btn btn-warning btn-block mg-b-10 btn-auditar" data-toggle="modal" data-target="#modaldemo1" data-ncm-importado="{{$produto->ncm_importado}}" data-lote-id="{{ $produto->lote_id }}" data-lote-produto-id="{{ $produto->id }}">AUDITADO</a>
+                  @else
+                    <a title="Produto necessita de auditoria" style="color: #212529;background-color: #a0abaa;border-color: #a0abaa;" href="" class="btn btn-warning btn-block mg-b-10 btn-auditar" data-toggle="modal" data-target="#modaldemo1" data-ncm-importado="{{$produto->ncm_importado}}" data-lote-id="{{ $produto->lote_id }}" data-lote-produto-id="{{ $produto->id }}">AUDITAR</a>
+                  @endif
+
               </td>
             </tr>
             @empty
@@ -127,11 +136,12 @@
         <form action="#" id="treinar">
           <label> NCM : </label>
           <input name="ncm_auditoria" type="text" id="ncm_auditoria" class="form-control" />
+
         </form>
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Auditar</button>
+        <button id="buscar_ncm_para_auditoria" type="button" class="btn btn-primary">Buscar</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
       </div>
     </div>
@@ -192,64 +202,237 @@
   </div><!-- modal-dialog -->
 </div>
 
+<div id="modalDadosAuditar" class="modal fade" >
+    <div class="modal-dialog modal-dialog-vertical-center" role="document" style="min-width: 70%">
+      <div class="modal-content bd-0 tx-14">
+        <div class="modal-header">
+          <h6 class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">Consulta de NCM pesquisado</h6>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body pd-25">
+
+          <table class="table">
+            <tbody>
+             <tr>
+                <button type="button" class="btn btn-secondary btn-assumir-ncm" data-ncm-auditado="" data-ncm-importado="" data-lote-id='' data-lote-produto-id="">Assumir este NCM</button>
+                <br/>
+                <br/>
+              </tr>
+              <tr>
+                <th class="text-nowrap" id="th-ncm-auditar" scope="row"></th>
+              </tr>
+              <tr>
+                <td><b>Capítulo TIPI : </b> <p id="td-captulo-auditar"></p></td>
+              </tr>
+              <tr>
+                <td><b>Posição TIPI : </b><p id="td-posicao-auditar"></p></td>
+              </tr>
+              <tr>
+                <td><b>Subposiçao TIPI : </b> <p id="td-suposicao-auditar"></p> </td>
+              </tr>
+              <tr>
+                <td><b>Subitem TIPI : </b> <p id="td-subitem-auditar"></p> </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Produtos Relacionados</h2>
+
+          <table class="table table-hover table-striped">
+            <tbody id="produtos-cosmos">
+            </tbody>
+          </table>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-assumir-ncm" data-ncm-auditado="" data-ncm-importado="" data-lote-id='' data-lote-produto-id="">Assumir este NCM</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div><!-- modal-dialog -->
+  </div>
+
 @push('post-scripts')
     <script>
 
-      $('.diferenca').on('click', function(){
+        $(".btn-auditar").on('click', function(){
 
-        Swal.fire({
-          title: 'Aguarde',
-          html: 'Consulta de NCM em progresso...',
-          timerProgressBar: true,
-          didOpen: () => {
-            Swal.showLoading()
-          }
-        });
+          $("#buscar_ncm_para_auditoria").attr('data-ncm-importado', $(this).attr('data-ncm-importado'))
+          $("#buscar_ncm_para_auditoria").attr('data-lote-id', $(this).attr('data-lote-id'))
+          $("#buscar_ncm_para_auditoria").attr('data-lote-produto-id', $(this).attr('data-lote-produto-id'))
+        })
 
-        var ncmimportado = $(this).data('ncmimportado');
-        var ncmia = $(this).data('ncmia');
-        var descricao = $(this).data('descricao');
+        $('.diferenca').on('click', function(){
 
-        $("#descricao-produto-ia").html(descricao);
+            Swal.fire({
+            title: 'Aguarde',
+            html: 'Consulta de NCM em progresso...',
+            timerProgressBar: true,
+            didOpen: () => {
+                Swal.showLoading()
+            }
+            });
 
-        var url = '{{route("ia.consulta.ncm")}}'+'/?ia='+ncmia+'&importado='+ncmimportado;
+            var ncmimportado = $(this).data('ncmimportado');
+            var ncmia        = $(this).data('ncmia');
+            var descricao    = $(this).data('descricao');
 
-        $.ajax({
-          url: url,
-          success: function(response){
-            $('#th-ncm-importado').empty();
-            $('#th-ncm-importado').append('NCM IMPORTADO : '+ncmimportado);
-            $('#th-ncm-ia').empty();
-            $('#th-ncm-ia').append('NCM IA : '+ncmia);
+            $("#descricao-produto-ia").html(descricao);
 
-            $('#td-captulo-importado').empty();
-            $('#td-captulo-importado').append(response.importado.desc_ncm_cliente_capitulo.ex_capitulo);
-            $('#td-captulo-ia').empty();
-            $('#td-captulo-ia').append(response.ncm.desc_ncm_cliente_capitulo.ex_capitulo);
+            var url = '{{route("ia.consulta.ncm")}}'+'/?ia='+ncmia+'&importado='+ncmimportado;
 
-            $('#td-posicao-importado').empty();
-            $('#td-posicao-importado').append(response.importado.desc_ncm_cliente_posicao.ex_posicao);
-            $('#td-posicao-ia').empty();
-            $('#td-posicao-ia').append(response.ncm.desc_ncm_cliente_posicao.ex_posicao);
+            $.ajax({
+                url: url,
+                success: function(response){
+                    $('#th-ncm-importado').empty();
+                    $('#th-ncm-importado').append('NCM IMPORTADO : '+ncmimportado);
+                    $('#th-ncm-ia').empty();
+                    $('#th-ncm-ia').append('NCM IA : '+ncmia);
 
-            $('#td-suposicao-importado').empty();
-            $('#td-suposicao-importado').append(response.importado.desc_ncm_cliente_subposicao.ex_subposicao);
-            $('#td-suposicao-ia').empty();
-            $('#td-suposicao-ia').append(response.ncm.desc_ncm_cliente_subposicao.ex_subposicao);
+                    $('#td-captulo-importado').empty();
+                    $('#td-captulo-importado').append(response.importado.desc_ncm_cliente_capitulo.ex_capitulo);
+                    $('#td-captulo-ia').empty();
+                    $('#td-captulo-ia').append(response.ncm.desc_ncm_cliente_capitulo.ex_capitulo);
 
-            $('#td-subitem-importado').empty();
-            $('#td-subitem-importado').append(response.importado.desc_ncm_cliente_subitem.ex_sub_item);
-            $('#td-subitem-ia').empty();
-            $('#td-subitem-ia').append(response.ncm.desc_ncm_cliente_subitem.ex_sub_item);
+                    $('#td-posicao-importado').empty();
+                    $('#td-posicao-importado').append(response.importado.desc_ncm_cliente_posicao.ex_posicao);
+                    $('#td-posicao-ia').empty();
+                    $('#td-posicao-ia').append(response.ncm.desc_ncm_cliente_posicao.ex_posicao);
 
-            Swal.close();
-            $('#modaldemo2').modal('show');
-          }
-        });
+                    $('#td-suposicao-importado').empty();
+                    $('#td-suposicao-importado').append(response.importado.desc_ncm_cliente_subposicao.ex_subposicao);
+                    $('#td-suposicao-ia').empty();
+                    $('#td-suposicao-ia').append(response.ncm.desc_ncm_cliente_subposicao.ex_subposicao);
 
-        return false;
-      });
+                    $('#td-subitem-importado').empty();
+                    $('#td-subitem-importado').append(response.importado.desc_ncm_cliente_subitem.ex_sub_item);
+                    $('#td-subitem-ia').empty();
+                    $('#td-subitem-ia').append(response.ncm.desc_ncm_cliente_subitem.ex_sub_item);
+
+                    Swal.close();
+                    $('#modaldemo2').modal('show');
+                }
+            });
+
+            return false;
+       });
+
+       $(".btn-assumir-ncm").on('click', function(){
+          let ncm_importado   = $(this).attr('data-ncm-importado');
+          let ncm_auditado    = $(this).attr('data-ncm-auditado');
+          let lote_id         = $(this).attr('data-lote-id');
+          let lote_produto_id = $(this).attr('data-lote-produto-id');
+
+          var url = '/lotes/assumir-ncm/?ncm_importado='+ncm_importado+'&ncm_auditado='+ncm_auditado+'&lote_id='+lote_id+'&lote_produto_id='+lote_produto_id;
+
+          $.ajax({
+              url: url,
+              success: function(response){
+
+                response = JSON.parse(response)
+
+                if(response.success){
+                  Swal.fire({
+                    title: 'Atualizado com sucesso',
+                    text: 'O NCM '+ncm_importado+' foi auditado para '+ncm_auditado,
+                    icon: 'success',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Ok'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      window.location.reload();
+                    }
+                  })
+                }else{
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Oops',
+                    text: 'Ocorreu uma falha, faça contato conosco ou tente mais tarde'
+                  })
+                }
+              }
+          });
+
+          return false;
+       })
+
+       $('#buscar_ncm_para_auditoria').on('click', function(){
+
+           let ncm_importado   = $(this).attr('data-ncm-importado');
+           let lote_id         = $(this).attr('data-lote-id');
+           let lote_produto_id = $(this).attr('data-lote-produto-id');
+
+            Swal.fire({
+            title: 'Aguarde',
+            html: 'Consulta de NCM em progresso...',
+            timerProgressBar: true,
+            didOpen: () => {
+                Swal.showLoading()
+            }
+            });
+
+            var ncm_auditado = $('#ncm_auditoria').val();
+
+            var url = '/ia/retorna-dados-planilha/'+ncm_auditado;
+
+            $.ajax({
+                url: url,
+                success: function(response){
+
+                    $('#th-ncm-auditar').empty();
+                    $('#th-ncm-auditar').append('NCM : '+ncm_auditado);
+
+                    $('#td-captulo-auditar').empty();
+                    $('#td-captulo-auditar').append(response.desc_ncm_cliente_capitulo.ex_capitulo);
+
+
+                    $('#td-posicao-auditar').empty();
+                    $('#td-posicao-auditar').append(response.desc_ncm_cliente_posicao.ex_posicao);
+
+
+                    $('#td-suposicao-auditar').empty();
+                    $('#td-suposicao-auditar').append(response.desc_ncm_cliente_subposicao.ex_subposicao);
+
+
+                    $('#td-subitem-auditar').empty();
+                    $('#td-subitem-auditar').append(response.desc_ncm_cliente_subitem.ex_sub_item);
+
+                    Swal.close();
+                    $('#modalDadosAuditar').modal('show');
+
+                    for (let index = 0; index < response.cosmos.length; index++) {
+                        if(index <= 10){
+                          $("#produtos-cosmos").append('<tr>'+
+                                                      '<td align="center">'+
+                                                              '<img src="'+response.cosmos[index].thumbnail+'" width="100" height="100" />'+
+                                                      '</td>'+
+                                                      '<td align="center">'+
+                                                      response.cosmos[index].description+
+                                                      '</td>'+
+                                                      '</tr>');
+                        }
+
+                    }
+
+                    $(".btn-assumir-ncm").attr('data-ncm-importado', ncm_importado)
+                    $(".btn-assumir-ncm").attr('data-ncm-auditado', ncm_auditado)
+                    $(".btn-assumir-ncm").attr('data-lote-id', lote_id)
+                    $(".btn-assumir-ncm").attr('data-lote-produto-id', lote_produto_id)
+
+
+                    //data-ncm-auditado="" data-ncm-importado="" data-lote-id='' data-lote-produto-id=""
+                }
+            });
+
+
+
+            return false;
+            });
     </script>
 @endpush
 
 @stop
+
