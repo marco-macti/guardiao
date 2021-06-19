@@ -156,9 +156,13 @@
                   <div class="col-lg-2 mg-t-20 mg-lg-t-0">
                     <div class="btn-group" role="group" aria-label="Basic example">
                         @if($lote->statusImport()['status'] == 'Importando')
-                            <a href="#" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye lote-em-importacao"></i></a>
+                            <a title="Visualizar produtos deste lote" href="#" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye lote-em-importacao"></i></a>
                         @else
-                            <a href="{{ URL("/lotes/$lote->id/edit") }}" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye"></i></a>
+                            <a title="Visualizar produtos deste lote" href="{{ URL("/lotes/$lote->id/edit") }}" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye"></i></a>
+                        @endif
+
+                        @if($lote->totalAuditados() > 0)
+                            <a href="#" title="Exportar lista de produtos ja auditados" style="color:white" class="btn btn-secondary active"><i class="fa fa-download"></i></a>
                         @endif
 
                       <a style="color:white" class="btn btn-secondary"><i class="fa fa-remove"></i></a>

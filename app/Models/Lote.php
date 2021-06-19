@@ -60,8 +60,10 @@ class Lote extends Model
             return $erros[0]->erros;
 
         }
+    }
 
+    public function totalAuditados(){
 
-
+        return LoteProdutoAuditoria::where('lote_id',$this->id)->count();
     }
 }
