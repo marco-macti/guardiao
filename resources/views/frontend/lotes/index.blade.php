@@ -48,7 +48,7 @@
     <!-- Filtros -->
 
 
-    <div id="accordion" class="accordion-one" role="tablist" aria-multiselectable="true">
+    <div style="display: none" id="accordion" class="accordion-one" role="tablist" aria-multiselectable="true">
         <div class="card">
           <div class="card-header" role="tab" id="headingOne">
             <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne" class="tx-gray-800 transition collapsed">

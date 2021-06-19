@@ -76,8 +76,11 @@
 
                 // informa se acertou ou nao
 
-
                 if($produto->ia_ncm == $produto->ncm_importado ){
+
+                    $classAcuracia = 'success';
+                    $totalAcuracia = '100%';
+
                     $classAcertou =  'success';
                     $acertou      =  'Acertou';
                 }elseif ($produto->ia_ncm != $produto->ncm_importado) {

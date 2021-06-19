@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 
 use App\Http\Controllers\IA\IaController;
 use App\Models\LoteProduto;
+use App\Models\LoteProdutoAuditoria;
 
 class CadastraProdutoJob implements ShouldQueue
 {
@@ -22,11 +23,6 @@ class CadastraProdutoJob implements ShouldQueue
     public $tries = 2;
     public $timeout = 0;
 
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
     public function __construct($lote_id,$data,$tipo)
     {
         $this->lote_id = $lote_id;
@@ -34,11 +30,6 @@ class CadastraProdutoJob implements ShouldQueue
         $this->tipo    = $tipo;
     }
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
     public function handle()
     {
         $ia_instance = new IaController();
@@ -49,7 +40,7 @@ class CadastraProdutoJob implements ShouldQueue
 
                 $reponse = $ia_instance->retornaDadosIa($item['DESCRICAO_DO_PRODUTO'], $item['NCM_NO_CLIENTE']);
 
-                $create = LoteProduto::create([
+                $loteProduto = LoteProduto::create([
                     'lote_id'                   => $this->lote_id,
                     'codigo_interno_do_cliente' => $item['CODIGO_NO_CLIENTE'],
                     'descricao_do_produto'      => $item['DESCRICAO_DO_PRODUTO'],
@@ -57,6 +48,20 @@ class CadastraProdutoJob implements ShouldQueue
                     'ia_ncm'                    => $reponse['ncm_ia'],
                     'acuracia'                  => $reponse['probabilidade_ia'],
                 ]);
+
+                if($item['NCM_NO_CLIENTE'] == $reponse['ncm_ia'] ){
+
+                    LoteProdutoAuditoria::create([
+                        'lote_id'         => $this->lote_id,
+                        'lote_produto_id' => $loteProduto->id,
+                        'ncm_importado'   => $reponse['ncm_ia'],
+                        'ncm_auditado'    => $reponse['ncm_ia'],
+                        'pre_auditado'    => 'S'
+                    ]);
+
+                }
+
+
             }
 
         }elseif($this->tipo == "NFXML"){
@@ -65,7 +70,7 @@ class CadastraProdutoJob implements ShouldQueue
 
                  $reponse = $ia_instance->retornaDadosIa($obj['prod']['xProd'], $obj['prod']['NCM']);
 
-                 LoteProduto::create([
+                $loteProduto =  LoteProduto::create([
                      'lote_id'                   => $this->lote_id,
                      'codigo_interno_do_cliente' => $obj['prod']['cProd'],
                      'descricao_do_produto'      => $obj['prod']['xProd'],
@@ -73,6 +78,18 @@ class CadastraProdutoJob implements ShouldQueue
                      'ia_ncm'                    => $reponse['ncm_ia'],
                      'acuracia'                  => $reponse['probabilidade_ia'],
                  ]);
+
+                if($obj['prod']['NCM'] == $reponse['ncm_ia'] ){
+
+                    LoteProdutoAuditoria::create([
+                        'lote_id'         => $this->lote_id,
+                        'lote_produto_id' => $loteProduto->id,
+                        'ncm_importado'   => $reponse['ncm_ia'],
+                        'ncm_auditado'    => $reponse['ncm_ia'],
+                        'pre_auditado'    => 'S'
+                    ]);
+
+                }
             }
 
         }elseif($this->tipo == "SPEED"){
@@ -81,7 +98,7 @@ class CadastraProdutoJob implements ShouldQueue
 
                  $reponse = $ia_instance->retornaDadosIa($produto[3], $produto[8]);
 
-                 LoteProduto::create([
+                 $loteProduto = LoteProduto::create([
                      'lote_id'                   => $this->lote_id,
                      'codigo_interno_do_cliente' => $produto[2],
                      'descricao_do_produto'      => $produto[3],
@@ -89,6 +106,18 @@ class CadastraProdutoJob implements ShouldQueue
                      'ia_ncm'                    => $reponse['probabilidade_ia'],
                      'acuracia'                  => $reponse['ncm_ia'],
                  ]);
+
+                 if($produto[8] == $reponse['ncm_ia'] ){
+
+                    LoteProdutoAuditoria::create([
+                        'lote_id'         => $this->lote_id,
+                        'lote_produto_id' => $loteProduto->id,
+                        'ncm_importado'   => $reponse['ncm_ia'],
+                        'ncm_auditado'    => $reponse['ncm_ia'],
+                        'pre_auditado'    => 'S'
+                    ]);
+
+                }
 
             }
 
