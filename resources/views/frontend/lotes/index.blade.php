@@ -322,9 +322,9 @@
 
                 console.log(response.url_redirect);
 
-                /*setTimeout(() => {
+                setTimeout(() => {
                   location.href = response.url_redirect;
-                }, 2000);*/
+                }, 2000);
 
               }else{
 
