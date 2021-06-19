@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use stdClass;
 
 class Cosmos extends Model
 {
@@ -76,7 +77,9 @@ class Cosmos extends Model
 
         if ($data === false || $data == NULL) {
 
-          dd(curl_error($curl));
+          //dd(curl_error($curl));
+
+          return [];
 
         } else {
 
