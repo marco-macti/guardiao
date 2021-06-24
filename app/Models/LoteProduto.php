@@ -18,6 +18,11 @@ class LoteProduto extends Model
         'acuracia'
     ];
 
+    public function auditoria()
+    {
+        return $this->hasOne(LoteProdutoAuditoria::class, 'lote_produto_id','id');
+    }
+
     public function auditado(){
 
         $auditado =  LoteProdutoAuditoria::where('lote_id',$this->lote_id)

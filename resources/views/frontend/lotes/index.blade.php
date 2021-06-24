@@ -162,7 +162,7 @@
                         @endif
 
                         @if($lote->totalAuditados() > 0)
-                            <a href="#" title="Exportar lista de produtos ja auditados" style="color:white" class="btn btn-secondary active"><i class="fa fa-download"></i></a>
+                            <a href="{{ route('exportar.lote',$lote->id) }}" title="Exportar lista de produtos ja auditados" style="color:white" class="btn btn-secondary active"><i class="fa fa-download"></i></a>
                         @endif
 
                       <a style="color:white" class="btn btn-secondary"><i class="fa fa-remove"></i></a>
@@ -319,8 +319,6 @@
               if(response.success){
 
                 $("#msg-upload").html(response.msg);
-
-                console.log(response.url_redirect);
 
                 setTimeout(() => {
                   location.href = response.url_redirect;

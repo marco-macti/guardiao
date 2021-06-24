@@ -16,6 +16,11 @@ class Lote extends Model
         return $this->hasOne(Cliente::class, 'id', 'cliente_id');
     }
 
+    public function produtos()
+    {
+        return $this->hasMany(LoteProduto::class, 'lote_id', 'id');
+    }
+
     public function statusImport(){
 
         $status = ['icon' => 'fa fa-download','status' => 'Importando', 'class' => 'warning'];

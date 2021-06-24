@@ -244,6 +244,11 @@ class LotesController extends Controller
 
     }
 
+    public function export(Lote $lote){
+
+
+        return view('frontend.lotes.export')->with('lote',$lote);
+    }
 
     public function assumirNcm(Request $request){
 
