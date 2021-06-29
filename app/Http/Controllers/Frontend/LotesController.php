@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Helpers\Cosmos;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Cliente;
@@ -248,6 +249,19 @@ class LotesController extends Controller
 
 
         return view('frontend.lotes.export')->with('lote',$lote);
+    }
+
+    public function buscaRelacionadosCosmosByDescricao(Request $request){
+
+        $ret = [
+            'success'=> false,
+            'data'   => ''
+        ];
+
+        $ret['data'] = Cosmos::getByDescricao($request->descricao);
+
+        return response()->json($ret);
+
     }
 
     public function assumirNcm(Request $request){

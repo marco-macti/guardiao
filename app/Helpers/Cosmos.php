@@ -15,12 +15,13 @@ class Cosmos extends Model
 
     public static function getByDescricao($descricao){
 
+
         $descricao = str_replace(' ','%20',$descricao);
 
         $url = "https://api.cosmos.bluesoft.com.br/products?query=$descricao";
         //$url = 'https://api.cosmos.bluesoft.com.br/products?query=Abridor%20de%20Garrafa';
 
-        $cosmosApiKey = env('COSMOS_API_KEY');
+        $cosmosApiKey = 'SJaFhcrcDrvFrwch5xPQvw';//env('COSMOS_API_KEY');
 
         $headers = array(
             "Content-Type: application/json",
@@ -37,12 +38,16 @@ class Cosmos extends Model
 
         if ($data === false || $data == NULL) {
 
-          dd(curl_error($curl));
+            return [];
+
+            //dd(curl_error($curl));
 
         } else {
+
           $object = json_decode($data);
 
-          dd($object->products);
+          return $object->products;
+
         }
 
         curl_close($curl);
@@ -50,7 +55,6 @@ class Cosmos extends Model
         die;
 
     }
-
 
     public static function getByNCM($ncm){
 

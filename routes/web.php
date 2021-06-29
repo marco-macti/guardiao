@@ -52,6 +52,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::group(['namespace' => 'Frontend'], function(){
             Route::get('/lotes/assumir-ncm'  , 'LotesController@assumirNcm')->name('assumir.ncm');
             Route::get('/lotes/{lote}/export','LotesController@export')->name('exportar.lote');
+            Route::get('/lotes/busca-relacionados-by-descricao'  , 'LotesController@buscaRelacionadosCosmosByDescricao')->name('busca.relacionados.by.descricao');
+
             Route::resource('/lotes', 'LotesController');
 
         });
