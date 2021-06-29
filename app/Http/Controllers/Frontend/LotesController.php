@@ -42,7 +42,9 @@ class LotesController extends Controller
 
         $produtos = LoteProduto::where('lote_id',$lote->id)->paginate(30);
 
-        return view('frontend.lotes.produtos')->with('produtos',$produtos);
+        return view('frontend.lotes.produtos')
+                ->with('lote',$lote)
+                ->with('produtos',$produtos);
     }
 
     public function store(Request $request){

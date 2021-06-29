@@ -6,17 +6,20 @@
          <ol class="breadcrumb slim-breadcrumb">
             <li class="breadcrumb-item"><a href="#">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page">Lotes</li>
-            <li class="breadcrumb-item active" aria-current="page">Lote 1</li>
+            <li class="breadcrumb-item active" aria-current="page">Lote {{ $lote->numero_do_lote }}</li>
          </ol>
          <h6 class="slim-pagetitle">Lotes de produtos</h6>
       </div>
       <!-- slim-pageheader -->
       <div class="section-wrapper">
          <div class="row row-sm mg-t-20">
-            <div class="col-md-12">
+            <div class="col-md-6">
                <label class="section-title">Produtos deste lote</label>
                <p class="mg-b-20 mg-sm-b-40">Lista dos Produtos importados neste lote</p>
             </div>
+            <div class="col-md-6">
+                <a style="float: right" target="_blank" href="{{ URL('lotes/'.$lote->id.'/export') }}" class="btn btn-primary">Exportar</a>
+             </div>
          </div>
          <span style="color: black">
          * A responsabilidade civil , administrativa quanto ao NCM auditado e de total responsabilidade do Auditor nos termos da LEI LGPD 13709 de 14 de Agosto de 2018

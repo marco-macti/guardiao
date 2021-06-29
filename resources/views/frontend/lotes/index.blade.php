@@ -107,8 +107,6 @@
 
       </div>
 
-
-
     <!-- Fim Filtros -->
 
     <br/>
@@ -293,8 +291,8 @@
             Swal.fire({
                 icon: 'info',
                 title: 'Aguarde',
-                text: 'Aguarde enquanto a Inteligencia Artificial audita os seus produtos. Este processo pode levar ate 2 horas',
-                footer: "<img width='200px' src='https://guardiaotributario.com.br/wp-content/uploads/2019/06/guardia%CC%83o_tributario_logotipo.png'>"
+                text: 'Aguarde enquanto a Inteligencia Artificial audita os seus produtos. Apos a finalização, você sera notificado por e-mail.',
+                footer: ""
             })
         })
 
