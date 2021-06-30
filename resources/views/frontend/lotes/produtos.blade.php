@@ -33,6 +33,7 @@
                      <th>Descrição</th>
                      <th>Código</th>
                      <th>NCM Cliente</th>
+                     <th>Comparativo</th>
                      <th>NCM IA</th>
                      <th>Acurácia</th>
                      <th>Acertou?</th>
@@ -47,6 +48,7 @@
                      </td>
                      <td>{{ $produto->descricao_do_produto }}</td>
                      <td>{{ $produto->codigo_interno_do_cliente }}</td>
+                     <td><a data-descricao="{{ $produto->descricao_do_produto }}" data-ncmia="{{$produto->ia_ncm}}" data-ncmimportado="{{$produto->ncm_importado}}" style="color: #212529;background-color: #a0abaa;border-color: #a0abaa;" href="#" class="btn btn-secondary btn-block mg-b-10 diferenca">NCM COMPARADO IA</a></td>
                      <td>{{ $produto->ncm_importado  }} </td>
                      <td>{{ $produto->ia_ncm  }} </td>
                      @php
@@ -82,12 +84,29 @@
                      <td><span class="badge badge-{{ $classAcertou}}"> {{ $acertou  }} </span></td>
                      <td>
                         @if($produto->auditado() == true)
-                        <a title="Produto ja auditado" style="color: #212529;background-color: green;" href="" class="btn btn-warning btn-block mg-b-10 btn-auditar" data-toggle="modal" data-target="#modaldemo1" data-pre-auditado="{{ $produto->preAuditado() }}" data-ncm-importado="{{$produto->ncm_importado}}" data-lote-id="{{ $produto->lote_id }}" data-lote-produto-id="{{ $produto->id }}">AUDITADO</a>
+                            <a title="Produto ja auditado"
+                               style="color: #212529;background-color: green;"
+                               href="" class="btn btn-warning btn-block mg-b-10 btn-auditar"
+                               data-toggle="modal"
+                               data-target="#modal-auditar"
+                               data-pre-auditado="{{ $produto->preAuditado() }}"
+                               data-descricao="{{$produto->descricao_do_produto}}"
+                               data-ncm-importado="{{$produto->ncm_importado}}"
+                               data-lote-id="{{ $produto->lote_id }}"
+                               data-lote-produto-id="{{ $produto->id }}">AUDITADO</a>
                         @else
-                        <a title="Produto necessita de auditoria" style="color: #212529;background-color: red;" href="" class="btn btn-warning btn-block mg-b-10 btn-auditar" data-toggle="modal" data-target="#modaldemo1" data-pre-auditado="" data-ncm-importado="{{$produto->ncm_importado}}" data-lote-id="{{ $produto->lote_id }}" data-lote-produto-id="{{ $produto->id }}">AUDITAR</a>
+                            <a title="Produto necessita de auditoria"
+                               style="color: #212529;background-color: red;"
+                               href=""
+                               class="btn btn-warning btn-block mg-b-10 btn-auditar"
+                               data-toggle="modal"
+                               data-target="#modal-auditar"
+                               data-pre-auditado=""
+                               data-descricao="{{$produto->descricao_do_produto}}"
+                               data-ncm-importado="{{$produto->ncm_importado}}"
+                               data-lote-id="{{ $produto->lote_id }}"
+                               data-lote-produto-id="{{ $produto->id }}">AUDITAR</a>
                         @endif
-                        <a data-descricao="{{ $produto->descricao_do_produto }}" data-ncmia="{{$produto->ia_ncm}}" data-ncmimportado="{{$produto->ncm_importado}}" style="color: #212529;background-color: #a0abaa;border-color: #a0abaa;" href="#" class="btn btn-secondary btn-block mg-b-10 diferenca">NCM COMPARADO IA</a>
-                        <a title="Pesquisar produtos baseado na descricao do produto atual" style="color: #212529;background-color: gray;" href="" class="btn btn-warning btn-block mg-b-10 btn-buscar-relacionados" data-toggle="modal" data-target="#modal-relacionados" data-descricao="{{ $produto->descricao_do_produto }}" data-pre-auditado="" data-ncm-importado="{{$produto->ncm_importado}}" data-lote-id="{{ $produto->lote_id }}" data-lote-produto-id="{{ $produto->id }}">PRODUTOS RELACIONADOS</a>
                      </td>
                   </tr>
                   @empty
@@ -103,7 +122,7 @@
    <!-- container -->
 </div>
 <!-- slim-mainpanel -->
-<div id="modaldemo1" class="modal fade">
+<div id="modal-auditar" class="modal fade">
    <div class="modal-dialog modal-dialog-vertical-center" role="document">
       <div class="modal-content bd-0 tx-14">
          <div class="modal-header">
@@ -119,6 +138,19 @@
                <label> NCM : </label>
                <input name="ncm_auditoria" type="text" id="ncm_auditoria" class="form-control" />
             </form>
+            <br/>
+            <p class="mg-b-5"> Ou busque por produtos baseados na descricao deste produto </p>
+            <br/>
+            <a style="color: #212529;background-color: gray;"
+               href=""
+               class="btn btn-warning btn-block mg-b-10 btn-buscar-relacionados"
+               data-toggle="modal"
+               data-target="#modal-relacionados"
+               data-descricao=""
+               data-pre-auditado=""
+               data-ncm-importado=""
+               data-lote-id=""
+               data-lote-produto-id="">BUSCA POR DESCRICAO</a>
          </div>
          <div class="modal-footer">
             <button id="buscar_ncm_para_auditoria" type="button" class="btn btn-primary">Buscar</button>
@@ -128,7 +160,8 @@
    </div>
    <!-- modal-dialog -->
 </div>
-<div id="modaldemo2" class="modal fade" >
+
+<div id="modal-diferenca" class="modal fade" >
    <div class="modal-dialog modal-dialog-vertical-center" role="document" style="min-width: 70%">
       <div class="modal-content bd-0 tx-14">
          <div class="modal-header">
@@ -204,6 +237,7 @@
    </div>
    <!-- modal-dialog -->
 </div>
+
 <div id="modalDadosAuditar" class="modal fade" >
    <div class="modal-dialog modal-dialog-vertical-center" role="document" style="min-width: 70%">
       <div class="modal-content bd-0 tx-14">
@@ -264,6 +298,7 @@
    </div>
    <!-- modal-dialog -->
 </div>
+
 <div id="modal-relacionados" class="modal fade" >
    <div class="modal-dialog modal-dialog-vertical-center" role="document" style="min-width: 70%">
       <div class="modal-content bd-0 tx-14">
@@ -290,6 +325,7 @@
    </div>
    <!-- modal-dialog -->
 </div>
+
 @push('post-scripts')
 
 <script>
@@ -351,6 +387,12 @@
        $("#buscar_ncm_para_auditoria").attr('data-ncm-importado', $(this).attr('data-ncm-importado'))
        $("#buscar_ncm_para_auditoria").attr('data-lote-id', $(this).attr('data-lote-id'))
        $("#buscar_ncm_para_auditoria").attr('data-lote-produto-id', $(this).attr('data-lote-produto-id'))
+
+
+       $(".btn-buscar-relacionados").attr('data-descricao', $(this).attr('data-descricao'))
+       $(".btn-buscar-relacionados").attr('data-ncm-importado', $(this).attr('data-ncm-importado'))
+       $(".btn-buscar-relacionados").attr('data-lote-id', $(this).attr('data-lote-id'))
+       $(".btn-buscar-relacionados").attr('data-lote-produto-id', $(this).attr('data-lote-produto-id'))
    })
 
    $('.diferenca').on('click', function(){
@@ -401,7 +443,7 @@
                $('#td-subitem-ia').append(response.ncm.desc_ncm_cliente_subitem.ex_sub_item);
 
                Swal.close();
-               $('#modaldemo2').modal('show');
+               $('#modal-diferenca').modal('show');
            }
        });
 

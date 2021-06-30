@@ -68,16 +68,22 @@ class CadastraProdutoJob implements ShouldQueue
 
             foreach ($this->data as $key => $obj) {
 
-                 $reponse = $ia_instance->retornaDadosIa($obj['prod']['xProd'], $obj['prod']['NCM']);
+                $reponse = $ia_instance->retornaDadosIa($obj['prod']['xProd'], $obj['prod']['NCM']);
 
                 $loteProduto =  LoteProduto::create([
-                     'lote_id'                   => $this->lote_id,
-                     'codigo_interno_do_cliente' => $obj['prod']['cProd'],
-                     'descricao_do_produto'      => $obj['prod']['xProd'],
-                     'ncm_importado'             => $obj['prod']['NCM'],
-                     'ia_ncm'                    => $reponse['ncm_ia'],
-                     'acuracia'                  => $reponse['probabilidade_ia'],
-                 ]);
+                    'lote_id'                   => $this->lote_id,
+                    'codigo_interno_do_cliente' => $obj['prod']['cProd'],
+                    'descricao_do_produto'      => $obj['prod']['xProd'],
+                    'ean_gtin'                  => $obj['prod']['cEAN'],
+                    'cest'                      => $obj['prod']['CEST'],
+                    'cfop'                      => $obj['prod']['CFOP'],
+                    'quantidade'                => $obj['prod']['qTrib'],
+                    'valor'                     => $obj['prod']['vUnTrib'],
+                    'valor_desconto'            => $obj['prod']['vDesc'],
+                    'ncm_importado'             => $obj['prod']['NCM'],
+                    'ia_ncm'                    => $reponse['ncm_ia'],
+                    'acuracia'                  => round($reponse['probabilidade_ia'])
+                ]);
 
                 if($obj['prod']['NCM'] == $reponse['ncm_ia'] ){
 
@@ -102,9 +108,10 @@ class CadastraProdutoJob implements ShouldQueue
                      'lote_id'                   => $this->lote_id,
                      'codigo_interno_do_cliente' => $produto[2],
                      'descricao_do_produto'      => $produto[3],
+                     'ean_gtin'                  => $produto[4],
                      'ncm_importado'             => $produto[8],
-                     'ia_ncm'                    => $reponse['probabilidade_ia'],
-                     'acuracia'                  => $reponse['ncm_ia'],
+                     'ia_ncm'                    => $reponse['ncm_ia'],
+                     'acuracia'                  => round($reponse['probabilidade_ia']),
                  ]);
 
                  if($produto[8] == $reponse['ncm_ia'] ){

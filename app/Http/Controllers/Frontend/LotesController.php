@@ -104,11 +104,12 @@ class LotesController extends Controller
                         'numero_do_lote'           => $proximoLote,
                         'cliente_id'               => $clienteId,
                         'quantidade_de_produtos'   => count($arrProdutos),
-                        'tipo_documento'        => $request->tipo_arquivo,
-                        'competencia_ou_numeracao' => $competencia // TODO : Pegar por dentro do arquivo a competencia
+                        'tipo_documento'           => $request->tipo_arquivo,
+                        'competencia_ou_numeracao' => $competencia
                     ]);
 
                     $job = (new CadastraProdutoJob($lote->id,$arrProdutos,$request->tipo_arquivo))->onQueue('high');
+
                     dispatch($job);
 
                     $ret['success']      = true;
@@ -145,14 +146,17 @@ class LotesController extends Controller
                     try {
 
                         $lote = Lote::create([
-                            'numero_do_lote'           => $proximoLote,
-                            'cliente_id'               => $clienteId,
-                            'quantidade_de_produtos'   => count($produtos),
-                            'tipo_documento'           => $request->tipo_arquivo,
-                            'competencia_ou_numeracao' => $competencia // TODO : Pegar por dentro do arquivo a competencia
+                            'numero_do_lote'             => $proximoLote,
+                            'cliente_id'                 => $clienteId,
+                            'quantidade_de_produtos'     => count($produtos),
+                            'tipo_documento'             => $request->tipo_arquivo,
+                            'numero_do_documento_fiscal' => $xml['NFe']['infNFe']['ide']['nNF'],
+                            'valor_frete'                => $xml['NFe']['infNFe']['total']['ICMSTot']['vFrete'],
+                            'competencia_ou_numeracao'   => $competencia
                         ]);
 
                         $job = (new CadastraProdutoJob($lote->id,$produtos,$request->tipo_arquivo))->onQueue('high');
+
                         dispatch($job);
 
                         $ret['success']      = true;

@@ -7,7 +7,7 @@
     <meta name="author" content="">
     <link rel="icon" href="https://getbootstrap.com/docs/4.0/assets/img/favicons/favicon.ico">
 
-    <title>Sticky Footer Template for Bootstrap</title>
+    <title>Guardião Tributário - Seja Bem-vindo </title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/4.0/examples/sticky-footer/">
 
@@ -22,9 +22,9 @@
 
     <!-- Begin page content -->
     <main role="main" class="container">
-      <h1 class="mt-5">Bem vindo ao Guardiao Tributario</h1>
+      <h1 class="mt-5">Bem vindo ao Guardião Tributário</h1>
       <p class="lead">Ola {{ $user->name }}!</p>
-      <p>Seu cadastro na plataforma Guardiao Tributario foi concluido com sucesso. Abaixo seus dados de acesso :</p>
+      <p>Seu cadastro na plataforma Guardião Tributário foi concluido com sucesso. Abaixo seus dados de acesso :</p>
       <strong>E-mail : {{ $user->email }} </strong>
       <br/>
       <strong>Senha  : {{ $user->senha }} </strong>
