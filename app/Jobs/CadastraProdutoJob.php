@@ -9,8 +9,15 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
 use App\Http\Controllers\IA\IaController;
+use App\Mail\LoteImportado;
+use App\Models\Cliente;
+use App\Models\Lote;
 use App\Models\LoteProduto;
 use App\Models\LoteProdutoAuditoria;
+use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Facades\Mail;
 
 class CadastraProdutoJob implements ShouldQueue
 {
@@ -28,6 +35,25 @@ class CadastraProdutoJob implements ShouldQueue
         $this->lote_id = $lote_id;
         $this->data    = $data;
         $this->tipo    = $tipo;
+    }
+
+
+    public function boot()
+    {
+        /*Queue::before(function (JobProcessing $event) {
+            // $event->connectionName
+            // $event->job
+            // $event->job->payload()
+        });*/
+
+        Queue::after(function (JobProcessed $event) {
+
+            $lote    = Lote::find($this->lote_id);
+            $cliente = Cliente::find($lote->cliente_id);
+
+            Mail::to($cliente->email_cliente)->send(new LoteImportado($lote));
+
+        });
     }
 
     public function handle()
@@ -129,5 +155,11 @@ class CadastraProdutoJob implements ShouldQueue
             }
 
         }
+
+        /*$lote    = Lote::find($this->lote_id);
+        $cliente = Cliente::find($lote->cliente_id);
+
+        Mail::to($cliente->email_cliente)->send(new LoteImportado($lote));
+        */
     }
 }

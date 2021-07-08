@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\Cosmos;
 use App\Http\Controllers\IA\IaController;
 use App\Mail\NovoCadastro;
+use App\Models\Lote;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
