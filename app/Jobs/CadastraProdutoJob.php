@@ -156,8 +156,6 @@ class CadastraProdutoJob implements ShouldQueue
 
         }
 
-        die;
-
         /*$lote    = Lote::find($this->lote_id);
         $cliente = Cliente::find($lote->cliente_id);
 
