@@ -82,8 +82,8 @@ class LotesController extends Controller
 
                     if(isset($lineExp[1]) && $lineExp[1] == '0000')
                     {
-                        $data_inicio = FormatValue::stringToDateBr($lineExp[4]);
-                        $data_fim = FormatValue::stringToDateBr($lineExp[5]);
+                        $data_inicio  = FormatValue::stringToDateBr($lineExp[4]);
+                        $data_fim     = FormatValue::stringToDateBr($lineExp[5]);
                         $competencia .= $data_inicio.' - '.$data_fim;
                     }
 

@@ -125,9 +125,6 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="row justify-content-center">
-                    {{$usuarios->appends(['modulo' => 'user', 'current_page' => $lotes->currentPage()])->links()}}
-                </div>
             </div>
             <div class="section-wrapper mt-4">
                 <div class="row row-sm mg-t-20">

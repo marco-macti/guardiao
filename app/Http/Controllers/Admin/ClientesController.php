@@ -175,7 +175,7 @@ class ClientesController extends Controller
             }
         }else{
             $data['lotes'] = Lote::where('cliente_id', $id)->paginate(10);
-            $data['usuarios'] = User::where('cliente_id', $id)->paginate(1);
+            $data['usuarios'] = User::where('cliente_id', $id)->get();
         }
 
         return view('admin.clientes.show',$data);
