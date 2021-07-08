@@ -13,6 +13,7 @@ use App\Helpers\FormatValue;
 use App\Jobs\CadastraProdutoJob;
 use App\Http\Controllers\IA\IaController;
 use App\Models\LoteProdutoAuditoria;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 
 class LotesController extends Controller
@@ -114,6 +115,10 @@ class LotesController extends Controller
 
                     dispatch($job);
 
+                    $command  = "queue:work --queue=$queue --memory=256 --timeout=0";
+
+                    Artisan::call($command);
+
                     $ret['success']      = true;
                     $ret['msg']          = count($arrProdutos).' enviados para fila de importação.';
                     $ret['url_redirect'] = URL("/lotes");
@@ -162,6 +167,10 @@ class LotesController extends Controller
                         $job = (new CadastraProdutoJob($lote->id,$produtos,$request->tipo_arquivo))->onQueue($queue);
 
                         dispatch($job);
+
+                        $command  = "queue:work --queue=$queue --memory=256 --timeout=0";
+
+                        Artisan::call($command);
 
                         $ret['success']      = true;
                         $ret['msg']          = count($produtos).' enviados para fila de importação.';
@@ -238,8 +247,12 @@ class LotesController extends Controller
                     $queue = "QUEUE_".$lote->id;
 
                     $job = (new CadastraProdutoJob($lote->id,$csv,$request->tipo_arquivo))->onQueue($queue);
-                    
+
                     dispatch($job);
+
+                    $command  = "queue:work --queue=$queue --memory=256 --timeout=0";
+
+                    Artisan::call($command);
 
                     $ret['success']      = true;
                     $ret['msg']          = count($csv).' enviados para fila de importação.';

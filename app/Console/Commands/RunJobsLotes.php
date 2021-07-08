@@ -19,7 +19,7 @@ class RunJobsLotes extends Command
 
     public function handle()
     {
-        $filas = DB::select('SELECT queue FROM jobs');
+        /*$filas = DB::select('SELECT queue FROM jobs');
 
         foreach ($filas as $fila) {
 
@@ -29,6 +29,6 @@ class RunJobsLotes extends Command
 
         }
 
-        die;
+        die;*/
     }
 }
