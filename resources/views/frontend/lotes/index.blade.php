@@ -154,7 +154,7 @@
                   <div class="col-lg-2 mg-t-20 mg-lg-t-0">
                     <div class="btn-group" role="group" aria-label="Basic example">
                         @if($lote->statusImport()['status'] == 'Importando')
-                            <a title="Visualizar produtos deste lote" href="#" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye lote-em-importacao"></i></a>
+                            <a title="Visualizar produtos deste lote" href="#" style="color:white" class="btn btn-secondary active"><i data-href="{{ URL("/lotes/$lote->id/edit") }}" class="fa fa-eye lote-em-importacao"></i></a>
                         @else
                             <a title="Visualizar produtos deste lote" href="{{ URL("/lotes/$lote->id/edit") }}" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye"></i></a>
                         @endif
@@ -288,12 +288,19 @@
     $(document).ready(function() {
 
         $(".lote-em-importacao").click(function(){
+
             Swal.fire({
                 icon: 'info',
                 title: 'Aguarde',
-                text: 'Aguarde enquanto a Inteligencia Artificial audita os seus produtos. Apos a finalização, você sera notificado por e-mail.',
+                text: 'Este lote ainda está em processo de importação e auditoria pela Inteligência Artificial. Alguns produtos podem nao constar na listagem.',
                 footer: ""
-            })
+            });
+
+            setTimeout(() => {
+                var href = $(this).data('href');
+                window.location = href;
+            }, 3000);
+
         })
 
         $(".tipo_arquivo").change(function(){
