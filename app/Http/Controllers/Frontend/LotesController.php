@@ -108,7 +108,9 @@ class LotesController extends Controller
                         'competencia_ou_numeracao' => $competencia
                     ]);
 
-                    $job = (new CadastraProdutoJob($lote->id,$arrProdutos,$request->tipo_arquivo))->onQueue('high');
+                    $queue = "QUEUE_".$lote->id;
+
+                    $job = (new CadastraProdutoJob($lote->id,$arrProdutos,$request->tipo_arquivo))->onQueue($queue);
 
                     dispatch($job);
 
@@ -155,7 +157,9 @@ class LotesController extends Controller
                             'competencia_ou_numeracao'   => $competencia
                         ]);
 
-                        $job = (new CadastraProdutoJob($lote->id,$produtos,$request->tipo_arquivo))->onQueue('high');
+                        $queue = "QUEUE_".$lote->id;
+
+                        $job = (new CadastraProdutoJob($lote->id,$produtos,$request->tipo_arquivo))->onQueue($queue);
 
                         dispatch($job);
 
@@ -231,7 +235,10 @@ class LotesController extends Controller
 
                     unset($csv[0]);
 
-                    $job = (new CadastraProdutoJob($lote->id,$csv,$request->tipo_arquivo))->onQueue('high');
+                    $queue = "QUEUE_".$lote->id;
+
+                    $job = (new CadastraProdutoJob($lote->id,$csv,$request->tipo_arquivo))->onQueue($queue);
+                    
                     dispatch($job);
 
                     $ret['success']      = true;
