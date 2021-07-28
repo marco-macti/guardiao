@@ -20,7 +20,9 @@ class LoteImportado extends Mailable
 
     public function build()
     {
-        return $this->view('frontend.mails.lote-importado')->with('lote',$this->lote);
+        return $this->from('projetos@greensignal.com.br')
+                    ->view('frontend.mails.lote-importado')
+                    ->with('lote',$this->lote);
 
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Frontend;
+ini_set('max_execution_time', 1);
 
 use App\Helpers\Cosmos;
 use Illuminate\Http\Request;
@@ -8,17 +9,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Cliente;
 use App\Models\Lote;
 use App\Models\LoteProduto;
+use Illuminate\Support\Facades\Artisan;
 
 use App\Helpers\FormatValue;
-use App\Jobs\CadastraProdutoJob;
 use App\Http\Controllers\IA\IaController;
 use App\Models\LoteProdutoAuditoria;
 use Illuminate\Support\Facades\DB;
 
+use App\Jobs\CadastraProdutoJob;
+use App\Jobs\AuditarLoteJob;
+
 class LotesController extends Controller
 {
     public function index(){
-
         $clienteId    = auth()->user()->cliente_id;
         $lotesCliente = Lote::select('id')->where('cliente_id',$clienteId)->get()->toArray();
 
@@ -38,13 +41,70 @@ class LotesController extends Controller
 
     }
 
-    public function edit(Lote $lote){
+    public function edit(Request $request, Lote $lote){
 
-        $produtos = LoteProduto::where('lote_id',$lote->id)->paginate(30);
+        $dados['lote'] = $lote;
 
-        return view('frontend.lotes.produtos')
-                ->with('lote',$lote)
-                ->with('produtos',$produtos);
+        $dados['tipo_busca'] = null;
+        $dados['valor'] = null;
+        $dados['itens_paginas'] = 30;
+
+        if($request->has('tipo_busca'))
+        {
+            $dados['tipo_busca'] = $request->get('tipo_busca');
+            $dados['valor'] = $request->get('valor');
+            $dados['itens_paginas'] = $request->get('itens_paginas');
+
+            // dd($dados['tipo_busca']);
+            switch ($dados['tipo_busca']) {
+                case 'codigo_cliente':
+                    $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('codigo_interno_do_cliente', $dados['valor'])->paginate($dados['itens_paginas']);
+                    break;
+                
+                case 'ncm_ia':
+                    $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('ia_ncm', $dados['valor'])->paginate($dados['itens_paginas']);
+                    break;
+                
+                case 'situacao':
+                    if($dados['valor']=='acerto')
+                    {
+                        $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->whereRaw('ia_ncm = ncm_importado')->paginate($dados['itens_paginas']);
+                    }else{
+                        $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->whereRaw('ia_ncm != ncm_importado')->paginate($dados['itens_paginas']);
+                    }
+                    
+                    break;
+                
+                case 'acuracia':
+                    switch ($dados['valor']) {
+                        case '1':
+                            $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('acuracia', '=<', '80')->paginate($dados['itens_paginas']);
+                            break;
+                        case '2':
+                            $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('acuracia', '>=', '80')->where('acuracia', '<=', '90')->paginate($dados['itens_paginas']);
+                            break;
+                        case '3':
+                            $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('acuracia', '>=', '90')->paginate($dados['itens_paginas']);
+                            break;
+                        
+                        default:
+                            $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->paginate($dados['itens_paginas']);
+                            break;
+                    }
+                    
+                    break;
+                    
+                default:
+                    $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->paginate($dados['itens_paginas']);
+                    break;
+            }
+        }else{
+            $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->paginate($dados['itens_paginas']);
+        }
+
+        return view('frontend.lotes.produtos', $dados);
+                // ->with('lote',$lote)
+                // ->with('produtos',$produtos);
     }
 
     public function store(Request $request){
@@ -110,9 +170,14 @@ class LotesController extends Controller
 
                     $queue = "QUEUE_".$lote->id;
 
-                    $job = (new CadastraProdutoJob($lote->id,$arrProdutos,$request->tipo_arquivo))->onQueue($queue);
+                    foreach(array_chunk($arrProdutos, 15000) as $produtos)
+                    {
 
-                    dispatch($job);
+                        $job = (new CadastraProdutoJob($lote->id,$produtos,$request->tipo_arquivo))->onQueue('speed');
+                        dispatch($job);
+                    }
+
+                    // $job = (new CadastraProdutoJob($lote->id,$arrProdutos,$request->tipo_arquivo))->onQueue("speed");
 
                     $ret['success']      = true;
                     $ret['msg']          = count($arrProdutos).' enviados para fila de importação.';
@@ -157,9 +222,12 @@ class LotesController extends Controller
 
                         $queue = "QUEUE_".$lote->id;
 
-                        $job = (new CadastraProdutoJob($lote->id,$produtos,$request->tipo_arquivo))->onQueue($queue);
+                        foreach(array_chunk($produtos, 15000) as $produto)
+                        {
 
-                        dispatch($job);
+                            $job = (new CadastraProdutoJob($lote->id,$produto,$request->tipo_arquivo))->onQueue('nfxml');
+                            dispatch($job);
+                        }
 
                         $ret['success']      = true;
                         $ret['msg']          = count($produtos).' enviados para fila de importação.';
@@ -235,7 +303,11 @@ class LotesController extends Controller
 
                     $queue = "QUEUE_".$lote->id;
 
-                    $job = (new CadastraProdutoJob($lote->id,$csv,$request->tipo_arquivo))->onQueue($queue);
+                    foreach(array_chunk($csv, 15000) as $produtos)
+                    {
+                        $job = (new CadastraProdutoJob($lote->id,$produtos,$request->tipo_arquivo))->onQueue('csv');
+                        dispatch($job);
+                    }
 
                     dispatch($job);
 
@@ -251,15 +323,52 @@ class LotesController extends Controller
 
                 }
         }
-
+        
         return response()->json($ret);
 
     }
 
-    public function export(Lote $lote){
+    public function export(Lote $lote)
+    {
+        $produtos = LoteProduto::select('codigo_interno_do_cliente as Código Interno',
+                                            'ean_gtin as EAN',
+                                            'ncm_importado as NCM Cliente',
+                                            'ia_ncm as NCM Auditado',
+                                            'descricao_do_produto as Descrição',
+                                            'cfop as CFOP',
+                                            'quantidade as Quantidade',
+                                            'valor as Valor',
+                                            'valor_desconto as Valor Desconto')
+                                    ->where('lote_id', $lote->id)
+                                    ->get()->toArray();
 
+        $headers = [
+            'Código Interno',
+            'EAN',
+            'NCM Cliente',
+            'NCM Auditado',
+            'Descrição',
+            'CFOP',
+            'Quantidade',
+            'Valor',
+            'Valor Desconto'
+        ];
 
-        return view('frontend.lotes.export')->with('lote',$lote);
+        $fp = fopen('php://output', 'w');
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="export.csv"');
+        fputcsv($fp, $headers);
+        foreach ($produtos as $key => $produto) {
+            fputcsv($fp, array_values($produto));
+        }
+
+        // function mysqli_field_name($result, $field_offset)
+        // {
+        //     $properties = mysqli_fetch_field_direct($result, $field_offset);
+        //     return is_object($properties) ? $properties->name : null;
+        // }
+
+        // return view('frontend.lotes.export')->with('lote',$lote);
     }
 
     public function buscaRelacionadosCosmosByDescricao(Request $request){
@@ -306,4 +415,17 @@ class LotesController extends Controller
         return json_encode(['success' => true]);
     }
 
+    public function auditarLote($lote_id)
+    {
+        $lote = Lote::find($lote_id);
+
+        if(!$lote)
+            return back()->withErrors("Lote não localizado!");
+
+        $job = (new AuditarLoteJob($lote->id))->onQueue('high');
+
+        dispatch($job);
+        
+        return back()->withSuccess("Produtos em fila de processamento!");
+    }
 }

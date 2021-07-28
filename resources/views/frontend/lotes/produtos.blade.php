@@ -19,16 +19,52 @@
             </div>
             <div class="col-md-6">
                 <a style="float: right" target="_blank" href="{{ URL('lotes/'.$lote->id.'/export') }}" class="btn btn-primary">Exportar</a>
+                <a href="#" data-href="{{route('lote.auditar', $lote->id)}}" class="btn btn-primary pull-right mr-3 btn-auditar-ia">Auditar IA</a>
              </div>
          </div>
-         <span style="color: black">
-         * A responsabilidade civil , administrativa quanto ao NCM auditado e de total responsabilidade do Auditor nos termos da LEI LGPD 13709 de 14 de Agosto de 2018
-         e LEI 13853 de 2019
-         </span>
+         
+         <form action="" method="GET">
+            <div class="row">
+                  <div class="col-md-3">
+                     <select name="tipo_busca" class="form-control">
+                        <option value="codigo_cliente">Código Interno do Cliente</option>
+                        <option value="ncm_cliente">Ncm do Cliente</option>
+                        <option value="ncm_ia">Ncm da IA</option>
+                        <option value="acuracia">Acuracia</option>
+                        <option value="situacao">Situação</option>
+                     </select>
+                  </div>
+                  <div class="col-md-3 area-busca">
+                     <input type="text" name="valor" class="form-control" placeholder="Informe o código">
+                  </div>
+                  <div class="col-md-3">
+                     <select name="itens_paginas" class="form-control">
+                        <option value="30">Quantidade de itens por página</option>
+                        <option value="30">30 itens por página</option>
+                        <option value="60">60 itens por página</option>
+                        <option value="90">90 itens por página</option>
+                     </select>
+                  </div>
+                  <div class="col-md-3">
+                     <button type="submit" class="btn btn-primary">Buscar</button>
+                  </div>
+            </div>
+      </form>
+         <hr>
+         <div class="row">
+            <div class="col-md-12">
+               <span style="color: black">
+               * A responsabilidade civil , administrativa quanto ao NCM auditado e de total responsabilidade do Auditor nos termos da LEI LGPD 13709 de 14 de Agosto de 2018
+               e LEI 13853 de 2019
+               </span>
+            </div>
+         </div>
+
          <div class="table-responsive">
             <table class="table mg-b-0">
                <thead>
                   <tr>
+                     {{-- <th>id </th> --}}
                      <th>Imagem </th>
                      <th>Descrição</th>
                      <th>Código</th>
@@ -43,6 +79,7 @@
                <tbody>
                   @forelse ($produtos as $produto)
                   <tr>
+                     {{-- <td>{{ $produto->id }}</td> --}}
                      <td>
                         <img style="width: 100px" src="{{ URL('img-default.jpeg') }}">
                      </td>
@@ -58,26 +95,27 @@
                      $classAcertou   = '';
                      $acertou        = '';
                      $permiteAuditar = false;
+                     
                      if($produto->acuracia >= 90.00 ){
-                     $classAcuracia = 'success';
-                     $totalAcuracia = '100%';
+                        $classAcuracia = 'success';
+                        $totalAcuracia = '100%';
                      }elseif ($produto->acuracia >= 80.00 && $produto->acuracia < 90.00) {
-                     $classAcuracia = 'warning';
-                     $totalAcuracia = $produto->acuracia;
+                        $classAcuracia = 'warning';
+                        $totalAcuracia = $produto->acuracia;
                      }elseif ($produto->acuracia < 80.00) {
-                     $classAcuracia = 'danger';
-                     $totalAcuracia = $produto->acuracia;
+                        $classAcuracia = 'danger';
+                        $totalAcuracia = $produto->acuracia;
                      }
                      // informa se acertou ou nao
                      if($produto->ia_ncm == $produto->ncm_importado || $produto->auditado()){
-                     $classAcuracia = 'success';
-                     $totalAcuracia = '100%';
-                     $classAcertou =  'success';
-                     $acertou      =  'Acertou';
+                        $classAcuracia = 'success';
+                        $totalAcuracia = '100%';
+                        $classAcertou =  'success';
+                        $acertou      =  'Acertou';
                      }elseif ($produto->ia_ncm != $produto->ncm_importado) {
-                     $classAcertou =  'danger';
-                     $acertou      =  'Errou';
-                     $permiteAuditar = true;
+                        $classAcertou =  'danger';
+                        $acertou      =  'Errou';
+                        $permiteAuditar = true;
                      }
                      @endphp
                      <td><span class="badge badge-{{ $classAcuracia}}"> {{ $totalAcuracia  }} %</span></td>
@@ -114,7 +152,7 @@
                   @endforelse
                </tbody>
             </table>
-            {{ $produtos->links()}}
+            {{ $produtos->appends(request()->input())->links()}}
          </div>
          <!-- table-responsive -->
       </div>
@@ -329,6 +367,45 @@
 @push('post-scripts')
 
 <script>
+
+   $(document).on('change', 'select[name=tipo_busca]', function(){
+      tipo = $(this).val();
+      html = '';
+      switch (tipo) {
+         case 'codigo_cliente':
+            html = '<input type="text" name="valor" class="form-control" placeholder="Informe o código">';
+            break;
+      
+         case 'ncm_cliente':
+            html = '<input type="text" name="valor" class="form-control" placeholder="Informe o NCM cliente">';
+            break;
+
+         case 'ncm_ia':
+            html = '<input type="text" name="valor" class="form-control" placeholder="Informe o NCM da IA">';
+            break;
+
+         case 'acuracia':
+            html =   '<select name="valor" class="form-control">'+
+                     '<option value="1"><= 80%</option>'+
+                     '<option value="2">>= 80% && <= 90%</option>'+
+                     '<option value="3">>= 90%</option>'+
+                     '</select>';
+            break;
+
+         case 'situacao':
+            html =   '<select name="valor" class="form-control">'+
+                     '<option value="acerto">Acertou</option>'+
+                     '<option value="erro">Errou</option>'+
+                     '</select>';
+            break;
+
+         default:
+            break;
+      }
+
+      $('.area-busca').empty();
+      $('.area-busca').append(html);
+   });
 
     function assumirNcm(target){
 
@@ -563,6 +640,21 @@
        });
 
        return false;
+    });
+
+    $('.btn-auditar-ia').on('click', function(){
+      var href = $(this).data('href');
+
+      Swal.fire({
+         title: 'Atenção',
+         html: 'Você deseja enviar os produtos deste lote, par que sejam auditados pela Inteligência Artificial do <strong>Guardião Tributário</strong>?<br>Esse processo será efetuado em fila e poderá demorar alguns minutos!',
+         showCancelButton: true,
+      }).then(function(result){
+         if(result.isConfirmed)
+         {
+            window.location.href = href;
+         }
+      });
     });
 
     $('.btn-buscar-relacionados').on('click', function(){

@@ -14,12 +14,44 @@
 
     <div class="section-wrapper">
       <div class="row row-sm mg-t-20">
-        <div class="col-md-12">
+        <div class="col-md-6">
           <label class="section-title">Produtos deste lote</label>
           <p class="mg-b-20 mg-sm-b-40">Lista dos Produtos importados neste lote</p>
         </div>
-        
+        <div class="col-md-6">
+          <a href="#" data-href="{{route('lote.auditar', $lote->id)}}" class="btn btn-primary pull-right mr-3 btn-auditar-ia">Auditar IA</a>
+         </div>
       </div>
+         
+      <form action="" method="GET">
+        <div class="row">
+              <div class="col-md-3">
+                  <select name="tipo_busca" class="form-control">
+                    <option value="codigo_cliente">Código Interno do Cliente</option>
+                    <option value="ncm_cliente">Ncm do Cliente</option>
+                    <option value="ncm_ia">Ncm da IA</option>
+                    <option value="acuracia">Acuracia</option>
+                    <option value="situacao">Situação</option>
+                  </select>
+              </div>
+              <div class="col-md-3 area-busca">
+                  <input type="text" name="valor" class="form-control" placeholder="Informe o código">
+              </div>
+              <div class="col-md-3">
+                  <select name="itens_paginas" class="form-control">
+                    <option value="30">Quantidade de itens por página</option>
+                    <option value="30">30 itens por página</option>
+                    <option value="60">60 itens por página</option>
+                    <option value="90">90 itens por página</option>
+                  </select>
+              </div>
+              <div class="col-md-3">
+                  <button type="submit" class="btn btn-primary">Buscar</button>
+              </div>
+        </div>
+      </form>
+
+      <hr>
 
       <div class="table-responsive">
         <table class="table mg-b-0">
@@ -69,7 +101,7 @@
       </div><!-- table-responsive -->
 
       <div class="row justify-content-center">
-        {{$produtos->links()}}
+        {{$produtos->appends(request()->input())->links()}}
       </div>
     </div>
   </div><!-- container -->
@@ -146,4 +178,63 @@
   </div><!-- modal-dialog -->
 </div>
 
-@stop
+@endsection
+
+@push('post-scripts')
+
+  <script>
+
+    $(document).on('change', 'select[name=tipo_busca]', function(){
+        tipo = $(this).val();
+        html = '';
+        switch (tipo) {
+          case 'codigo_cliente':
+              html = '<input type="text" name="valor" class="form-control" placeholder="Informe o código">';
+              break;
+        
+          case 'ncm_cliente':
+              html = '<input type="text" name="valor" class="form-control" placeholder="Informe o NCM cliente">';
+              break;
+
+          case 'ncm_ia':
+              html = '<input type="text" name="valor" class="form-control" placeholder="Informe o NCM da IA">';
+              break;
+
+          case 'acuracia':
+              html =   '<select name="valor" class="form-control">'+
+                      '<option value="1"><= 80%</option>'+
+                      '<option value="2">>= 80% && <= 90%</option>'+
+                      '<option value="3">>= 90%</option>'+
+                      '</select>';
+              break;
+
+          case 'situacao':
+              html =   '<select name="valor" class="form-control">'+
+                      '<option value="acerto">Acertou</option>'+
+                      '<option value="erro">Errou</option>'+
+                      '</select>';
+              break;
+
+          default:
+              break;
+        }
+
+        $('.area-busca').empty();
+        $('.area-busca').append(html);
+    });
+    $('.btn-auditar-ia').on('click', function(){
+      var href = $(this).data('href');
+
+      Swal.fire({
+         title: 'Atenção',
+         html: 'Você deseja enviar os produtos deste lote, par que sejam auditados pela Inteligência Artificial do <strong>Guardião Tributário</strong>?<br>Esse processo será efetuado em fila e poderá demorar alguns minutos!',
+         showCancelButton: true,
+      }).then(function(result){
+         if(result.isConfirmed)
+         {
+            window.location.href = href;
+         }
+      });
+    });
+  </script>
+@endpush

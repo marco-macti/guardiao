@@ -2,6 +2,8 @@
 
 // Rotas Antigas
 
+Route::get('/teste-email' , 'TesteEmailController@index');
+
 Route::get('/relatorio-lote/{lote}'                   ,'ClienteLoteController@relatorioLote');
 Route::get('/relatorio-lote-passo-4/{lote}'           ,'ClienteLoteController@relatorioLotePasso4');
 Route::get('/export-json'                             ,'ClienteLoteController@exportJsonNcm');
@@ -55,6 +57,9 @@ Route::group(['middleware' => 'auth'], function () {
             Route::get('/lotes/busca-relacionados-by-descricao'  , 'LotesController@buscaRelacionadosCosmosByDescricao')->name('busca.relacionados.by.descricao');
 
             Route::resource('/lotes', 'LotesController');
+
+            Route::get('/lotes/auditar/{lote_id}'  , 'LotesController@auditarLote')->name('lote.auditar');
+            
 
         });
 

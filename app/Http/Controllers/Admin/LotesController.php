@@ -22,15 +22,72 @@ class LotesController extends Controller
         return view('admin.lotes.index', $data);
     }
 
-    public function edit($lote){
-        $data['lote'] = Lote::find($lote);
+    public function edit(Request $request, $lote){
+        $lote = Lote::find($lote);
+        $dados['lote'] = $lote;
 
-        if(!$data['lote'])
-            return back()->withErrors("Lote não localizado!");
+        $dados['tipo_busca'] = null;
+        $dados['valor'] = null;
+        $dados['itens_paginas'] = 30;
 
-        $data['produtos'] = LoteProduto::where('lote_id', $data['lote']->id)->paginate(15);
+        if($request->has('tipo_busca'))
+        {
+            $dados['tipo_busca'] = $request->get('tipo_busca');
+            $dados['valor'] = $request->get('valor');
+            $dados['itens_paginas'] = $request->get('itens_paginas');
 
-        return view('admin.lotes.produtos',$data);
+            if($dados['valor'])
+            {
+                switch ($dados['tipo_busca']) {
+                    case 'codigo_cliente':
+                        $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('codigo_interno_do_cliente', $dados['valor'])->paginate($dados['itens_paginas']);
+                        break;
+                    
+                    case 'ncm_ia':
+                        $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('ia_ncm', $dados['valor'])->paginate($dados['itens_paginas']);
+                        break;
+                    
+                    case 'situacao':
+                        if($dados['valor']=='acerto')
+                        {
+                            $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->whereRaw('ia_ncm = ncm_importado')->paginate($dados['itens_paginas']);
+                        }else{
+                            $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->whereRaw('ia_ncm != ncm_importado')->paginate($dados['itens_paginas']);
+                        }
+                        
+                        break;
+                    
+                    case 'acuracia':
+                        switch ($dados['valor']) {
+                            case '1':
+                                $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('acuracia', '=<', '80')->paginate($dados['itens_paginas']);
+                                break;
+                            case '2':
+                                $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('acuracia', '>=', '80')->where('acuracia', '<=', '90')->paginate($dados['itens_paginas']);
+                                break;
+                            case '3':
+                                $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('acuracia', '>=', '90')->paginate($dados['itens_paginas']);
+                                break;
+                            
+                            default:
+                                $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->paginate($dados['itens_paginas']);
+                                break;
+                        }
+                        
+                        break;
+                        
+                    default:
+                        $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->paginate($dados['itens_paginas']);
+                        break;
+                }
+            }else{
+                $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->paginate($dados['itens_paginas']);
+            }
+        }else{
+            $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->paginate($dados['itens_paginas']);
+        }
+
+        return view('admin.lotes.produtos',$dados);
     }
 
     public function store(Request $request){
@@ -93,9 +150,15 @@ class LotesController extends Controller
                         'tipo_documento'        => $request->tipo_arquivo,
                         'competencia_ou_numeracao' => $competencia // TODO : Pegar por dentro do arquivo a competencia
                     ]);
+                    foreach(array_chunk($arrProdutos, 15000) as $produtos)
+                    {
 
-                    $job = (new CadastraProdutoJob($lote->id,$arrProdutos,$request->tipo_arquivo))->onQueue('high');
-                    dispatch($job);
+                        $job = (new CadastraProdutoJob($lote->id,$produtos,$request->tipo_arquivo))->onQueue('speed');
+                        dispatch($job);
+                    }
+
+                    // $job = (new CadastraProdutoJob($lote->id,$arrProdutos,$request->tipo_arquivo))->onQueue('speed');
+                    // dispatch($job);
 
                     $ret['success']      = true;
                     $ret['msg']          = count($arrProdutos).' enviados para fila de importação.';
@@ -138,8 +201,15 @@ class LotesController extends Controller
                             'competencia_ou_numeracao' => $competencia // TODO : Pegar por dentro do arquivo a competencia
                         ]);
 
-                        $job = (new CadastraProdutoJob($lote->id,$produtos,$request->tipo_arquivo))->onQueue('high');
-                        dispatch($job);
+                        foreach(array_chunk($produtos, 15000) as $produto)
+                        {
+    
+                            $job = (new CadastraProdutoJob($lote->id,$produto,$request->tipo_arquivo))->onQueue('nfxml');
+                            dispatch($job);
+                        }
+
+                        // $job = (new CadastraProdutoJob($lote->id,$produtos,$request->tipo_arquivo))->onQueue('nfxml');
+                        // dispatch($job);
 
                         $ret['success']      = true;
                         $ret['msg']          = count($produtos).' enviados para fila de importação.';
@@ -197,8 +267,26 @@ class LotesController extends Controller
                 $proximoLote = ($qtdsLotes == 0) ? 1 : $qtdsLotes++;
 
                 try {
-
+                    
                     $csv = array_map('str_getcsv', file($arquivo));
+                    $padrao_cabecalho_csv = [
+                        'CODIGO_NO_CLIENTE',
+                        'DESCRICAO_DO_PRODUTO',
+                        'NCM_NO_CLIENTE'
+                    ];
+
+                    foreach ($csv[0] as $key => $cabecalho) {
+                        if($padrao_cabecalho_csv[$key] != $cabecalho)
+                        {
+
+                            $ret['success']      = false;
+                            $ret['msg']          = 'Falha na validação do cabeçalho. Verifique o arquivo e tente novamente!';
+                            $ret['url_redirect'] = URL("/lotes/$lote->id/edit");
+
+                            return response()->json($ret);
+                        }
+                    }
+
                     array_walk($csv, function(&$a) use ($csv) {
                         $a = array_combine($csv[0], $a);
                     });
@@ -212,9 +300,12 @@ class LotesController extends Controller
                     ]);
 
                     unset($csv[0]);
+                    foreach(array_chunk($csv, 15000) as $produtos)
+                    {
 
-                    $job = (new CadastraProdutoJob($lote->id,$csv,$request->tipo_arquivo))->onQueue('high');
-                    dispatch($job);
+                        $job = (new CadastraProdutoJob($lote->id,$produtos,$request->tipo_arquivo))->onQueue('csv');
+                        dispatch($job);
+                    }
 
                     $ret['success']      = true;
                     $ret['msg']          = count($csv).' enviados para fila de importação.';
@@ -231,5 +322,10 @@ class LotesController extends Controller
 
         return response()->json($ret);
 
+    }
+
+    function validaCsv($csv)
+    {
+        dd($csv);
     }
 }
