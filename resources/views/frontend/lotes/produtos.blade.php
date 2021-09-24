@@ -16,6 +16,12 @@
             <div class="col-md-6">
                <label class="section-title">Produtos deste lote</label>
                <p class="mg-b-20 mg-sm-b-40">Lista dos Produtos importados neste lote</p>
+               <p class="mg-b-20 mg-sm-b-40">
+                  Total: {{$produtos_total}}<br>
+                  Auditados: {{$produtos_auditados}}<br>
+                  Erros: {{$erros_total}}<br>
+                  Acertos: {{$acertos_total}}
+               </p>
             </div>
             <div class="col-md-6">
                 <a style="float: right" target="_blank" href="{{ URL('lotes/'.$lote->id.'/export') }}" class="btn btn-primary">Exportar</a>
@@ -50,7 +56,18 @@
                   </div>
             </div>
       </form>
+
+         @isset($msg_filtro)
+            <hr>
+            <div class="alert alert-primary" role="alert">
+               {{$msg_filtro}}
+               <br>
+               <a href="{{route('lotes.edit', $lote->id)}}" class="text-primary ml-auto">Limpar Filtro</a>
+            </div>
+         @endisset
+
          <hr>
+
          <div class="row">
             <div class="col-md-12">
                <span style="color: black">
@@ -108,8 +125,8 @@
                      }
                      // informa se acertou ou nao
                      if($produto->ia_ncm == $produto->ncm_importado || $produto->auditado()){
-                        $classAcuracia = 'success';
-                        $totalAcuracia = '100%';
+                        // $classAcuracia = 'success';
+                        // $totalAcuracia = '100%';
                         $classAcertou =  'success';
                         $acertou      =  'Acertou';
                      }elseif ($produto->ia_ncm != $produto->ncm_importado) {
@@ -386,9 +403,9 @@
 
          case 'acuracia':
             html =   '<select name="valor" class="form-control">'+
-                     '<option value="1"><= 80%</option>'+
-                     '<option value="2">>= 80% && <= 90%</option>'+
-                     '<option value="3">>= 90%</option>'+
+                     '<option value="1">menor que 80%</option>'+
+                     '<option value="2">Entre 80% e 90%</option>'+
+                     '<option value="3">maior que 90%</option>'+
                      '</select>';
             break;
 
@@ -617,13 +634,13 @@
                     for (let index = 0; index < response.cosmos.length; index++) {
                         if(index <= 10){
                             $("#produtos-cosmos").append('<tr>'+
-                                                        '<td align="center">'+
-                                                                '<img src="'+response.cosmos[index].thumbnail+'" width="100" height="100" />'+
-                                                        '</td>'+
-                                                        '<td align="center">'+
-                                                        response.cosmos[index].description+
-                                                        '</td>'+
-                                                        '</tr>');
+                              '<td align="center">'+
+                                       '<img src="'+response.cosmos[index].thumbnail+'" width="100" height="100" />'+
+                              '</td>'+
+                              '<td align="center">'+
+                              response.cosmos[index].description+
+                              '</td>'+
+                              '</tr>');
                         }
                     }
                }

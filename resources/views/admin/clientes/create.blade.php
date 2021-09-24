@@ -23,7 +23,24 @@
 
 @push('post-scripts')
     <script>
+
     $(document).ready(function(){
+        var selecao = $("#em_degustacao option:selected").val();
+
+        if(selecao == 'S'){
+
+            $('.campos-degustacao').prop("disabled", false);
+
+        }else{
+
+            $('.campos-degustacao').prop("disabled", true);
+
+        }
+
+    });
+
+    $(document).ready(function(){
+        
 
         $('.cnpj').mask('00.000.000/0000-00', {reverse: true});
         $('.cep').mask('00000-000');
@@ -32,7 +49,7 @@
         $('.inscricao_estadual').mask('000000000');
 
         $("#em_degustacao").change(function(){
-
+            console.log("aqui");
             var selecao = $("#em_degustacao option:selected").val();
 
             if(selecao == 'S'){

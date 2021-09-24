@@ -11,6 +11,7 @@ use App\Models\LoteProduto;
 use App\Helpers\FormatValue;
 use App\Jobs\CadastraProdutoJob;
 use App\Http\Controllers\IA\IaController;
+use App\Models\LoteProdutoAuditoria;
 
 class LotesController extends Controller
 {
@@ -29,6 +30,10 @@ class LotesController extends Controller
         $dados['tipo_busca'] = null;
         $dados['valor'] = null;
         $dados['itens_paginas'] = 30;
+        $dados['produtos_auditados'] = LoteProdutoAuditoria::where('lote_id', $lote->id)->count();
+        $dados['produtos_total'] = LoteProduto::where('lote_id', $lote->id)->count();
+        $dados['acertos_total'] = LoteProduto::where('lote_id',$lote->id)->whereRaw('ncm_importado = ia_ncm')->count();
+        $dados['erros_total'] = LoteProduto::where('lote_id',$lote->id)->whereRaw('ncm_importado != ia_ncm')->count();
 
         if($request->has('tipo_busca'))
         {
@@ -41,18 +46,27 @@ class LotesController extends Controller
                 switch ($dados['tipo_busca']) {
                     case 'codigo_cliente':
                         $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('codigo_interno_do_cliente', $dados['valor'])->paginate($dados['itens_paginas']);
+                        $dados['msg_filtro'] = "Filtro por codigo do cliente nº ".$dados['valor']."!";
                         break;
                     
                     case 'ncm_ia':
                         $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('ia_ncm', $dados['valor'])->paginate($dados['itens_paginas']);
+                        $dados['msg_filtro'] = "Filtro por NCM da IA nº ".$dados['valor']."!";
+                        break;
+                
+                    case 'ncm_cliente':
+                        $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('ncm_importado', $dados['valor'])->paginate($dados['itens_paginas']);
+                        $dados['msg_filtro'] = "Filtro por NCM da IA nº ".$dados['valor']."!";
                         break;
                     
                     case 'situacao':
                         if($dados['valor']=='acerto')
                         {
                             $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->whereRaw('ia_ncm = ncm_importado')->paginate($dados['itens_paginas']);
+                            $dados['msg_filtro'] = "Filtro por situação ".strtoupper($dados['valor'])."!";
                         }else{
                             $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->whereRaw('ia_ncm != ncm_importado')->paginate($dados['itens_paginas']);
+                            $dados['msg_filtro'] = "Filtro por situação ".strtoupper($dados['valor'])."!";
                         }
                         
                         break;
@@ -60,17 +74,20 @@ class LotesController extends Controller
                     case 'acuracia':
                         switch ($dados['valor']) {
                             case '1':
-                                $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('acuracia', '=<', '80')->paginate($dados['itens_paginas']);
+                                $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('acuracia', '<=', '80')->orderBy('acuracia', 'desc')->paginate($dados['itens_paginas']);
+                                $dados['msg_filtro'] = "Filtro por acuracia menor que 80% !";
                                 break;
                             case '2':
-                                $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('acuracia', '>=', '80')->where('acuracia', '<=', '90')->paginate($dados['itens_paginas']);
+                                $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('acuracia', '>=', '80')->where('acuracia', '<=', '90')->orderBy('acuracia', 'desc')->paginate($dados['itens_paginas']);
+                                $dados['msg_filtro'] = "Filtro por acuracia entre 80% e 90% !";
                                 break;
                             case '3':
-                                $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('acuracia', '>=', '90')->paginate($dados['itens_paginas']);
+                                $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('acuracia', '>=', '90')->orderBy('acuracia', 'desc')->paginate($dados['itens_paginas']);
+                                $dados['msg_filtro'] = "Filtro por acuracia maior que 90% !";
                                 break;
                             
                             default:
-                                $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->paginate($dados['itens_paginas']);
+                                $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->orderBy('acuracia', 'desc')->paginate($dados['itens_paginas']);
                                 break;
                         }
                         

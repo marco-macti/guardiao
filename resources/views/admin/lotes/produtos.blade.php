@@ -17,6 +17,12 @@
         <div class="col-md-6">
           <label class="section-title">Produtos deste lote</label>
           <p class="mg-b-20 mg-sm-b-40">Lista dos Produtos importados neste lote</p>
+          <p class="mg-b-20 mg-sm-b-40">
+             Total: {{$produtos_total}}<br>
+             Auditados: {{$produtos_auditados}}<br>
+             Erros: {{$erros_total}}<br>
+             Acertos: {{$acertos_total}}
+          </p>
         </div>
         <div class="col-md-6">
           <a href="#" data-href="{{route('lote.auditar', $lote->id)}}" class="btn btn-primary pull-right mr-3 btn-auditar-ia">Auditar IA</a>
@@ -50,6 +56,15 @@
               </div>
         </div>
       </form>
+
+      @isset($msg_filtro)
+        <hr>
+        <div class="alert alert-primary" role="alert">
+          {{$msg_filtro}}
+          <br>
+          <a href="{{route('admin.lotes.edit', $lote->id)}}" class="text-primary ml-auto">Limpar Filtro</a>
+        </div>
+      @endisset
 
       <hr>
 
@@ -202,9 +217,9 @@
 
           case 'acuracia':
               html =   '<select name="valor" class="form-control">'+
-                      '<option value="1"><= 80%</option>'+
-                      '<option value="2">>= 80% && <= 90%</option>'+
-                      '<option value="3">>= 90%</option>'+
+                      '<option value="1">menor que 80%</option>'+
+                      '<option value="2">Entre 80% e 90%</option>'+
+                      '<option value="3">maior que 90%</option>'+
                       '</select>';
               break;
 
