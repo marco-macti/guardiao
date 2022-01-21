@@ -73,6 +73,14 @@ class CadastraProdutoJob implements ShouldQueue
 
                 // $reponse = $ia_instance->retornaDadosIa($item['DESCRICAO_DO_PRODUTO'], $item['NCM_NO_CLIENTE']);
 
+                $verifica_produto = LoteProduto::where('codigo_interno_do_cliente', $item['CODIGO_NO_CLIENTE'])
+                                                    ->where('descricao_do_produto', $item['DESCRICAO_DO_PRODUTO'])
+                                                    ->where('ncm_importado', $item['NCM_NO_CLIENTE'])
+                                                    ->first();
+
+                if($verifica_produto)
+                    continue;
+
                 $loteProduto = LoteProduto::create([
                     'lote_id'                   => $this->lote_id,
                     'codigo_interno_do_cliente' => $item['CODIGO_NO_CLIENTE'],
@@ -82,19 +90,15 @@ class CadastraProdutoJob implements ShouldQueue
                     'acuracia'                  => 0,
                 ]);
 
-                // if($item['NCM_NO_CLIENTE'] == $reponse['ncm_ia'] ){
 
-                //     LoteProdutoAuditoria::create([
-                //         'lote_id'         => $this->lote_id,
-                //         'lote_produto_id' => $loteProduto->id,
-                //         'ncm_importado'   => $reponse['ncm_ia'],
-                //         'ncm_auditado'    => $reponse['ncm_ia'],
-                //         'pre_auditado'    => 'S'
-                //     ]);
+            }
 
-                // }
+            $lote_instance = Lote::find($this->lote_id);
+            $lote_count_produtos = LoteProduto::where('lote_id', $this->lote_id)->count();
 
-
+            if($lote_instance->quantidade_de_produtos = $lote_count_produtos)
+            {
+                
             }
 
         }elseif($this->tipo == "NFXML"){
@@ -102,6 +106,14 @@ class CadastraProdutoJob implements ShouldQueue
             foreach ($this->data as $key => $obj) {
 
                 // $reponse = $ia_instance->retornaDadosIa($obj['prod']['xProd'], $obj['prod']['NCM']);
+
+                $verifica_produto = LoteProduto::where('codigo_interno_do_cliente', $obj['prod']['cProd'])
+                                                ->where('descricao_do_produto', $obj['prod']['xProd'])
+                                                ->where('ncm_importado', $obj['prod']['NCM'])
+                                                ->first();
+
+                if($verifica_produto)
+                    continue;
 
                 $loteProduto =  LoteProduto::create([
                     'lote_id'                   => $this->lote_id,
@@ -136,6 +148,14 @@ class CadastraProdutoJob implements ShouldQueue
             foreach ($this->data as $key => $produto) {
 
                 //  $reponse = $ia_instance->retornaDadosIa($produto[3], $produto[8]);
+
+                $verifica_produto = LoteProduto::where('codigo_interno_do_cliente', $produto[2])
+                                                ->where('descricao_do_produto', $produto[3])
+                                                ->where('ncm_importado', $produto[8])
+                                                ->first();
+
+                if($verifica_produto)
+                    continue;
 
                  $loteProduto = LoteProduto::create([
                      'lote_id'                   => $this->lote_id,

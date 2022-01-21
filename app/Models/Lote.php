@@ -26,8 +26,8 @@ class Lote extends Model
         $status = ['icon' => 'fa fa-download','status' => 'Importando', 'class' => 'warning'];
 
         $qtdProdutosImportados = LoteProduto::where('lote_id',$this->id)->count();
-
-        if($qtdProdutosImportados == $this->quantidade_de_produtos ){
+        
+        if($qtdProdutosImportados >= $this->quantidade_de_produtos ){
             $status['icon']   = 'fa fa-check';
             $status['status'] = 'Finalizada';
             $status['class']  = 'success';
