@@ -47,7 +47,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::group(['middleware' => 'checkFirstAccess'], function () {
 
-        Route::get('/'                 , 'HomeController@index');
+        Route::get('/'                 , 'HomeController@index')->name('home.index');
         Route::get('/home'             , 'HomeController@index')->name('home');
         Route::any('/atualizar-senha'  , 'HomeController@atualizarSenha')->name('atualizar.senha');
 

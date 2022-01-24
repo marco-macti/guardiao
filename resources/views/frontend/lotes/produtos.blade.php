@@ -4,7 +4,7 @@
    <div class="container">
       <div class="slim-pageheader">
          <ol class="breadcrumb slim-breadcrumb">
-            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{route('home.index')}}">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page">Lotes</li>
             <li class="breadcrumb-item active" aria-current="page">Lote {{ $lote->numero_do_lote }}</li>
          </ol>
