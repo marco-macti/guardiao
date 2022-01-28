@@ -76,6 +76,7 @@ class CadastraProdutoJob implements ShouldQueue
                 $verifica_produto = LoteProduto::where('codigo_interno_do_cliente', $item['CODIGO_NO_CLIENTE'])
                                                     ->where('descricao_do_produto', $item['DESCRICAO_DO_PRODUTO'])
                                                     ->where('ncm_importado', $item['NCM_NO_CLIENTE'])
+                                                    ->where('lote_id', $this->lote_id)
                                                     ->first();
 
                 if($verifica_produto)
@@ -110,6 +111,7 @@ class CadastraProdutoJob implements ShouldQueue
                 $verifica_produto = LoteProduto::where('codigo_interno_do_cliente', $obj['prod']['cProd'])
                                                 ->where('descricao_do_produto', $obj['prod']['xProd'])
                                                 ->where('ncm_importado', $obj['prod']['NCM'])
+                                                ->where('lote_id', $this->lote_id)
                                                 ->first();
 
                 if($verifica_produto)
@@ -152,6 +154,7 @@ class CadastraProdutoJob implements ShouldQueue
                 $verifica_produto = LoteProduto::where('codigo_interno_do_cliente', $produto[2])
                                                 ->where('descricao_do_produto', $produto[3])
                                                 ->where('ncm_importado', $produto[8])
+                                                ->where('lote_id', $this->lote_id)
                                                 ->first();
 
                 if($verifica_produto)
