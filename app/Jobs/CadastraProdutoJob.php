@@ -187,8 +187,20 @@ class CadastraProdutoJob implements ShouldQueue
         }
 
         $lote    = Lote::find($this->lote_id);
+
+        $lote->status_importacao = 1;
+        $lote->save();
+
         $cliente = Cliente::find($lote->cliente_id);
 
         Mail::to($cliente->email_cliente)->send(new LoteImportado($lote));
+    }
+
+    public function failed(Throwable $exception)
+    {
+        $lote    = Lote::find($this->lote_id);
+
+        $lote->status_importacao = 2;
+        $lote->save();
     }
 }

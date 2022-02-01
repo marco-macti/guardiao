@@ -20,6 +20,8 @@ class LotesController extends Controller
         $data['clientes']      = Cliente::all();
         $data['lotes']         = Lote::paginate(10);
 
+        $data['lotes_status']  = Lote::STATUSLOTES;
+        
         return view('admin.lotes.index', $data);
     }
 
@@ -161,11 +163,12 @@ class LotesController extends Controller
                 try {
 
                     $lote = Lote::create([
-                        'numero_do_lote'           => $proximoLote,
-                        'cliente_id'               => $clienteId,
-                        'quantidade_de_produtos'   => count($arrProdutos),
-                        'tipo_documento'        => $request->tipo_arquivo,
-                        'competencia_ou_numeracao' => $competencia // TODO : Pegar por dentro do arquivo a competencia
+                        'numero_do_lote'            => $proximoLote,
+                        'cliente_id'                => $clienteId,
+                        'quantidade_de_produtos'    => count($arrProdutos),
+                        'tipo_documento'            => $request->tipo_arquivo,
+                        'competencia_ou_numeracao'  => $competencia, // TODO : Pegar por dentro do arquivo a competencia
+                        'status_importacao'         => 0 
                     ]);
                     foreach(array_chunk($arrProdutos, 15000) as $produtos)
                     {
@@ -215,7 +218,8 @@ class LotesController extends Controller
                             'cliente_id'               => $clienteId,
                             'quantidade_de_produtos'   => count($produtos),
                             'tipo_documento'           => $request->tipo_arquivo,
-                            'competencia_ou_numeracao' => $competencia // TODO : Pegar por dentro do arquivo a competencia
+                            'competencia_ou_numeracao' => $competencia, // TODO : Pegar por dentro do arquivo a competencia
+                            'status_importacao'         => 0 
                         ]);
 
                         foreach(array_chunk($produtos, 15000) as $produto)
@@ -252,7 +256,8 @@ class LotesController extends Controller
                             'cliente_id'               => $clienteId,
                             'quantidade_de_produtos'   => 1,
                             'tipo_documento'           => $request->tipo_arquivo,
-                            'competencia_ou_numeracao' => date('m/Y') // TODO : Pegar por dentro do arquivo a competencia
+                            'competencia_ou_numeracao' => date('m/Y'), // TODO : Pegar por dentro do arquivo a competencia
+                            'status_importacao'         => 0 
                         ]);
 
                         LoteProduto::create([
@@ -265,6 +270,9 @@ class LotesController extends Controller
                         $ret['success']      = true;
                         $ret['msg']          = '1 produto importado com sucesso.';
                         $ret['url_redirect'] = URL("/lotes/$lote->id/edit");
+
+                        $lote->status_importacao = 1;
+                        $lote->save();
 
                     } catch (\Throwable $th) {
 
@@ -313,13 +321,16 @@ class LotesController extends Controller
                         'cliente_id'               => $clienteId,
                         'quantidade_de_produtos'   => count($csv),
                         'tipo_documento'           => 'ARQUIVO DO CLIENTE',
-                        'competencia_ou_numeracao' => date('m/Y') // TODO : Pegar por dentro do arquivo a competencia
+                        'competencia_ou_numeracao' => date('m/Y'), // TODO : Pegar por dentro do arquivo a competencia
+                        'status_importacao'         => 0 
                     ]);
 
-                    unset($csv[0]);
-                    foreach(array_chunk($csv, 15000) as $produtos)
+                    // unset($csv[0]);
+                    foreach(array_chunk($csv, 15000) as $key => $produtos)
                     {
-
+                        if($key == 0)
+                            continue;
+                            
                         $job = (new CadastraProdutoJob($lote->id,$produtos,$request->tipo_arquivo))->onQueue('csv');
                         dispatch($job);
                     }

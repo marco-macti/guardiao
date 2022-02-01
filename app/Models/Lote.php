@@ -11,6 +11,24 @@ class Lote extends Model
     protected $table    = 'lotes';
     protected $guarded = [];
 
+    const STATUSLOTES = [
+        [
+            "name" => "Importando",
+            "class" => "info",
+            "icon"  => "fa fa-spinner" 
+        ],
+        [
+            "name"  => "Importado",
+            "class" => "success",
+            "icon"  => "fa fa-check" 
+        ],
+        [
+            "name" => "Importado com erro",
+            "class" => "warning",
+            "icon"  => "fa fa-exclamation-triangle" 
+        ],
+    ];
+
     public function cliente()
     {
         return $this->hasOne(Cliente::class, 'id', 'cliente_id');
@@ -23,17 +41,18 @@ class Lote extends Model
 
     public function statusImport(){
 
-        $status = ['icon' => 'fa fa-download','status' => 'Importando', 'class' => 'warning'];
+        // $status = ['icon' => 'fa fa-download','status' => 'Importando', 'class' => 'warning'];
 
-        $qtdProdutosImportados = LoteProduto::where('lote_id',$this->id)->count();
+        // $qtdProdutosImportados = LoteProduto::where('lote_id',$this->id)->count();
         
-        if($qtdProdutosImportados >= $this->quantidade_de_produtos ){
-            $status['icon']   = 'fa fa-check';
-            $status['status'] = 'Finalizada';
-            $status['class']  = 'success';
-        }
+        // if($qtdProdutosImportados >= $this->quantidade_de_produtos ){
+        //     $status['icon']   = 'fa fa-check';
+        //     $status['status'] = 'Finalizada';
+        //     $status['class']  = 'success';
+        // }
 
-        return $status;
+        return $this::STATUSLOTES[$this->status_importacao];
+        // return $status;
     }
 
     public function totalAcertos(){
