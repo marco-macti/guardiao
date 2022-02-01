@@ -10,6 +10,9 @@ class Lote extends Model
 {
     protected $table    = 'lotes';
     protected $guarded = [];
+    protected $fillable = [
+        'status_importacao'
+    ];
 
     const STATUSLOTES = [
         [
