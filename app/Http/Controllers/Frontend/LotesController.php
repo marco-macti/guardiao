@@ -180,7 +180,8 @@ class LotesController extends Controller
                         'cliente_id'               => $clienteId,
                         'quantidade_de_produtos'   => count($arrProdutos),
                         'tipo_documento'           => $request->tipo_arquivo,
-                        'competencia_ou_numeracao' => $competencia
+                        'competencia_ou_numeracao' => $competencia,
+                        'status_importacao'         => 0 
                     ]);
 
                     $queue = "QUEUE_".$lote->id;
@@ -232,7 +233,8 @@ class LotesController extends Controller
                             'tipo_documento'             => $request->tipo_arquivo,
                             'numero_do_documento_fiscal' => $xml['NFe']['infNFe']['ide']['nNF'],
                             'valor_frete'                => $xml['NFe']['infNFe']['total']['ICMSTot']['vFrete'],
-                            'competencia_ou_numeracao'   => $competencia
+                            'competencia_ou_numeracao'   => $competencia,
+                            'status_importacao'          => 0 
                         ]);
 
                         $queue = "QUEUE_".$lote->id;
@@ -268,7 +270,8 @@ class LotesController extends Controller
                             'cliente_id'               => $clienteId,
                             'quantidade_de_produtos'   => 1,
                             'tipo_documento'           => $request->tipo_arquivo,
-                            'competencia_ou_numeracao' => date('m/Y') // TODO : Pegar por dentro do arquivo a competencia
+                            'competencia_ou_numeracao' => date('m/Y'), // TODO : Pegar por dentro do arquivo a competencia
+                            'status_importacao'         => 0 
                         ]);
 
                         LoteProduto::create([
@@ -282,6 +285,8 @@ class LotesController extends Controller
                         $ret['msg']          = '1 produto importado com sucesso.';
                         $ret['url_redirect'] = URL("/lotes");
 
+                        $lote->status_importacao = 1;
+                        $lote->save();
                     } catch (\Throwable $th) {
 
                         $ret['success']      = false;
@@ -306,15 +311,16 @@ class LotesController extends Controller
                         $a = array_combine($csv[0], $a);
                     });
 
+                    unset($csv[0]);
+
                     $lote = Lote::create([
                         'numero_do_lote'           => $proximoLote,
                         'cliente_id'               => $clienteId,
                         'quantidade_de_produtos'   => count($csv),
                         'tipo_documento'           => 'ARQUIVO DO CLIENTE',
-                        'competencia_ou_numeracao' => date('m/Y') // TODO : Pegar por dentro do arquivo a competencia
+                        'competencia_ou_numeracao' => date('m/Y'), // TODO : Pegar por dentro do arquivo a competencia
+                        'status_importacao'         => 0 
                     ]);
-
-                    unset($csv[0]);
 
                     $queue = "QUEUE_".$lote->id;
 

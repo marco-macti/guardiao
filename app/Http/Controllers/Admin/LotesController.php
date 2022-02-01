@@ -316,6 +316,8 @@ class LotesController extends Controller
                         $a = array_combine($csv[0], $a);
                     });
 
+                    unset($csv[0]);
+
                     $lote = Lote::create([
                         'numero_do_lote'           => $proximoLote,
                         'cliente_id'               => $clienteId,
@@ -325,7 +327,6 @@ class LotesController extends Controller
                         'status_importacao'         => 0 
                     ]);
 
-                    unset($csv[0]);
                     foreach(array_chunk($csv, 15000) as $key => $produtos)
                     {
                             
