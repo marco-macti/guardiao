@@ -325,11 +325,9 @@ class LotesController extends Controller
                         'status_importacao'         => 0 
                     ]);
 
-                    // unset($csv[0]);
+                    unset($csv[0]);
                     foreach(array_chunk($csv, 15000) as $key => $produtos)
                     {
-                        if($key == 0)
-                            continue;
                             
                         $job = (new CadastraProdutoJob($lote->id,$produtos,$request->tipo_arquivo))->onQueue('csv');
                         dispatch($job);
