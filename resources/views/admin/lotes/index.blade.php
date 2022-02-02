@@ -8,7 +8,7 @@
           if(valor == 'CSV')
           {
             $('#link-area').empty();
-            $('#link-area').append('<a target="_blank" href="'+url+'" class="h3"><strong>Baixe o Model CSV</strong></a>');
+            $('#link-area').append('<a target="_blank" href="'+url+'" class="h3"><strong>Baixe o Modelo CSV</strong></a>');
           }else{
             $('#link-area').empty();
           }
