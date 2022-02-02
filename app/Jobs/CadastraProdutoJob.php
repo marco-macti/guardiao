@@ -94,14 +94,6 @@ class CadastraProdutoJob implements ShouldQueue
 
             }
 
-            $lote_instance = Lote::find($this->lote_id);
-            $lote_count_produtos = LoteProduto::where('lote_id', $this->lote_id)->count();
-
-            if($lote_instance->quantidade_de_produtos = $lote_count_produtos)
-            {
-                
-            }
-
         }elseif($this->tipo == "NFXML"){
 
             foreach ($this->data as $key => $obj) {
@@ -131,18 +123,6 @@ class CadastraProdutoJob implements ShouldQueue
                     'ia_ncm'                    => '',
                     'acuracia'                  => 0
                 ]);
-
-                // if($obj['prod']['NCM'] == $reponse['ncm_ia'] ){
-
-                //     LoteProdutoAuditoria::create([
-                //         'lote_id'         => $this->lote_id,
-                //         'lote_produto_id' => $loteProduto->id,
-                //         'ncm_importado'   => $reponse['ncm_ia'],
-                //         'ncm_auditado'    => $reponse['ncm_ia'],
-                //         'pre_auditado'    => 'S'
-                //     ]);
-
-                // }
             }
 
         }elseif($this->tipo == "SPEED"){
@@ -169,19 +149,6 @@ class CadastraProdutoJob implements ShouldQueue
                      'ia_ncm'                    => '',
                      'acuracia'                  => 0,
                  ]);
-
-                //  if($produto[8] == $reponse['ncm_ia'] ){
-
-                //     LoteProdutoAuditoria::create([
-                //         'lote_id'         => $this->lote_id,
-                //         'lote_produto_id' => $loteProduto->id,
-                //         'ncm_importado'   => $reponse['ncm_ia'],
-                //         'ncm_auditado'    => $reponse['ncm_ia'],
-                //         'pre_auditado'    => 'S'
-                //     ]);
-
-                // }
-
             }
 
         }
@@ -193,7 +160,12 @@ class CadastraProdutoJob implements ShouldQueue
 
         $cliente = Cliente::find($lote->cliente_id);
 
-        Mail::to($cliente->email_cliente)->send(new LoteImportado($lote));
+        $lote_count_produtos = LoteProduto::where('lote_id', $this->lote_id)->count();
+
+        if(($lote->status_importacao == 1) && ($lote_count_produtos == $lote->quantidade_de_produtos))
+        {
+            Mail::to($cliente->email_cliente)->send(new LoteImportado($lote));
+        }
     }
 
     public function failed(Throwable $exception)
@@ -202,5 +174,9 @@ class CadastraProdutoJob implements ShouldQueue
 
         $lote->status_importacao = 2;
         $lote->save();
+
+        $cliente = Cliente::find($lote->cliente_id);
+
+        Mail::to($cliente->email_cliente)->send(new LoteImportado($lote));
     }
 }
