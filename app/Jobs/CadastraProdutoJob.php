@@ -157,14 +157,11 @@ class CadastraProdutoJob implements ShouldQueue
 
         $lote_count_produtos = LoteProduto::where('lote_id', $this->lote_id)->count();
 
-        if($lote_count_produtos == $lote->quantidade_de_produtos)
+        if($lote_count_produtos >= $lote->quantidade_de_produtos)
         {
             $lote->status_importacao = 1;
             $lote->save();
-        }
-
-        if(($lote->status_importacao == 1) && ($lote_count_produtos == $lote->quantidade_de_produtos))
-        {
+            
             $cliente = Cliente::find($lote->cliente_id);
             Mail::to($cliente->email_cliente)->send(new LoteImportado($lote));
         }
