@@ -147,13 +147,13 @@
                 <td>{{ $lote->tipo_documento }}</td>
                 <td>{{ $lote->competencia_ou_numeracao }}</td>
                 <td>
-                    <span class="badge badge-{{ $lote->statusImport()['class'] }}"> <i class="{{ $lote->statusImport()['icon'] }}"></i>  {{ $lote->statusImport()['status'] }} </span>
+                    <span class="badge badge-{{ $lote->statusImport()['class'] }}"> <i class="{{ $lote->statusImport()['icon'] }}"></i>  {{ $lote->statusImport()['name'] }} </span>
 
                 </td>
                 <td>
                   <div class="col-lg-2 mg-t-20 mg-lg-t-0">
                     <div class="btn-group" role="group" aria-label="Basic example">
-                        @if($lote->statusImport() && $lote->statusImport()['status'] == 'Importando')
+                        @if($lote->statusImport()['name'] == 'Importando')
                             <a title="Visualizar produtos deste lote" href="#" style="color:white" class="btn btn-secondary active"><i data-href="{{ URL("/lotes/$lote->id/edit") }}" class="fa fa-eye lote-em-importacao"></i></a>
                         @else
                             <a title="Visualizar produtos deste lote" href="{{ URL("/lotes/$lote->id/edit") }}" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye"></i></a>
