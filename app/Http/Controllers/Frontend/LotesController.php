@@ -312,7 +312,7 @@ class LotesController extends Controller
                     });
 
                     unset($csv[0]);
-
+                    
                     $lote = Lote::create([
                         'numero_do_lote'           => $proximoLote,
                         'cliente_id'               => $clienteId,
@@ -329,8 +329,6 @@ class LotesController extends Controller
                         $job = (new CadastraProdutoJob($lote->id,$produtos,$request->tipo_arquivo))->onQueue('csv');
                         dispatch($job);
                     }
-
-                    dispatch($job);
 
                     $ret['success']      = true;
                     $ret['msg']          = count($csv).' enviados para fila de importação.';
