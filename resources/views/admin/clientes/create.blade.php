@@ -24,23 +24,64 @@
 @push('post-scripts')
     <script>
 
-    $(document).ready(function(){
-        var selecao = $("#em_degustacao option:selected").val();
+    function validarCNPJ(cnpj) {
 
-        if(selecao == 'S'){
+        if(cnpj == '') return false;
 
-            $('.campos-degustacao').prop("disabled", false);
+        if (cnpj.length != 14)
+            return false;
 
-        }else{
+        if (cnpj == "00000000000000" ||
+            cnpj == "11111111111111" ||
+            cnpj == "22222222222222" ||
+            cnpj == "33333333333333" ||
+            cnpj == "44444444444444" ||
+            cnpj == "55555555555555" ||
+            cnpj == "66666666666666" ||
+            cnpj == "77777777777777" ||
+            cnpj == "88888888888888" ||
+            cnpj == "99999999999999")
+            return false;
 
-            $('.campos-degustacao').prop("disabled", true);
-
+        tamanho = cnpj.length - 2
+        numeros = cnpj.substring(0,tamanho);
+        digitos = cnpj.substring(tamanho);
+        soma = 0;
+        pos = tamanho - 7;
+        for (i = tamanho; i >= 1; i--) {
+        soma += numeros.charAt(tamanho - i) * pos--;
+        if (pos < 2)
+                pos = 9;
         }
+        resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+        if (resultado != digitos.charAt(0))
+            return false;
 
-    });
+        tamanho = tamanho + 1;
+        numeros = cnpj.substring(0,tamanho);
+        soma = 0;
+        pos = tamanho - 7;
+        for (i = tamanho; i >= 1; i--) {
+        soma += numeros.charAt(tamanho - i) * pos--;
+        if (pos < 2)
+                pos = 9;
+        }
+        resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+        if (resultado != digitos.charAt(1))
+            return false;
+
+        return true;
+
+    }
 
     $(document).ready(function(){
-        
+
+        var selecao = $("#em_degustacao option:selected").val();
+        if(selecao == 'S'){
+            $('.campos-degustacao').prop("disabled", false);
+        }else{
+            $('.campos-degustacao').prop("disabled", true);
+        }
 
         $('.cnpj').mask('00.000.000/0000-00', {reverse: true});
         $('.cep').mask('00000-000');
@@ -49,7 +90,6 @@
         $('.inscricao_estadual').mask('000000000');
 
         $("#em_degustacao").change(function(){
-            console.log("aqui");
             var selecao = $("#em_degustacao option:selected").val();
 
             if(selecao == 'S'){
@@ -113,6 +153,31 @@
                 limpa_formulário_cep();
             }
         });
+
+        $("#cnpj").on('blur',function(){
+
+            let cnpj    = $("#cnpj").val().replace(/[^\d]+/g,'');
+            var isValid = validarCNPJ(cnpj);
+
+            if(!isValid){
+                Swal.fire({
+                    title: 'Atenção',
+                    html: 'O cnpj informado não é valido , de acordo com o padrão da RFB.',
+                    showCancelButton: false,
+                });
+            }
+
+            $.getJSON("/admin/clientes/check-cnpj?cnpj="+ cnpj, function(dados) {
+                if(!dados.isValid){
+                    Swal.fire({
+                    title: 'Atenção',
+                    html: 'CNPJ já cadastrado na base de dados.',
+                    showCancelButton: false,
+                });
+                }
+            });
+
+        })
     });
     </script>
 @endpush

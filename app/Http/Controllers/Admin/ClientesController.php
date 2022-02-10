@@ -252,4 +252,16 @@ class ClientesController extends Controller
 
         return back()->withSuccess("Usuário editado com sucesso!");
     }
+
+    public function checkCnpj(Request $request){
+        try {
+
+            $cliente = Cliente::where('cnpj',$request->cnpj)->first();
+
+            return is_object($cliente) ? response()->json(['isValid' => false]) : response()->json(['isValid' => true]);
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
 }

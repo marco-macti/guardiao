@@ -25,7 +25,6 @@ class ClienteRequest extends FormRequest
     {
         return [
             'dados.cnpj'                => 'required|max:18|min:18',
-            'dados.inscricao_estadual'  => 'required|max:9|min:9',
             'dados.email_cliente'       => 'required|email',
             'dados.operacao'            => 'required',
             'dados.estado_origem'       => 'required',
