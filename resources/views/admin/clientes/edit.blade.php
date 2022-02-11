@@ -98,6 +98,31 @@
                 limpa_formulário_cep();
             }
         });
+
+        $("#cnpj").on('blur',function(){
+
+            let cnpj    = $("#cnpj").val().replace(/[^\d]+/g,'');
+            var isValid = validarCNPJ(cnpj);
+
+            if(!isValid){
+                Swal.fire({
+                    title: 'Atenção',
+                    html: 'O cnpj informado não é valido , de acordo com o padrão da RFB.',
+                    showCancelButton: false,
+                });
+            }
+
+            $.getJSON("/admin/clientes/check-cnpj?cnpj="+ cnpj, function(dados) {
+                if(!dados.isValid){
+                    Swal.fire({
+                    title: 'Atenção',
+                    html: 'CNPJ já cadastrado na base de dados.',
+                    showCancelButton: false,
+                });
+                }
+            });
+
+        })
     });
     </script>
 @endpush
