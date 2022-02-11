@@ -51,8 +51,8 @@ class AuditarLoteJob implements ShouldQueue
         {
             $response = $ia_instance->retornaDadosIa($produto->descricao_do_produto, $produto->ncm_importado);
 
-            if($produto->ncm_importado == $response['ncm_ia'] )
-            {
+            /*if($produto->ncm_importado == $response['ncm_ia'] )
+            {*/
                 LoteProdutoAuditoria::create([
                     'lote_id'         => $this->lote_id,
                     'lote_produto_id' => $produto->id,
@@ -63,7 +63,7 @@ class AuditarLoteJob implements ShouldQueue
                 $produto->ia_ncm    = $response['ncm_ia'];
                 $produto->acuracia  = $response['probabilidade_ia'];
                 $produto->update();
-            }
+            //}
 
         }
     }

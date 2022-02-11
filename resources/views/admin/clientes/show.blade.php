@@ -75,7 +75,7 @@
                         <span>Razão Social: {{$cliente->razao_social}}</span><br>
                         <span>Nome Fantasia: {{$cliente->nome_fantasia}}</span><br>
                         <span>CNPJ: <span class="cnpj">{{$cliente->cnpj}}</span></span><br>
-                        <span>Data de Abertura: <span>{{date('d/m/Y', strtotime($cliente->dt_nascimento))}}</span></span><br>
+                        <span>Data de Abertura: <span>@if(!empty($cliente->dt_nascimento)){{date('d/m/Y', strtotime($cliente->dt_nascimento))}}@endif</span></span><br>
                         <span>Operação: {{$cliente->operacao}}</span><br>
                         <span>Endereço: {{$cliente->endereco .','
                                             . $cliente->numero .','
