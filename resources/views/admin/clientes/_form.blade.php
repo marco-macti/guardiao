@@ -7,15 +7,15 @@
             <h5>Dados da Empresa</h5>
         </div>
         <div class="form-group col-4">
-            {!! Form::label('cnpj', 'CNPJ') !!}
+            {!! Form::label('cnpj', ' * CNPJ') !!}
             {!! Form::text('dados[cnpj]', $cliente->cnpj, ['class' => 'form-control form-control-sm cnpj', 'id' => 'cnpj']) !!}
         </div>
         <div class="form-group col-4">
-            {!! Form::label('razao_social', 'Razão Social') !!}
+            {!! Form::label('razao_social', '* Razão Social') !!}
             {!! Form::text('dados[razao_social]', $cliente->razao_social, ['class' => 'form-control form-control-sm', 'id' => 'razao_social']) !!}
         </div>
         <div class="form-group col-4">
-            {!! Form::label('nome_fantasia', 'Nome Fantasia') !!}
+            {!! Form::label('nome_fantasia', '* Nome Fantasia') !!}
             {!! Form::text('dados[nome_fantasia]', $cliente->nome_fantasia, ['class' => 'form-control form-control-sm', 'id' => 'nome_fantasia']) !!}
         </div>
     </div>
@@ -26,7 +26,7 @@
             {!! Form::text('dados[inscricao_estadual]', $cliente->inscricao_estadual, ['class' => 'form-control form-control-sm inscricao_estadual', 'id' => 'inscricao_estadual']) !!}
         </div>
         <div class="form-group col-4">
-            {!! Form::label('email_cliente', 'Email') !!}
+            {!! Form::label('email_cliente', ' * Email') !!}
             {!! Form::text('dados[email_cliente]', $cliente->email_cliente, ['class' => 'form-control form-control-sm', 'id' => 'email_cliente']) !!}
         </div>
         <div class="form-group col-4">
@@ -50,15 +50,15 @@
             {!! Form::date('dados[dt_nascimento]', $cliente->dt_nascimento, ['class' => 'form-control form-control-sm', 'id' => 'data_nascimento']) !!}
         </div>
         <div class="form-group col-4">
-            {!! Form::label('nome_do_responsavel', 'Nome do Responsável') !!}
+            {!! Form::label('nome_do_responsavel', '* Nome do Responsável') !!}
             {!! Form::text('dados[nome_do_responsavel]', $cliente->nome_do_responsavel, ['class' => 'form-control form-control-sm', 'id' => 'nome_do_responsavel']) !!}
         </div>
         <div class="form-group col-4">
-            {!! Form::label('tel1', 'Telefone 1') !!}
+            {!! Form::label('tel1', '* Telefone 1') !!}
             {!! Form::text('dados[tel1]', $cliente->tel1, ['class' => 'form-control form-control-sm tel_ddd', 'id' => 'tel1']) !!}
         </div>
         <div class="form-group col-4">
-            {!! Form::label('tel2', 'Telefone 2') !!}
+            {!! Form::label('tel2', '* Telefone 2') !!}
             {!! Form::text('dados[tel2]', $cliente->tel2, ['class' => 'form-control form-control-sm tel_ddd', 'id' => 'tel2']) !!}
         </div>
         <div class="form-group col-4">
@@ -76,27 +76,27 @@
     </div>
     <div class="row">
         <div class="form-group col-4">
-            {!! Form::label('cep', 'CEP') !!}
+            {!! Form::label('cep', '* CEP') !!}
             {!! Form::text('dados[cep]', $cliente->cep, ['class' => 'form-control form-control-sm cep', 'id' => 'cep']) !!}
         </div>
         <div class="form-group col-8">
-            {!! Form::label('endereco', 'Endereço') !!}
+            {!! Form::label('endereco', '* Endereço') !!}
             {!! Form::text('dados[endereco]', $cliente->endereco, ['class' => 'form-control form-control-sm', 'id' => 'endereco']) !!}
         </div>
         <div class="form-group col-4">
-            {!! Form::label('estado', 'Estado') !!}
+            {!! Form::label('estado', '* Estado') !!}
             {!! Form::select('dados[estado]', $estados, $cliente->estado, ['class' => 'custom-select custom-select-sm', 'id' => 'estado']) !!}
         </div>
         <div class="form-group col-4">
-            {!! Form::label('cidade', 'Cidade') !!}
+            {!! Form::label('cidade', '* Cidade') !!}
             {!! Form::text('dados[cidade]', $cliente->cidade, ['class' => 'form-control form-control-sm', 'id' => 'cidade']) !!}
         </div>
         <div class="form-group col-4">
-            {!! Form::label('bairro', 'Bairro') !!}
+            {!! Form::label('bairro', '* Bairro') !!}
             {!! Form::text('dados[bairro]', $cliente->bairro, ['class' => 'form-control form-control-sm', 'id' => 'bairro']) !!}
         </div>
         <div class="form-group col-4">
-            {!! Form::label('numero', 'Numero') !!}
+            {!! Form::label('numero', '* Numero') !!}
             {!! Form::text('dados[numero]', $cliente->numero, ['class' => 'form-control form-control-sm', 'id' => 'numero']) !!}
         </div>
         <div class="form-group col-4">

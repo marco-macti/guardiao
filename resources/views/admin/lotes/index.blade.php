@@ -8,7 +8,7 @@
           if(valor == 'CSV')
           {
             $('#link-area').empty();
-            $('#link-area').append('<a target="_blank" href="'+url+'" class="h3"><strong>Baixe o Modelo CSV</strong></a>');
+            $('#link-area').append('<a target="_blank" href="'+url+'"><i class="fa fa-download"></i> Baixe o Modelo CSV</a>');
           }else{
             $('#link-area').empty();
           }
@@ -29,7 +29,10 @@
       </ol>
       <h6 class="slim-pagetitle">Lote de produtos</h6>
     </div><!-- slim-pageheader -->
-
+    <div class="col-md-3 pull-right">
+              <a href="{{ URL('/') }}" class="btn btn-primary btn-block mg-b-10">Voltar</a>
+      </div>
+    <br style="clear: both;"/>
     <div class="section-wrapper">
       <div class="row row-sm mg-t-20">
         <div class="col-md-6">
@@ -240,6 +243,7 @@
         });
 
         $("#dropzone").dropzone({
+            dictDefaultMessage: "Arraste seu arquivo aqui",
             maxFiles: 1,
             url: "/admin/lotes",
             sending: function(file, response){

@@ -261,7 +261,7 @@ class ClientesController extends Controller
             return is_object($cliente) ? response()->json(['isValid' => false]) : response()->json(['isValid' => true]);
 
         } catch (\Throwable $th) {
-            throw $th;
+                throw $th;
         }
     }
 }

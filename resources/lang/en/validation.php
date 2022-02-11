@@ -13,8 +13,8 @@ return [
     |
     */
 
-    'accepted' => 'The :attribute must be accepted.',
-    'active_url' => 'The :attribute is not a valid URL.',
+    'accepted' => 'O :attribute foi aceito.',
+    'active_url' => 'O :attribute não é uma URL válida.',
     'after' => 'The :attribute must be a date after :date.',
     'after_or_equal' => 'The :attribute must be a date after or equal to :date.',
     'alpha' => 'The :attribute may only contain letters.',
@@ -95,7 +95,7 @@ return [
     'numeric' => 'The :attribute must be a number.',
     'present' => 'The :attribute field must be present.',
     'regex' => 'The :attribute format is invalid.',
-    'required' => 'The :attribute é obrigatório.',
+    'required' => 'O :attribute é obrigatório.',
     'required_if' => 'The :attribute field is required when :other is :value.',
     'required_unless' => 'The :attribute field is required unless :other is in :values.',
     'required_with' => 'The :attribute field is required when :values is present.',
@@ -131,7 +131,7 @@ return [
     'custom' => [
         'attribute-name' => [
             'rule-name' => 'custom-message',
-        ],
+        ]
     ],
 
     /*
@@ -145,6 +145,21 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'dados.cnpj'                => 'CNPJ',
+        'dados.email_cliente'       => 'Email',
+        'dados.operacao'            => 'Operação',
+        'dados.estado_origem'       => 'Estado Origem',
+        'dados.estado_destino'      => 'Estado Destino',
+        'dados.razao_social'        => 'Razão Social',
+        'dados.nome_fantasia'       => 'Nome Fantasia',
+        'dados.nome_do_responsavel' => 'Nome do Responsável',
+        'dados.tel1'                => 'Telefone',
+        'dados.cep'                 => 'CEP',
+        'dados.endereco'            => 'Endereço',
+        'dados.bairro'              => 'Bairro',
+        'dados.cidade'              => 'Cidade',
+        'dados.estado'              => 'Estado'
+    ],
 
 ];

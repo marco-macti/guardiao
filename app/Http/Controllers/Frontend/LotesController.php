@@ -21,6 +21,7 @@ use App\Jobs\AuditarLoteJob;
 
 class LotesController extends Controller
 {
+
     public function index(){
         $clienteId    = auth()->user()->cliente_id;
         $lotesCliente = Lote::select('id')->where('cliente_id',$clienteId)->get()->toArray();
@@ -64,17 +65,17 @@ class LotesController extends Controller
                     $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('codigo_interno_do_cliente', $dados['valor'])->paginate($dados['itens_paginas']);
                     $dados['msg_filtro'] = "Filtro por codigo do cliente nº ".$dados['valor']."!";
                     break;
-                
+
                 case 'ncm_cliente':
                     $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('ncm_importado', $dados['valor'])->paginate($dados['itens_paginas']);
                     $dados['msg_filtro'] = "Filtro por NCM da IA nº ".$dados['valor']."!";
                     break;
-                
+
                 case 'ncm_ia':
                     $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('ia_ncm', $dados['valor'])->paginate($dados['itens_paginas']);
                     $dados['msg_filtro'] = "Filtro por NCM da IA nº ".$dados['valor']."!";
                     break;
-                
+
                 case 'situacao':
                     if($dados['valor']=='acerto')
                     {
@@ -84,9 +85,9 @@ class LotesController extends Controller
                         $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->whereRaw('ia_ncm != ncm_importado')->paginate($dados['itens_paginas']);
                         $dados['msg_filtro'] = "Filtro por situação ".strtoupper($dados['valor'])."!";
                     }
-                    
+
                     break;
-                
+
                 case 'acuracia':
                     switch ($dados['valor']) {
                         case '1':
@@ -101,14 +102,14 @@ class LotesController extends Controller
                             $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->where('acuracia', '>=', '90')->orderBy('acuracia', 'desc')->paginate($dados['itens_paginas']);
                             $dados['msg_filtro'] = "Filtro por acuracia maior que 90% !";
                             break;
-                        
+
                         default:
                             $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->paginate($dados['itens_paginas']);
                             break;
                     }
-                    
+
                     break;
-                    
+
                 default:
                     $dados['produtos'] = LoteProduto::where('lote_id',$lote->id)->paginate($dados['itens_paginas']);
                     break;
@@ -181,7 +182,7 @@ class LotesController extends Controller
                         'quantidade_de_produtos'   => count($arrProdutos),
                         'tipo_documento'           => $request->tipo_arquivo,
                         'competencia_ou_numeracao' => $competencia,
-                        'status_importacao'         => 0 
+                        'status_importacao'         => 0
                     ]);
 
                     $queue = "QUEUE_".$lote->id;
@@ -234,7 +235,7 @@ class LotesController extends Controller
                             'numero_do_documento_fiscal' => $xml['NFe']['infNFe']['ide']['nNF'],
                             'valor_frete'                => $xml['NFe']['infNFe']['total']['ICMSTot']['vFrete'],
                             'competencia_ou_numeracao'   => $competencia,
-                            'status_importacao'          => 0 
+                            'status_importacao'          => 0
                         ]);
 
                         $queue = "QUEUE_".$lote->id;
@@ -271,7 +272,7 @@ class LotesController extends Controller
                             'quantidade_de_produtos'   => 1,
                             'tipo_documento'           => $request->tipo_arquivo,
                             'competencia_ou_numeracao' => date('m/Y'), // TODO : Pegar por dentro do arquivo a competencia
-                            'status_importacao'         => 0 
+                            'status_importacao'         => 0
                         ]);
 
                         LoteProduto::create([
@@ -312,14 +313,14 @@ class LotesController extends Controller
                     });
 
                     unset($csv[0]);
-                    
+
                     $lote = Lote::create([
                         'numero_do_lote'           => $proximoLote,
                         'cliente_id'               => $clienteId,
                         'quantidade_de_produtos'   => count($csv),
                         'tipo_documento'           => 'ARQUIVO DO CLIENTE',
                         'competencia_ou_numeracao' => date('m/Y'), // TODO : Pegar por dentro do arquivo a competencia
-                        'status_importacao'         => 0 
+                        'status_importacao'         => 0
                     ]);
 
                     $queue = "QUEUE_".$lote->id;
@@ -342,7 +343,7 @@ class LotesController extends Controller
 
                 }
         }
-        
+
         return response()->json($ret);
 
     }
@@ -444,7 +445,25 @@ class LotesController extends Controller
         $job = (new AuditarLoteJob($lote->id))->onQueue('high');
 
         dispatch($job);
-        
+
         return back()->withSuccess("Produtos em fila de processamento!");
+    }
+
+    public function destroy(Lote $lote){
+
+        try {
+
+            LoteProdutoAuditoria::where('lote_id',$lote->id)->delete();
+            LoteProduto::where('lote_id',$lote->id)->delete();
+            $lote->delete();
+
+            return response()->json(['success' => true]);
+
+        } catch (\Throwable $th) {
+
+            return response()->json(['success' => false,'msg' => $th->getMessage()]);
+
+        }
+
     }
 }

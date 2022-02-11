@@ -57,6 +57,10 @@
                 </ol>
                 <h6 class="slim-pagetitle">{{$cliente->razao_social}}</h6>
             </div><!-- slim-pageheader -->
+            <div class="col-md-3 pull-right">
+              <a href="{{ URL('/') }}" class="btn btn-primary btn-block mg-b-10">Voltar</a>
+            </div>
+            <br style="clear: both;"/>
             <div class="section-wrapper">
                 <div class="row row-sm mg-t-20">
                   <div class="col-md-6">

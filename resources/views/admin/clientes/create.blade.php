@@ -13,6 +13,10 @@
             </ol>
             <h6 class="slim-pagetitle">Cadastro de Clientes</h6>
         </div><!-- slim-pageheader -->
+        <div class="col-md-3 pull-right">
+              <a href="{{ URL('/') }}" class="btn btn-primary btn-block mg-b-10">Voltar</a>
+      </div>
+      <br style="clear: both;"/>
         <div class="section-wrapper">
             @include('admin.clientes._form',['method' => 'POST','action' => route('admin.clientes.store'), 'estados'=> $estados , 'cliente' => $cliente ])
         </div>

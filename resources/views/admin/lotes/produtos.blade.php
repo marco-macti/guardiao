@@ -11,7 +11,10 @@
       </ol>
       <h6 class="slim-pagetitle">Lotes de produtos</h6>
     </div><!-- slim-pageheader -->
-
+    <div class="col-md-3 pull-right">
+              <a href="{{ URL('/') }}" class="btn btn-primary btn-block mg-b-10">Voltar</a>
+      </div>
+    <br style="clear: both;"/>
     <div class="section-wrapper">
       <div class="row row-sm mg-t-20">
         <div class="col-md-6">
@@ -28,7 +31,7 @@
           <a href="#" data-href="{{route('lote.auditar', $lote->id)}}" class="btn btn-primary pull-right mr-3 btn-auditar-ia">Auditar IA</a>
          </div>
       </div>
-         
+
       <form action="" method="GET">
         <div class="row">
               <div class="col-md-3">
@@ -100,7 +103,7 @@
                 <td>
                   <a href="" data-toggle="modal" data-target="#modaldemo2">
                     <i class="fa fa-info-circle"></i>
-                  </a> {{$produto->ia_ncm}} 
+                  </a> {{$produto->ia_ncm}}
                 </td>
                 <td style="color:red">{{$produto->acuracia}}</td>
                 <td style="color:red">AUDITAR</td>
@@ -141,7 +144,7 @@
           <input name="ncm" type="text" id="ncm" class="form-control" />
         </form>
       </div>
-      
+
       <div class="modal-footer">
         <button type="button" class="btn btn-primary">Treinar</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -165,27 +168,27 @@
             <tr>
               <th scope="row">Capítulo </th>
               <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</td>
-              
+
             </tr>
             <tr>
               <th scope="row">Posição </th>
               <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</td>
-              
+
             </tr>
             <tr>
               <th>Subposição </th>
               <td>Outros</td>
-              
+
             </tr>
             <tr>
               <th>Subitem </th>
               <td>Outros</td>
-              
+
             </tr>
           </tbody>
         </table>
       </div>
-      
+
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
       </div>
@@ -206,7 +209,7 @@
           case 'codigo_cliente':
               html = '<input type="text" name="valor" class="form-control" placeholder="Informe o código">';
               break;
-        
+
           case 'ncm_cliente':
               html = '<input type="text" name="valor" class="form-control" placeholder="Informe o NCM cliente">';
               break;

@@ -60,7 +60,6 @@ Route::group(['middleware' => 'auth'], function () {
 
             Route::get('/lotes/auditar/{lote_id}'  , 'LotesController@auditarLote')->name('lote.auditar');
 
-
         });
 
         Route::group(['prefix' => 'admin','namespace' => 'Admin'], function () {
@@ -69,18 +68,19 @@ Route::group(['middleware' => 'auth'], function () {
 
             Route::group(['prefix' => 'clientes'],function () {
 
-                Route::get('/'                 , 'ClientesController@index')->name('admin.clientes.index');
-                Route::get('/create'           , 'ClientesController@create')->name('admin.clientes.create');
-                Route::post('/store'           , 'ClientesController@store')->name('admin.clientes.store');
-                Route::get('/edit/{cliente}'   , 'ClientesController@edit')->name('admin.clientes.edit');
-                Route::put('/update/{cliente}' , 'ClientesController@update')->name('admin.clientes.update');
-                Route::get('/show/{id}'        , 'ClientesController@show')->name('admin.clientes.show');
+                Route::get('/'                    , 'ClientesController@index')->name('admin.clientes.index');
+                Route::get('/create'              , 'ClientesController@create')->name('admin.clientes.create');
+                Route::post('/store'              , 'ClientesController@store')->name('admin.clientes.store');
+                Route::get('/edit/{cliente}'      , 'ClientesController@edit')->name('admin.clientes.edit');
+                Route::put('/update/{cliente}'    , 'ClientesController@update')->name('admin.clientes.update');
+                Route::get('/show/{id}'           , 'ClientesController@show')->name('admin.clientes.show');
 
                 Route::post('/add-user'       , 'ClientesController@adduser')->name('admin.clientes.adduser');
                 Route::get('/remove-user/{id}', 'ClientesController@removeUser')->name('admin.clientes.removeUser');
                 Route::get('/info-user'       , 'ClientesController@infoUser')->name('admin.clientes.infoUser');
                 Route::post('/edit-user'      , 'ClientesController@edituser')->name('admin.clientes.edituser');
-                Route::get('/check-cnpj'    , 'ClientesController@checkCnpj')->name('admin.clientes.checkCnpj');
+                Route::get('/check-cnpj'      , 'ClientesController@checkCnpj')->name('admin.clientes.checkCnpj');
+
             });
         });
     });
