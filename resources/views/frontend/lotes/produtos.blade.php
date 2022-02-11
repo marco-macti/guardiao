@@ -714,8 +714,14 @@
 
                         if(index <= 10 && response.data[index].ncm != '' ){
 
+                            let imagem = 'Sem imagem';
+
+                            if(response.data[index].thumbnail){
+                                imagem = '<img src="'+response.data[index].thumbnail+'" width="100" height="100" />';
+                            }
+
                         $("#produtos-relacionados-cosmos").append('<tr>'+
-                                                    '<td align="center"><img src="'+response.data[index].thumbnail+'" width="100" height="100" /></td>'+
+                                                    '<td align="center">'+imagem+'</td>'+
                                                     '<td align="center">'+response.data[index].description+'</td>'+
                                                     '<td align="center">'+response.data[index].gtins[0].gtin+'</td>'+
                                                     '<td align="center">'+response.data[index].ncm.code+'</td>'+
