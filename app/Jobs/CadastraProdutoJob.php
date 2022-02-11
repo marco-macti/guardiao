@@ -65,13 +65,13 @@ class CadastraProdutoJob implements ShouldQueue
 
     public function handle()
     {
-        // $ia_instance = new IaController();
+         $ia_instance = new IaController();
 
         if($this->tipo == "CSV"){
 
             foreach ($this->data as $item) {
 
-                // $reponse = $ia_instance->retornaDadosIa($item['DESCRICAO_DO_PRODUTO'], $item['NCM_NO_CLIENTE']);
+                $response = $ia_instance->retornaDadosIa($item['DESCRICAO_DO_PRODUTO'], $item['NCM_NO_CLIENTE']);
 
                 $verifica_produto = LoteProduto::where('codigo_interno_do_cliente', $item['CODIGO_NO_CLIENTE'])
                                                     ->where('descricao_do_produto', $item['DESCRICAO_DO_PRODUTO'])
@@ -87,8 +87,8 @@ class CadastraProdutoJob implements ShouldQueue
                     'codigo_interno_do_cliente' => $item['CODIGO_NO_CLIENTE'],
                     'descricao_do_produto'      => $item['DESCRICAO_DO_PRODUTO'],
                     'ncm_importado'             => $item['NCM_NO_CLIENTE'],
-                    'ia_ncm'                    => '',
-                    'acuracia'                  => 0,
+                    'ia_ncm'                    => $response['ncm_ia'],
+                    'acuracia'                  => $response['probabilidade_ia'],
                 ]);
 
 
@@ -98,7 +98,7 @@ class CadastraProdutoJob implements ShouldQueue
 
             foreach ($this->data as $key => $obj) {
 
-                // $reponse = $ia_instance->retornaDadosIa($obj['prod']['xProd'], $obj['prod']['NCM']);
+                $response = $ia_instance->retornaDadosIa($obj['prod']['xProd'], $obj['prod']['NCM']);
 
                 $verifica_produto = LoteProduto::where('codigo_interno_do_cliente', $obj['prod']['cProd'])
                                                 ->where('descricao_do_produto', $obj['prod']['xProd'])
@@ -120,8 +120,8 @@ class CadastraProdutoJob implements ShouldQueue
                     'valor'                     => $obj['prod']['vUnTrib'],
                     'valor_desconto'            => $obj['prod']['vDesc'],
                     'ncm_importado'             => $obj['prod']['NCM'],
-                    'ia_ncm'                    => '',
-                    'acuracia'                  => 0
+                    'ia_ncm'                    => $response['ncm_ia'],
+                    'acuracia'                  => $response['probabilidade_ia'],
                 ]);
             }
 
@@ -129,7 +129,7 @@ class CadastraProdutoJob implements ShouldQueue
 
             foreach ($this->data as $key => $produto) {
 
-                //  $reponse = $ia_instance->retornaDadosIa($produto[3], $produto[8]);
+                $response = $ia_instance->retornaDadosIa($produto[3], $produto[8]);
 
                 $verifica_produto = LoteProduto::where('codigo_interno_do_cliente', $produto[2])
                                                 ->where('descricao_do_produto', $produto[3])
@@ -146,8 +146,8 @@ class CadastraProdutoJob implements ShouldQueue
                      'descricao_do_produto'      => $produto[3],
                      'ean_gtin'                  => $produto[4],
                      'ncm_importado'             => $produto[8],
-                     'ia_ncm'                    => '',
-                     'acuracia'                  => 0,
+                     'ia_ncm'                    => $response['ncm_ia'],
+                     'acuracia'                  => $response['probabilidade_ia'],
                  ]);
             }
 
@@ -161,7 +161,7 @@ class CadastraProdutoJob implements ShouldQueue
         {
             $lote->status_importacao = 1;
             $lote->save();
-            
+
             $cliente = Cliente::find($lote->cliente_id);
             Mail::to($cliente->email_cliente)->send(new LoteImportado($lote));
         }
