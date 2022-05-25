@@ -1395,32 +1395,32 @@ class ClienteLoteController extends Controller
         }else{
 
 
-//            [
-//                [0] => CODIGO_DO_PRODUTO_NO_CLIENTE
-//                [1] => NOME_DO_PRODUTO_NO_CLIENTE
-//                [2] => NOME_PRODUTO_NA_BASE_COMPARATIVA
-//                [3] => GTIN_NO_CLIENTE
-//                [4] => GTIN_NA_BASE_COMPARATIVA
-//                [5] => NCM_NO_CLIENTE
-//                [6] => NCM_NA_BASE_COMPARATIVA
-//                [7] => ALIQUOTA_ICMS_NO_CLIENTE
-//                [8] => ALIQUOTA_ICMS_NA_BASE_COMPARATIVA
-//                [9] => ALIQUOTA_PIS_NO_CLIENTE
-//                [10] => ALIQUOTA_PIS_NA_BASE_COMPARATIVA
-//                [11] => ALIQUOTA_COFINS_NO_CLIENTE
-//                [12] => ALIQUOTA_COFINS_NA_BASE_COMPARATIVA
-//                [13] => POSSUI_ST_NO_CLIENTE
-//                [14] => POSSUI_ST_NA_BASE_COMPARATIVA
-//                [15] => BASE_COMPARATIVA_PIS_CST
-//                [16] => BASE_COMPARATIVA_COFINS_CST
-//                [17] => ICMS_BASE_LEGAL
-//                [18] => COFINS_BASE_LEGAL
-//                [19] => PIS_BASE_LEGAL
-//                [20] => NCM_CORRETO
-//                [21] => ICMS_CORRETO
-//                [22] => PIS_CORRETO
-//                [23] => COFINS_CORRETO
-//            ]
+            //            [
+            //                [0] => CODIGO_DO_PRODUTO_NO_CLIENTE
+            //                [1] => NOME_DO_PRODUTO_NO_CLIENTE
+            //                [2] => NOME_PRODUTO_NA_BASE_COMPARATIVA
+            //                [3] => GTIN_NO_CLIENTE
+            //                [4] => GTIN_NA_BASE_COMPARATIVA
+            //                [5] => NCM_NO_CLIENTE
+            //                [6] => NCM_NA_BASE_COMPARATIVA
+            //                [7] => ALIQUOTA_ICMS_NO_CLIENTE
+            //                [8] => ALIQUOTA_ICMS_NA_BASE_COMPARATIVA
+            //                [9] => ALIQUOTA_PIS_NO_CLIENTE
+            //                [10] => ALIQUOTA_PIS_NA_BASE_COMPARATIVA
+            //                [11] => ALIQUOTA_COFINS_NO_CLIENTE
+            //                [12] => ALIQUOTA_COFINS_NA_BASE_COMPARATIVA
+            //                [13] => POSSUI_ST_NO_CLIENTE
+            //                [14] => POSSUI_ST_NA_BASE_COMPARATIVA
+            //                [15] => BASE_COMPARATIVA_PIS_CST
+            //                [16] => BASE_COMPARATIVA_COFINS_CST
+            //                [17] => ICMS_BASE_LEGAL
+            //                [18] => COFINS_BASE_LEGAL
+            //                [19] => PIS_BASE_LEGAL
+            //                [20] => NCM_CORRETO
+            //                [21] => ICMS_CORRETO
+            //                [22] => PIS_CORRETO
+            //                [23] => COFINS_CORRETO
+            //            ]
 
             /*[
                 'gtin',
@@ -1611,25 +1611,25 @@ class ClienteLoteController extends Controller
                                 break;
                         }
 
-//                        echo "<pre>";
-//                        print_r([
-//                            'gtin'                      => $linha[2],
-//                            'seu_codigo'                => $linha[0],
-//                            'seu_nome'                  => $linha[1],
-//                            'ncm'                       => $linha[3],
-//                            'origem'                    => $linha[4],
-//                            'tributado_4'               => $linha[5],
-//                            'uf_origem_fk'              => $linha[6],
-//                            'possui_st'                 => $linha[9],
-//                            'aliquota_icm'              => $linha[10],
-//                            'aliquota_pis'              => $linha[11],
-//                            'aliquota_cofins'           => $linha[12],
-//                            'bc_perfilcontabil_fk_id'   => null,
-//                            'estab_origem_fk_id'        => $estabelecimentoDeOrigem,
-//                            'lote_fk_id'                => $loteId,
-//                            'status_fk_id'              => 1,
-//                            'trib_estab_origem_fk_id'   => 1 //@todo: Verificar como buscar esta informação no banco.
-//                        ]);
+                    //    echo "<pre>";
+                    //    print_r([
+                    //        'gtin'                      => $linha[2],
+                    //        'seu_codigo'                => $linha[0],
+                    //        'seu_nome'                  => $linha[1],
+                    //        'ncm'                       => $linha[3],
+                    //        'origem'                    => $linha[4],
+                    //        'tributado_4'               => $linha[5],
+                    //        'uf_origem_fk'              => $linha[6],
+                    //        'possui_st'                 => $linha[9],
+                    //        'aliquota_icm'              => $linha[10],
+                    //        'aliquota_pis'              => $linha[11],
+                    //        'aliquota_cofins'           => $linha[12],
+                    //        'bc_perfilcontabil_fk_id'   => null,
+                    //        'estab_origem_fk_id'        => $estabelecimentoDeOrigem,
+                    //        'lote_fk_id'                => $loteId,
+                    //        'status_fk_id'              => 1,
+                    //        'trib_estab_origem_fk_id'   => 1 //@todo: Verificar como buscar esta informação no banco.
+                    //    ]);
 
                         $lastInsertId = DB::SELECT ("SELECT lp.id  FROM public.lote_produto lp ORDER BY lp.id DESC OFFSET 0 LIMIT 1");
                         $lastInsertId =  $lastInsertId[0]->id;

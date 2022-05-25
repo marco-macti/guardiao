@@ -6,13 +6,13 @@
     <div class="slim-pageheader">
       <ol class="breadcrumb slim-breadcrumb">
         <li class="breadcrumb-item"><a href="{{route('home.index')}}">Home</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Lotes</li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="{{route('lotes.index')}}">Lotes</a></li>
         <li class="breadcrumb-item active" aria-current="page">Lote {{$lote->id}}</li>
       </ol>
       <h6 class="slim-pagetitle">Lotes de produtos</h6>
     </div><!-- slim-pageheader -->
     <div class="col-md-3 pull-right">
-              <a href="{{ URL('/') }}" class="btn btn-primary btn-block mg-b-10">Voltar</a>
+              <a href="{{ route('lotes.index') }}" class="btn btn-primary btn-block mg-b-10">Voltar</a>
       </div>
     <br style="clear: both;"/>
     <div class="section-wrapper">
@@ -84,7 +84,6 @@
               <th>Acertou?</th>
               <th>Treinar</th>
               <th>Tributação</th>
-              <th>Monofásico</th>
             </tr>
           </thead>
           <tbody>
@@ -110,8 +109,7 @@
                 <td>
                   <a style="color:white" href="" class="btn btn-secondary btn-block mg-b-10" data-toggle="modal" data-target="#modaldemo1"><i class="fa fa-check"></i></a>
                 </td>
-                <td>ST</td>
-                <td>Não</td>
+                <td>{{$produto->tipo_tributacao}}</td>
               </tr>
             @endforeach
           </tbody>
@@ -245,7 +243,7 @@
 
       Swal.fire({
          title: 'Atenção',
-         html: 'Você deseja enviar os produtos deste lote, par que sejam auditados pela Inteligência Artificial do <strong>Guardião Tributário</strong>?<br>Esse processo será efetuado em fila e poderá demorar alguns minutos!',
+         html: 'Você deseja enviar os produtos deste lote, para que sejam auditados pela Inteligência Artificial do <strong>Guardião Tributário</strong>?<br>Esse processo será efetuado em fila e poderá demorar alguns minutos!',
          showCancelButton: true,
       }).then(function(result){
          if(result.isConfirmed)

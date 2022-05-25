@@ -52,6 +52,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::any('/atualizar-senha'  , 'HomeController@atualizarSenha')->name('atualizar.senha');
 
         Route::group(['namespace' => 'Frontend'], function(){
+
+            Route::get('/lotes/monofasico/{id}'  , 'LotesController@monofasico')->name('lote.monofasico');
             Route::get('/lotes/assumir-ncm'  , 'LotesController@assumirNcm')->name('assumir.ncm');
             Route::get('/lotes/{lote}/export','LotesController@export')->name('exportar.lote');
             Route::get('/lotes/busca-relacionados-by-descricao'  , 'LotesController@buscaRelacionadosCosmosByDescricao')->name('busca.relacionados.by.descricao');

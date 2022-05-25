@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Frontend;
-ini_set('max_execution_time', 1);
+ini_set('max_execution_time', '500'); 
+ini_set('memory_limit', '512M');
 
 use App\Helpers\Cosmos;
 use Illuminate\Http\Request;
@@ -350,17 +351,7 @@ class LotesController extends Controller
 
     public function export(Lote $lote)
     {
-        $produtos = LoteProduto::select('codigo_interno_do_cliente as Código Interno',
-                                            'ean_gtin as EAN',
-                                            'ncm_importado as NCM Cliente',
-                                            'ia_ncm as NCM Auditado',
-                                            'descricao_do_produto as Descrição',
-                                            'cfop as CFOP',
-                                            'quantidade as Quantidade',
-                                            'valor as Valor',
-                                            'valor_desconto as Valor Desconto')
-                                    ->where('lote_id', $lote->id)
-                                    ->get()->toArray();
+        $produtos = LoteProduto::get();
 
         $headers = [
             'Código Interno',
@@ -371,24 +362,47 @@ class LotesController extends Controller
             'CFOP',
             'Quantidade',
             'Valor',
-            'Valor Desconto'
+            'Valor Desconto',
+            'Total',
+            'Tipo Tributação',
+            'Legislação'
         ];
 
         $fp = fopen('php://output', 'w');
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="export.csv"');
         fputcsv($fp, $headers);
+        
         foreach ($produtos as $key => $produto) {
-            fputcsv($fp, array_values($produto));
+            $legislacao = '';
+            switch ($produto->tipo_tributacao) {
+                case 'MONOFÁSICO':
+                    $pathFileMonofasico = public_path("monofasico.csv");
+                    
+                    $dados = fopen($pathFileMonofasico, "r");
+            
+                    while(($data = fgetcsv($dados, 1000, ",")) !== FALSE){
+                        if($data[0] == $produto->ncm_importado)
+                            $legislacao = $data[2];
+                    }
+                break;
+            }
+
+            fputcsv($fp, array_values([
+                'Código Interno' => $produto->codigo_interno_do_cliente,
+                'EAN' => $produto->ean_gtin,
+                'NCM Cliente' => $produto->ncm_importado,
+                'NCM Auditado' => $produto->ia_ncm,
+                'Descrição' => $produto->descricao_do_produto,
+                'CFOP' => $produto->cfop,
+                'Quantidade' => $produto->quantidade,
+                'Valor' => $produto->valor,
+                'Valor Desconto' => $produto->valor_desconto,
+                'Total' => $produto->valor * $produto->quantidade,
+                'Tipo Tributação' => $produto->tipo_tributacao,
+                'Legislação' => $legislacao
+            ]));
         }
-
-        // function mysqli_field_name($result, $field_offset)
-        // {
-        //     $properties = mysqli_fetch_field_direct($result, $field_offset);
-        //     return is_object($properties) ? $properties->name : null;
-        // }
-
-        // return view('frontend.lotes.export')->with('lote',$lote);
     }
 
     public function buscaRelacionadosCosmosByDescricao(Request $request){
@@ -426,6 +440,20 @@ class LotesController extends Controller
             $loteProdutoAuditoria->pre_auditado    = 'N';
             $loteProdutoAuditoria->save();
 
+            $produto = LoteProduto::find($request->lote_produto_id);
+
+            if($this->monofasico($request->ncm_auditado)){
+                $produto->tipo_tributacao = 'MONOFÁSICO';
+            }else{
+                if($this->st($request->ncm_auditado)){
+                    $produto->tipo_tributacao = 'SUBSTITUIÇÃO TRIBUITÁRIA';
+                }else{
+                    $produto->tipo_tributacao = 'TRIBUTAÇÃO';
+                }
+            }
+
+            $produto->update();
+
             return json_encode(['success' => true]);
 
         } catch (\Throwable $th) {
@@ -449,8 +477,8 @@ class LotesController extends Controller
         return back()->withSuccess("Produtos em fila de processamento!");
     }
 
-    public function destroy(Lote $lote){
-
+    public function destroy(Lote $lote)
+    {
         try {
 
             LoteProdutoAuditoria::where('lote_id',$lote->id)->delete();
@@ -465,5 +493,38 @@ class LotesController extends Controller
 
         }
 
+    }
+
+
+    public function monofasico($ncm)
+    {
+        $pathFileMonofasico = public_path("monofasico.csv");
+        
+        $dados = fopen($pathFileMonofasico, "r");
+
+        while(($data = fgetcsv($dados, 1000, ",")) !== FALSE){
+            if($data[0] == $ncm)
+                return true;
+        }
+        
+        return false;
+    }
+
+    public function st($ncmConsulta)
+    {
+        $pathFileMonofasico = public_path("st.csv");
+        
+        $dados = fopen($pathFileMonofasico, "r");
+
+        while(($data = fgetcsv($dados, 1000, ",")) !== FALSE){
+            $ncms = explode(' ', $data[0]);
+
+            foreach ($ncms as $ncm) {
+                if($ncmConsulta == preg_replace( '/[^0-9]/', '', $ncm))
+                    return true;
+            }
+        }
+        
+        return false;
     }
 }

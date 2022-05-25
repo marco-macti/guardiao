@@ -43,12 +43,17 @@ class AuditarLoteJob implements ShouldQueue
      */
     public function handle()
     {
+        // $output = new Symfony\Component\Console\Output\ConsoleOutput();
+        // $output->writeln("Iniciou Auditar");
+
         $ia_instance = new IaController();
 
         $produtos = LoteProduto::where('lote_id' , $this->lote_id)->get();
 
         foreach ($produtos as $key => $produto)
         {
+            // $output->writeln("ncm = ".$produto->ncm_importado);
+
             $response = $ia_instance->retornaDadosIa($produto->descricao_do_produto, $produto->ncm_importado);
 
             if($produto->ncm_importado == $response['ncm_ia'] )
@@ -60,10 +65,53 @@ class AuditarLoteJob implements ShouldQueue
                     'ncm_auditado'    => $response['ncm_ia'],
                     'pre_auditado'    => 'S'
                 ]);
+
+                if($this->monofasico($produto->ncm_importado)){
+                    $produto->tipo_tributacao = 'MONOFÁSICO';
+                }else{
+                    if($this->st($produto->ncm_importado)){
+                        $produto->tipo_tributacao = 'SUBSTITUIÇÃO TRIBUITÁRIA';
+                    }else{
+                        $produto->tipo_tributacao = 'TRIBUTAÇÃO';
+                    }
+                }
+
                 $produto->ia_ncm    = $response['ncm_ia'];
                 $produto->acuracia  = $response['probabilidade_ia'];
                 $produto->update();
             }
         }
+    }
+
+    public function monofasico($ncm)
+    {
+        $pathFileMonofasico = public_path("monofasico.csv");
+        
+        $dados = fopen($pathFileMonofasico, "r");
+
+        while(($data = fgetcsv($dados, 1000, ",")) !== FALSE){
+            if($data[0] == $ncm)
+                return true;
+        }
+        
+        return false;
+    }
+
+    public function st($ncmConsulta)
+    {
+        $pathFileMonofasico = public_path("st.csv");
+        
+        $dados = fopen($pathFileMonofasico, "r");
+
+        while(($data = fgetcsv($dados, 1000, ",")) !== FALSE){
+            $ncms = explode(' ', $data[0]);
+
+            foreach ($ncms as $ncm) {
+                if($ncmConsulta == preg_replace( '/[^0-9]/', '', $ncm))
+                    return true;
+            }
+        }
+        
+        return false;
     }
 }

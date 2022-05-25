@@ -25,7 +25,7 @@
     <div class="slim-pageheader">
       <ol class="breadcrumb slim-breadcrumb">
         <li class="breadcrumb-item"><a href="{{route('home')}}">Home</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+        <li class="breadcrumb-item active" aria-current="page">Lotes</li>
       </ol>
       <h6 class="slim-pagetitle">Lote de produtos</h6>
     </div><!-- slim-pageheader -->
@@ -81,7 +81,7 @@
                   <div class="col-lg-2 mg-t-20 mg-lg-t-0">
                     <div class="btn-group" role="group" aria-label="Basic example">
                       <a href="{{ route('admin.lotes.edit', $lote->id) }}" style="color:white" class="btn btn-secondary active"><i class="fa fa-eye"></i></a>
-                      <a style="color:white" class="btn btn-secondary"><i class="fa fa-remove"></i></a>
+                      <a data-id="{{ $lote->id }} "  style="color:white" class="btn removerLote btn-secondary"><i class="fa fa-remove"></i></a>
                     </div>
                   </div>
                 </td>
@@ -226,6 +226,61 @@
 
     $(document).ready(function() {
 
+      $(".removerLote").on('click',function(){
+        console.log("teste");
+        let idLote = $(this).data('id');
+        Swal.fire({
+            title: "Está certo disto?",
+            text: "Esta ação é irreversível! Após confirmar, todos os dados deste lote serão apagados...",
+            type: "danger",
+            showCancelButton: true,
+            confirmButtonColor: '#DD6B55',
+            confirmButtonText: 'Sim, tenho certeza!',
+            cancelButtonText: "Não, cancelar.",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        }).then((result) => {
+
+            if (result['isConfirmed']){
+
+                $.ajax({
+                    url: "lotes/"+idLote,
+                    type: 'DELETE',
+                    data: {
+                        "id": idLote,
+                        "_token": '{{ csrf_token() }}',
+                    },
+                    success: function(response){
+
+                        if(!response.success){
+                            Swal.fire({
+                                title: 'Ocorreu um erro',
+                                text: response.msg,
+                                icon: 'warning',
+                                showCancelButton: false,
+                                confirmButtonColor: '#3085d6',
+                                confirmButtonText: 'Ok'
+                            })
+                        }else{
+                            Swal.fire({
+                                title: 'Removido com sucesso',
+                                text: 'Lote removido com sucesso.',
+                                icon: 'success',
+                                showCancelButton: false,
+                                confirmButtonColor: '#3085d6',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.reload();
+                                }
+                            })
+                        }
+                    }
+                });
+
+            }
+        })
+        });
         $(".tipo_arquivo").change(function(){
 
           var tipo = $(this).find(":selected").val();

@@ -355,4 +355,18 @@ class LotesController extends Controller
     {
         dd($csv);
     }
+
+    public function destroy(Lote $lote)
+    {
+        try {
+            LoteProdutoAuditoria::where('lote_id',$lote->id)->delete();
+            LoteProduto::where('lote_id',$lote->id)->delete();
+            $lote->delete();
+
+            return response()->json(['success' => true]);
+        } catch (\Throwable $th) {
+            return response()->json(['success' => false,'msg' => $th->getMessage()]);
+        }
+
+    }
 }

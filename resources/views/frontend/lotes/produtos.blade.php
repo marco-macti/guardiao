@@ -668,7 +668,7 @@
 
       Swal.fire({
          title: 'Atenção',
-         html: 'Você deseja enviar os produtos deste lote, par que sejam auditados pela Inteligência Artificial do <strong>Guardião Tributário</strong>?<br>Esse processo será efetuado em fila e poderá demorar alguns minutos!',
+         html: 'Você deseja enviar os produtos deste lote, para que sejam auditados pela Inteligência Artificial do <strong>Guardião Tributário</strong>?<br>Esse processo será efetuado em fila e poderá demorar alguns minutos!',
          showCancelButton: true,
       }).then(function(result){
          if(result.isConfirmed)
